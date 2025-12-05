@@ -1,0 +1,1016 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hengtiansoft.fastop.model.planner.dto.ExeStepMapper">
+  <resultMap id="BaseResultMap" type="com.hengtiansoft.fastop.model.planner.entity.ExeStep">
+    <id column="exe_step_id" jdbcType="CHAR" property="exeStepId" />
+    <result column="step_id" jdbcType="INTEGER" property="stepId" />
+    <result column="exe_function_id" jdbcType="CHAR" property="exeFunctionId" />
+    <result column="step_level" jdbcType="INTEGER" property="stepLevel" />
+    <result column="step_order" jdbcType="INTEGER" property="stepOrder" />
+    <result column="level_seq" jdbcType="VARCHAR" property="levelSeq" />
+    <result column="step_seq" jdbcType="VARCHAR" property="stepSeq" />
+    <result column="step_description" jdbcType="VARCHAR" property="stepDescription" />
+    <result column="content_id" jdbcType="CHAR" property="contentId" />
+    <result column="exe_status" jdbcType="INTEGER" property="exeStatus" />
+    <result column="verify_status" jdbcType="INTEGER" property="verifyStatus" />
+    <result column="military_status" jdbcType="INTEGER" property="militaryStatus" />
+    <result column="result_comments" jdbcType="VARCHAR" property="resultComments" />
+    <result column="military_comment" jdbcType="VARCHAR" property="militaryComment" />
+    <result column="step_result" jdbcType="VARCHAR" property="stepResult" />
+    <result column="data_id" jdbcType="INTEGER" property="dataId" />
+    <result column="is_manual" jdbcType="BIT" property="isManual" />
+    <result column="level_one_id" jdbcType="VARCHAR" property="levelOneId" />
+    <result column="judge_result" jdbcType="INTEGER" property="judgeResult" />
+    <result column="can_next" jdbcType="BIT" property="canNext" />
+    <result column="operation" jdbcType="VARCHAR" property="operation" />
+    <result column="operation_object" jdbcType="VARCHAR" property="operationObject" />
+    <result column="operation_content" jdbcType="VARCHAR" property="operationContent" />
+    <result column="criterion_standard_id" jdbcType="INTEGER" property="criterionStandardId" />
+    <result column="criterion_standard" jdbcType="VARCHAR" property="criterionStandard" />
+    <result column="criterion_type" jdbcType="INTEGER" property="criterionType" />
+    <result column="criterion_value_unit" jdbcType="VARCHAR" property="criterionValueUnit" />
+    <result column="criterion_desc" jdbcType="VARCHAR" property="criterionDesc" />
+    <result column="guide_url" jdbcType="VARCHAR" property="guideUrl" />
+    <result column="key_process" jdbcType="BIT" property="keyProcess" />
+    <result column="depend_on_device" jdbcType="BIT" property="dependOnDevice" />
+    <result column="caution" jdbcType="VARCHAR" property="caution" />
+    <result column="commander" jdbcType="VARCHAR" property="commander" />
+    <result column="verfier" jdbcType="VARCHAR" property="verfier" />
+    <result column="soldier" jdbcType="VARCHAR" property="soldier" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="change_flag" jdbcType="INTEGER" property="changeFlag" />
+    <result column="deleted" jdbcType="BIT" property="deleted" />
+    <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+    <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+    <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+    <result column="updated_by" jdbcType="VARCHAR" property="updatedBy" />
+    <result column="calculate" jdbcType="VARCHAR" property="calculate" />
+    <result column="parallel_execute" jdbcType="INTEGER" property="parallelExecute" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.hengtiansoft.fastop.model.planner.entity.ExeStepWithBLOBs">
+    <result column="command_data" jdbcType="LONGVARCHAR" property="commandData" />
+    <result column="fail_cause" jdbcType="LONGVARCHAR" property="failCause" />
+    <result column="criterion_content" jdbcType="LONGVARCHAR" property="criterionContent" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    exe_step_id, step_id, exe_function_id, step_level, step_order, level_seq, step_seq, 
+    step_description, content_id, exe_status, verify_status, military_status, result_comments, 
+    military_comment, step_result, data_id, is_manual, level_one_id, judge_result, can_next, 
+    operation, operation_object, operation_content, criterion_standard_id, criterion_standard, 
+    criterion_type, criterion_value_unit, criterion_desc, guide_url, key_process, depend_on_device, 
+    caution, commander, verfier, soldier, start_time, end_time, change_flag, deleted, 
+    created_at, updated_at, created_by, updated_by, calculate, parallel_execute
+  </sql>
+  <sql id="Blob_Column_List">
+    command_data, fail_cause, criterion_content
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.hengtiansoft.fastop.model.planner.entity.ExeStepExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from exe_step
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.hengtiansoft.fastop.model.planner.entity.ExeStepExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from exe_step
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from exe_step
+    where exe_step_id = #{exeStepId,jdbcType=CHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from exe_step
+    where exe_step_id = #{exeStepId,jdbcType=CHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.hengtiansoft.fastop.model.planner.entity.ExeStepExample">
+    delete from exe_step
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.hengtiansoft.fastop.model.planner.entity.ExeStepWithBLOBs">
+    insert into exe_step (exe_step_id, step_id, exe_function_id, 
+      step_level, step_order, level_seq, 
+      step_seq, step_description, content_id, 
+      exe_status, verify_status, military_status, 
+      result_comments, military_comment, step_result, 
+      data_id, is_manual, level_one_id, 
+      judge_result, can_next, operation, 
+      operation_object, operation_content, criterion_standard_id, 
+      criterion_standard, criterion_type, criterion_value_unit, 
+      criterion_desc, guide_url, key_process, 
+      depend_on_device, caution, commander, 
+      verfier, soldier, start_time, 
+      end_time, change_flag, deleted, 
+      created_at, updated_at, created_by, 
+      updated_by, calculate, parallel_execute, 
+      command_data, fail_cause, criterion_content
+      )
+    values (#{exeStepId,jdbcType=CHAR}, #{stepId,jdbcType=INTEGER}, #{exeFunctionId,jdbcType=CHAR}, 
+      #{stepLevel,jdbcType=INTEGER}, #{stepOrder,jdbcType=INTEGER}, #{levelSeq,jdbcType=VARCHAR}, 
+      #{stepSeq,jdbcType=VARCHAR}, #{stepDescription,jdbcType=VARCHAR}, #{contentId,jdbcType=CHAR}, 
+      #{exeStatus,jdbcType=INTEGER}, #{verifyStatus,jdbcType=INTEGER}, #{militaryStatus,jdbcType=INTEGER}, 
+      #{resultComments,jdbcType=VARCHAR}, #{militaryComment,jdbcType=VARCHAR}, #{stepResult,jdbcType=VARCHAR}, 
+      #{dataId,jdbcType=INTEGER}, #{isManual,jdbcType=BIT}, #{levelOneId,jdbcType=VARCHAR}, 
+      #{judgeResult,jdbcType=INTEGER}, #{canNext,jdbcType=BIT}, #{operation,jdbcType=VARCHAR}, 
+      #{operationObject,jdbcType=VARCHAR}, #{operationContent,jdbcType=VARCHAR}, #{criterionStandardId,jdbcType=INTEGER}, 
+      #{criterionStandard,jdbcType=VARCHAR}, #{criterionType,jdbcType=INTEGER}, #{criterionValueUnit,jdbcType=VARCHAR}, 
+      #{criterionDesc,jdbcType=VARCHAR}, #{guideUrl,jdbcType=VARCHAR}, #{keyProcess,jdbcType=BIT}, 
+      #{dependOnDevice,jdbcType=BIT}, #{caution,jdbcType=VARCHAR}, #{commander,jdbcType=VARCHAR}, 
+      #{verfier,jdbcType=VARCHAR}, #{soldier,jdbcType=VARCHAR}, #{startTime,jdbcType=TIMESTAMP}, 
+      #{endTime,jdbcType=TIMESTAMP}, #{changeFlag,jdbcType=INTEGER}, #{deleted,jdbcType=BIT}, 
+      #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, 
+      #{updatedBy,jdbcType=VARCHAR}, #{calculate,jdbcType=VARCHAR}, #{parallelExecute,jdbcType=INTEGER}, 
+      #{commandData,jdbcType=LONGVARCHAR}, #{failCause,jdbcType=LONGVARCHAR}, #{criterionContent,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.hengtiansoft.fastop.model.planner.entity.ExeStepWithBLOBs">
+    insert into exe_step
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="exeStepId != null">
+        exe_step_id,
+      </if>
+      <if test="stepId != null">
+        step_id,
+      </if>
+      <if test="exeFunctionId != null">
+        exe_function_id,
+      </if>
+      <if test="stepLevel != null">
+        step_level,
+      </if>
+      <if test="stepOrder != null">
+        step_order,
+      </if>
+      <if test="levelSeq != null">
+        level_seq,
+      </if>
+      <if test="stepSeq != null">
+        step_seq,
+      </if>
+      <if test="stepDescription != null">
+        step_description,
+      </if>
+      <if test="contentId != null">
+        content_id,
+      </if>
+      <if test="exeStatus != null">
+        exe_status,
+      </if>
+      <if test="verifyStatus != null">
+        verify_status,
+      </if>
+      <if test="militaryStatus != null">
+        military_status,
+      </if>
+      <if test="resultComments != null">
+        result_comments,
+      </if>
+      <if test="militaryComment != null">
+        military_comment,
+      </if>
+      <if test="stepResult != null">
+        step_result,
+      </if>
+      <if test="dataId != null">
+        data_id,
+      </if>
+      <if test="isManual != null">
+        is_manual,
+      </if>
+      <if test="levelOneId != null">
+        level_one_id,
+      </if>
+      <if test="judgeResult != null">
+        judge_result,
+      </if>
+      <if test="canNext != null">
+        can_next,
+      </if>
+      <if test="operation != null">
+        operation,
+      </if>
+      <if test="operationObject != null">
+        operation_object,
+      </if>
+      <if test="operationContent != null">
+        operation_content,
+      </if>
+      <if test="criterionStandardId != null">
+        criterion_standard_id,
+      </if>
+      <if test="criterionStandard != null">
+        criterion_standard,
+      </if>
+      <if test="criterionType != null">
+        criterion_type,
+      </if>
+      <if test="criterionValueUnit != null">
+        criterion_value_unit,
+      </if>
+      <if test="criterionDesc != null">
+        criterion_desc,
+      </if>
+      <if test="guideUrl != null">
+        guide_url,
+      </if>
+      <if test="keyProcess != null">
+        key_process,
+      </if>
+      <if test="dependOnDevice != null">
+        depend_on_device,
+      </if>
+      <if test="caution != null">
+        caution,
+      </if>
+      <if test="commander != null">
+        commander,
+      </if>
+      <if test="verfier != null">
+        verfier,
+      </if>
+      <if test="soldier != null">
+        soldier,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+      <if test="changeFlag != null">
+        change_flag,
+      </if>
+      <if test="deleted != null">
+        deleted,
+      </if>
+      <if test="createdAt != null">
+        created_at,
+      </if>
+      <if test="updatedAt != null">
+        updated_at,
+      </if>
+      <if test="createdBy != null">
+        created_by,
+      </if>
+      <if test="updatedBy != null">
+        updated_by,
+      </if>
+      <if test="calculate != null">
+        calculate,
+      </if>
+      <if test="parallelExecute != null">
+        parallel_execute,
+      </if>
+      <if test="commandData != null">
+        command_data,
+      </if>
+      <if test="failCause != null">
+        fail_cause,
+      </if>
+      <if test="criterionContent != null">
+        criterion_content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="exeStepId != null">
+        #{exeStepId,jdbcType=CHAR},
+      </if>
+      <if test="stepId != null">
+        #{stepId,jdbcType=INTEGER},
+      </if>
+      <if test="exeFunctionId != null">
+        #{exeFunctionId,jdbcType=CHAR},
+      </if>
+      <if test="stepLevel != null">
+        #{stepLevel,jdbcType=INTEGER},
+      </if>
+      <if test="stepOrder != null">
+        #{stepOrder,jdbcType=INTEGER},
+      </if>
+      <if test="levelSeq != null">
+        #{levelSeq,jdbcType=VARCHAR},
+      </if>
+      <if test="stepSeq != null">
+        #{stepSeq,jdbcType=VARCHAR},
+      </if>
+      <if test="stepDescription != null">
+        #{stepDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="contentId != null">
+        #{contentId,jdbcType=CHAR},
+      </if>
+      <if test="exeStatus != null">
+        #{exeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="verifyStatus != null">
+        #{verifyStatus,jdbcType=INTEGER},
+      </if>
+      <if test="militaryStatus != null">
+        #{militaryStatus,jdbcType=INTEGER},
+      </if>
+      <if test="resultComments != null">
+        #{resultComments,jdbcType=VARCHAR},
+      </if>
+      <if test="militaryComment != null">
+        #{militaryComment,jdbcType=VARCHAR},
+      </if>
+      <if test="stepResult != null">
+        #{stepResult,jdbcType=VARCHAR},
+      </if>
+      <if test="dataId != null">
+        #{dataId,jdbcType=INTEGER},
+      </if>
+      <if test="isManual != null">
+        #{isManual,jdbcType=BIT},
+      </if>
+      <if test="levelOneId != null">
+        #{levelOneId,jdbcType=VARCHAR},
+      </if>
+      <if test="judgeResult != null">
+        #{judgeResult,jdbcType=INTEGER},
+      </if>
+      <if test="canNext != null">
+        #{canNext,jdbcType=BIT},
+      </if>
+      <if test="operation != null">
+        #{operation,jdbcType=VARCHAR},
+      </if>
+      <if test="operationObject != null">
+        #{operationObject,jdbcType=VARCHAR},
+      </if>
+      <if test="operationContent != null">
+        #{operationContent,jdbcType=VARCHAR},
+      </if>
+      <if test="criterionStandardId != null">
+        #{criterionStandardId,jdbcType=INTEGER},
+      </if>
+      <if test="criterionStandard != null">
+        #{criterionStandard,jdbcType=VARCHAR},
+      </if>
+      <if test="criterionType != null">
+        #{criterionType,jdbcType=INTEGER},
+      </if>
+      <if test="criterionValueUnit != null">
+        #{criterionValueUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="criterionDesc != null">
+        #{criterionDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="guideUrl != null">
+        #{guideUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="keyProcess != null">
+        #{keyProcess,jdbcType=BIT},
+      </if>
+      <if test="dependOnDevice != null">
+        #{dependOnDevice,jdbcType=BIT},
+      </if>
+      <if test="caution != null">
+        #{caution,jdbcType=VARCHAR},
+      </if>
+      <if test="commander != null">
+        #{commander,jdbcType=VARCHAR},
+      </if>
+      <if test="verfier != null">
+        #{verfier,jdbcType=VARCHAR},
+      </if>
+      <if test="soldier != null">
+        #{soldier,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="changeFlag != null">
+        #{changeFlag,jdbcType=INTEGER},
+      </if>
+      <if test="deleted != null">
+        #{deleted,jdbcType=BIT},
+      </if>
+      <if test="createdAt != null">
+        #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null">
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="calculate != null">
+        #{calculate,jdbcType=VARCHAR},
+      </if>
+      <if test="parallelExecute != null">
+        #{parallelExecute,jdbcType=INTEGER},
+      </if>
+      <if test="commandData != null">
+        #{commandData,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="failCause != null">
+        #{failCause,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="criterionContent != null">
+        #{criterionContent,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.hengtiansoft.fastop.model.planner.entity.ExeStepExample" resultType="java.lang.Long">
+    select count(*) from exe_step
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update exe_step
+    <set>
+      <if test="record.exeStepId != null">
+        exe_step_id = #{record.exeStepId,jdbcType=CHAR},
+      </if>
+      <if test="record.stepId != null">
+        step_id = #{record.stepId,jdbcType=INTEGER},
+      </if>
+      <if test="record.exeFunctionId != null">
+        exe_function_id = #{record.exeFunctionId,jdbcType=CHAR},
+      </if>
+      <if test="record.stepLevel != null">
+        step_level = #{record.stepLevel,jdbcType=INTEGER},
+      </if>
+      <if test="record.stepOrder != null">
+        step_order = #{record.stepOrder,jdbcType=INTEGER},
+      </if>
+      <if test="record.levelSeq != null">
+        level_seq = #{record.levelSeq,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stepSeq != null">
+        step_seq = #{record.stepSeq,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stepDescription != null">
+        step_description = #{record.stepDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contentId != null">
+        content_id = #{record.contentId,jdbcType=CHAR},
+      </if>
+      <if test="record.exeStatus != null">
+        exe_status = #{record.exeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.verifyStatus != null">
+        verify_status = #{record.verifyStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.militaryStatus != null">
+        military_status = #{record.militaryStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.resultComments != null">
+        result_comments = #{record.resultComments,jdbcType=VARCHAR},
+      </if>
+      <if test="record.militaryComment != null">
+        military_comment = #{record.militaryComment,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stepResult != null">
+        step_result = #{record.stepResult,jdbcType=VARCHAR},
+      </if>
+      <if test="record.dataId != null">
+        data_id = #{record.dataId,jdbcType=INTEGER},
+      </if>
+      <if test="record.isManual != null">
+        is_manual = #{record.isManual,jdbcType=BIT},
+      </if>
+      <if test="record.levelOneId != null">
+        level_one_id = #{record.levelOneId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.judgeResult != null">
+        judge_result = #{record.judgeResult,jdbcType=INTEGER},
+      </if>
+      <if test="record.canNext != null">
+        can_next = #{record.canNext,jdbcType=BIT},
+      </if>
+      <if test="record.operation != null">
+        operation = #{record.operation,jdbcType=VARCHAR},
+      </if>
+      <if test="record.operationObject != null">
+        operation_object = #{record.operationObject,jdbcType=VARCHAR},
+      </if>
+      <if test="record.operationContent != null">
+        operation_content = #{record.operationContent,jdbcType=VARCHAR},
+      </if>
+      <if test="record.criterionStandardId != null">
+        criterion_standard_id = #{record.criterionStandardId,jdbcType=INTEGER},
+      </if>
+      <if test="record.criterionStandard != null">
+        criterion_standard = #{record.criterionStandard,jdbcType=VARCHAR},
+      </if>
+      <if test="record.criterionType != null">
+        criterion_type = #{record.criterionType,jdbcType=INTEGER},
+      </if>
+      <if test="record.criterionValueUnit != null">
+        criterion_value_unit = #{record.criterionValueUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="record.criterionDesc != null">
+        criterion_desc = #{record.criterionDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="record.guideUrl != null">
+        guide_url = #{record.guideUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="record.keyProcess != null">
+        key_process = #{record.keyProcess,jdbcType=BIT},
+      </if>
+      <if test="record.dependOnDevice != null">
+        depend_on_device = #{record.dependOnDevice,jdbcType=BIT},
+      </if>
+      <if test="record.caution != null">
+        caution = #{record.caution,jdbcType=VARCHAR},
+      </if>
+      <if test="record.commander != null">
+        commander = #{record.commander,jdbcType=VARCHAR},
+      </if>
+      <if test="record.verfier != null">
+        verfier = #{record.verfier,jdbcType=VARCHAR},
+      </if>
+      <if test="record.soldier != null">
+        soldier = #{record.soldier,jdbcType=VARCHAR},
+      </if>
+      <if test="record.startTime != null">
+        start_time = #{record.startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.endTime != null">
+        end_time = #{record.endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.changeFlag != null">
+        change_flag = #{record.changeFlag,jdbcType=INTEGER},
+      </if>
+      <if test="record.deleted != null">
+        deleted = #{record.deleted,jdbcType=BIT},
+      </if>
+      <if test="record.createdAt != null">
+        created_at = #{record.createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updatedAt != null">
+        updated_at = #{record.updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.createdBy != null">
+        created_by = #{record.createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="record.updatedBy != null">
+        updated_by = #{record.updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="record.calculate != null">
+        calculate = #{record.calculate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.parallelExecute != null">
+        parallel_execute = #{record.parallelExecute,jdbcType=INTEGER},
+      </if>
+      <if test="record.commandData != null">
+        command_data = #{record.commandData,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.failCause != null">
+        fail_cause = #{record.failCause,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.criterionContent != null">
+        criterion_content = #{record.criterionContent,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update exe_step
+    set exe_step_id = #{record.exeStepId,jdbcType=CHAR},
+      step_id = #{record.stepId,jdbcType=INTEGER},
+      exe_function_id = #{record.exeFunctionId,jdbcType=CHAR},
+      step_level = #{record.stepLevel,jdbcType=INTEGER},
+      step_order = #{record.stepOrder,jdbcType=INTEGER},
+      level_seq = #{record.levelSeq,jdbcType=VARCHAR},
+      step_seq = #{record.stepSeq,jdbcType=VARCHAR},
+      step_description = #{record.stepDescription,jdbcType=VARCHAR},
+      content_id = #{record.contentId,jdbcType=CHAR},
+      exe_status = #{record.exeStatus,jdbcType=INTEGER},
+      verify_status = #{record.verifyStatus,jdbcType=INTEGER},
+      military_status = #{record.militaryStatus,jdbcType=INTEGER},
+      result_comments = #{record.resultComments,jdbcType=VARCHAR},
+      military_comment = #{record.militaryComment,jdbcType=VARCHAR},
+      step_result = #{record.stepResult,jdbcType=VARCHAR},
+      data_id = #{record.dataId,jdbcType=INTEGER},
+      is_manual = #{record.isManual,jdbcType=BIT},
+      level_one_id = #{record.levelOneId,jdbcType=VARCHAR},
+      judge_result = #{record.judgeResult,jdbcType=INTEGER},
+      can_next = #{record.canNext,jdbcType=BIT},
+      operation = #{record.operation,jdbcType=VARCHAR},
+      operation_object = #{record.operationObject,jdbcType=VARCHAR},
+      operation_content = #{record.operationContent,jdbcType=VARCHAR},
+      criterion_standard_id = #{record.criterionStandardId,jdbcType=INTEGER},
+      criterion_standard = #{record.criterionStandard,jdbcType=VARCHAR},
+      criterion_type = #{record.criterionType,jdbcType=INTEGER},
+      criterion_value_unit = #{record.criterionValueUnit,jdbcType=VARCHAR},
+      criterion_desc = #{record.criterionDesc,jdbcType=VARCHAR},
+      guide_url = #{record.guideUrl,jdbcType=VARCHAR},
+      key_process = #{record.keyProcess,jdbcType=BIT},
+      depend_on_device = #{record.dependOnDevice,jdbcType=BIT},
+      caution = #{record.caution,jdbcType=VARCHAR},
+      commander = #{record.commander,jdbcType=VARCHAR},
+      verfier = #{record.verfier,jdbcType=VARCHAR},
+      soldier = #{record.soldier,jdbcType=VARCHAR},
+      start_time = #{record.startTime,jdbcType=TIMESTAMP},
+      end_time = #{record.endTime,jdbcType=TIMESTAMP},
+      change_flag = #{record.changeFlag,jdbcType=INTEGER},
+      deleted = #{record.deleted,jdbcType=BIT},
+      created_at = #{record.createdAt,jdbcType=TIMESTAMP},
+      updated_at = #{record.updatedAt,jdbcType=TIMESTAMP},
+      created_by = #{record.createdBy,jdbcType=VARCHAR},
+      updated_by = #{record.updatedBy,jdbcType=VARCHAR},
+      calculate = #{record.calculate,jdbcType=VARCHAR},
+      parallel_execute = #{record.parallelExecute,jdbcType=INTEGER},
+      command_data = #{record.commandData,jdbcType=LONGVARCHAR},
+      fail_cause = #{record.failCause,jdbcType=LONGVARCHAR},
+      criterion_content = #{record.criterionContent,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update exe_step
+    set exe_step_id = #{record.exeStepId,jdbcType=CHAR},
+      step_id = #{record.stepId,jdbcType=INTEGER},
+      exe_function_id = #{record.exeFunctionId,jdbcType=CHAR},
+      step_level = #{record.stepLevel,jdbcType=INTEGER},
+      step_order = #{record.stepOrder,jdbcType=INTEGER},
+      level_seq = #{record.levelSeq,jdbcType=VARCHAR},
+      step_seq = #{record.stepSeq,jdbcType=VARCHAR},
+      step_description = #{record.stepDescription,jdbcType=VARCHAR},
+      content_id = #{record.contentId,jdbcType=CHAR},
+      exe_status = #{record.exeStatus,jdbcType=INTEGER},
+      verify_status = #{record.verifyStatus,jdbcType=INTEGER},
+      military_status = #{record.militaryStatus,jdbcType=INTEGER},
+      result_comments = #{record.resultComments,jdbcType=VARCHAR},
+      military_comment = #{record.militaryComment,jdbcType=VARCHAR},
+      step_result = #{record.stepResult,jdbcType=VARCHAR},
+      data_id = #{record.dataId,jdbcType=INTEGER},
+      is_manual = #{record.isManual,jdbcType=BIT},
+      level_one_id = #{record.levelOneId,jdbcType=VARCHAR},
+      judge_result = #{record.judgeResult,jdbcType=INTEGER},
+      can_next = #{record.canNext,jdbcType=BIT},
+      operation = #{record.operation,jdbcType=VARCHAR},
+      operation_object = #{record.operationObject,jdbcType=VARCHAR},
+      operation_content = #{record.operationContent,jdbcType=VARCHAR},
+      criterion_standard_id = #{record.criterionStandardId,jdbcType=INTEGER},
+      criterion_standard = #{record.criterionStandard,jdbcType=VARCHAR},
+      criterion_type = #{record.criterionType,jdbcType=INTEGER},
+      criterion_value_unit = #{record.criterionValueUnit,jdbcType=VARCHAR},
+      criterion_desc = #{record.criterionDesc,jdbcType=VARCHAR},
+      guide_url = #{record.guideUrl,jdbcType=VARCHAR},
+      key_process = #{record.keyProcess,jdbcType=BIT},
+      depend_on_device = #{record.dependOnDevice,jdbcType=BIT},
+      caution = #{record.caution,jdbcType=VARCHAR},
+      commander = #{record.commander,jdbcType=VARCHAR},
+      verfier = #{record.verfier,jdbcType=VARCHAR},
+      soldier = #{record.soldier,jdbcType=VARCHAR},
+      start_time = #{record.startTime,jdbcType=TIMESTAMP},
+      end_time = #{record.endTime,jdbcType=TIMESTAMP},
+      change_flag = #{record.changeFlag,jdbcType=INTEGER},
+      deleted = #{record.deleted,jdbcType=BIT},
+      created_at = #{record.createdAt,jdbcType=TIMESTAMP},
+      updated_at = #{record.updatedAt,jdbcType=TIMESTAMP},
+      created_by = #{record.createdBy,jdbcType=VARCHAR},
+      updated_by = #{record.updatedBy,jdbcType=VARCHAR},
+      calculate = #{record.calculate,jdbcType=VARCHAR},
+      parallel_execute = #{record.parallelExecute,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hengtiansoft.fastop.model.planner.entity.ExeStepWithBLOBs">
+    update exe_step
+    <set>
+      <if test="stepId != null">
+        step_id = #{stepId,jdbcType=INTEGER},
+      </if>
+      <if test="exeFunctionId != null">
+        exe_function_id = #{exeFunctionId,jdbcType=CHAR},
+      </if>
+      <if test="stepLevel != null">
+        step_level = #{stepLevel,jdbcType=INTEGER},
+      </if>
+      <if test="stepOrder != null">
+        step_order = #{stepOrder,jdbcType=INTEGER},
+      </if>
+      <if test="levelSeq != null">
+        level_seq = #{levelSeq,jdbcType=VARCHAR},
+      </if>
+      <if test="stepSeq != null">
+        step_seq = #{stepSeq,jdbcType=VARCHAR},
+      </if>
+      <if test="stepDescription != null">
+        step_description = #{stepDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="contentId != null">
+        content_id = #{contentId,jdbcType=CHAR},
+      </if>
+      <if test="exeStatus != null">
+        exe_status = #{exeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="verifyStatus != null">
+        verify_status = #{verifyStatus,jdbcType=INTEGER},
+      </if>
+      <if test="militaryStatus != null">
+        military_status = #{militaryStatus,jdbcType=INTEGER},
+      </if>
+      <if test="resultComments != null">
+        result_comments = #{resultComments,jdbcType=VARCHAR},
+      </if>
+      <if test="militaryComment != null">
+        military_comment = #{militaryComment,jdbcType=VARCHAR},
+      </if>
+      <if test="stepResult != null">
+        step_result = #{stepResult,jdbcType=VARCHAR},
+      </if>
+      <if test="dataId != null">
+        data_id = #{dataId,jdbcType=INTEGER},
+      </if>
+      <if test="isManual != null">
+        is_manual = #{isManual,jdbcType=BIT},
+      </if>
+      <if test="levelOneId != null">
+        level_one_id = #{levelOneId,jdbcType=VARCHAR},
+      </if>
+      <if test="judgeResult != null">
+        judge_result = #{judgeResult,jdbcType=INTEGER},
+      </if>
+      <if test="canNext != null">
+        can_next = #{canNext,jdbcType=BIT},
+      </if>
+      <if test="operation != null">
+        operation = #{operation,jdbcType=VARCHAR},
+      </if>
+      <if test="operationObject != null">
+        operation_object = #{operationObject,jdbcType=VARCHAR},
+      </if>
+      <if test="operationContent != null">
+        operation_content = #{operationContent,jdbcType=VARCHAR},
+      </if>
+      <if test="criterionStandardId != null">
+        criterion_standard_id = #{criterionStandardId,jdbcType=INTEGER},
+      </if>
+      <if test="criterionStandard != null">
+        criterion_standard = #{criterionStandard,jdbcType=VARCHAR},
+      </if>
+      <if test="criterionType != null">
+        criterion_type = #{criterionType,jdbcType=INTEGER},
+      </if>
+      <if test="criterionValueUnit != null">
+        criterion_value_unit = #{criterionValueUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="criterionDesc != null">
+        criterion_desc = #{criterionDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="guideUrl != null">
+        guide_url = #{guideUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="keyProcess != null">
+        key_process = #{keyProcess,jdbcType=BIT},
+      </if>
+      <if test="dependOnDevice != null">
+        depend_on_device = #{dependOnDevice,jdbcType=BIT},
+      </if>
+      <if test="caution != null">
+        caution = #{caution,jdbcType=VARCHAR},
+      </if>
+      <if test="commander != null">
+        commander = #{commander,jdbcType=VARCHAR},
+      </if>
+      <if test="verfier != null">
+        verfier = #{verfier,jdbcType=VARCHAR},
+      </if>
+      <if test="soldier != null">
+        soldier = #{soldier,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="changeFlag != null">
+        change_flag = #{changeFlag,jdbcType=INTEGER},
+      </if>
+      <if test="deleted != null">
+        deleted = #{deleted,jdbcType=BIT},
+      </if>
+      <if test="createdAt != null">
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null">
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="calculate != null">
+        calculate = #{calculate,jdbcType=VARCHAR},
+      </if>
+      <if test="parallelExecute != null">
+        parallel_execute = #{parallelExecute,jdbcType=INTEGER},
+      </if>
+      <if test="commandData != null">
+        command_data = #{commandData,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="failCause != null">
+        fail_cause = #{failCause,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="criterionContent != null">
+        criterion_content = #{criterionContent,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where exe_step_id = #{exeStepId,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.hengtiansoft.fastop.model.planner.entity.ExeStepWithBLOBs">
+    update exe_step
+    set step_id = #{stepId,jdbcType=INTEGER},
+      exe_function_id = #{exeFunctionId,jdbcType=CHAR},
+      step_level = #{stepLevel,jdbcType=INTEGER},
+      step_order = #{stepOrder,jdbcType=INTEGER},
+      level_seq = #{levelSeq,jdbcType=VARCHAR},
+      step_seq = #{stepSeq,jdbcType=VARCHAR},
+      step_description = #{stepDescription,jdbcType=VARCHAR},
+      content_id = #{contentId,jdbcType=CHAR},
+      exe_status = #{exeStatus,jdbcType=INTEGER},
+      verify_status = #{verifyStatus,jdbcType=INTEGER},
+      military_status = #{militaryStatus,jdbcType=INTEGER},
+      result_comments = #{resultComments,jdbcType=VARCHAR},
+      military_comment = #{militaryComment,jdbcType=VARCHAR},
+      step_result = #{stepResult,jdbcType=VARCHAR},
+      data_id = #{dataId,jdbcType=INTEGER},
+      is_manual = #{isManual,jdbcType=BIT},
+      level_one_id = #{levelOneId,jdbcType=VARCHAR},
+      judge_result = #{judgeResult,jdbcType=INTEGER},
+      can_next = #{canNext,jdbcType=BIT},
+      operation = #{operation,jdbcType=VARCHAR},
+      operation_object = #{operationObject,jdbcType=VARCHAR},
+      operation_content = #{operationContent,jdbcType=VARCHAR},
+      criterion_standard_id = #{criterionStandardId,jdbcType=INTEGER},
+      criterion_standard = #{criterionStandard,jdbcType=VARCHAR},
+      criterion_type = #{criterionType,jdbcType=INTEGER},
+      criterion_value_unit = #{criterionValueUnit,jdbcType=VARCHAR},
+      criterion_desc = #{criterionDesc,jdbcType=VARCHAR},
+      guide_url = #{guideUrl,jdbcType=VARCHAR},
+      key_process = #{keyProcess,jdbcType=BIT},
+      depend_on_device = #{dependOnDevice,jdbcType=BIT},
+      caution = #{caution,jdbcType=VARCHAR},
+      commander = #{commander,jdbcType=VARCHAR},
+      verfier = #{verfier,jdbcType=VARCHAR},
+      soldier = #{soldier,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      change_flag = #{changeFlag,jdbcType=INTEGER},
+      deleted = #{deleted,jdbcType=BIT},
+      created_at = #{createdAt,jdbcType=TIMESTAMP},
+      updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      calculate = #{calculate,jdbcType=VARCHAR},
+      parallel_execute = #{parallelExecute,jdbcType=INTEGER},
+      command_data = #{commandData,jdbcType=LONGVARCHAR},
+      fail_cause = #{failCause,jdbcType=LONGVARCHAR},
+      criterion_content = #{criterionContent,jdbcType=LONGVARCHAR}
+    where exe_step_id = #{exeStepId,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hengtiansoft.fastop.model.planner.entity.ExeStep">
+    update exe_step
+    set step_id = #{stepId,jdbcType=INTEGER},
+      exe_function_id = #{exeFunctionId,jdbcType=CHAR},
+      step_level = #{stepLevel,jdbcType=INTEGER},
+      step_order = #{stepOrder,jdbcType=INTEGER},
+      level_seq = #{levelSeq,jdbcType=VARCHAR},
+      step_seq = #{stepSeq,jdbcType=VARCHAR},
+      step_description = #{stepDescription,jdbcType=VARCHAR},
+      content_id = #{contentId,jdbcType=CHAR},
+      exe_status = #{exeStatus,jdbcType=INTEGER},
+      verify_status = #{verifyStatus,jdbcType=INTEGER},
+      military_status = #{militaryStatus,jdbcType=INTEGER},
+      result_comments = #{resultComments,jdbcType=VARCHAR},
+      military_comment = #{militaryComment,jdbcType=VARCHAR},
+      step_result = #{stepResult,jdbcType=VARCHAR},
+      data_id = #{dataId,jdbcType=INTEGER},
+      is_manual = #{isManual,jdbcType=BIT},
+      level_one_id = #{levelOneId,jdbcType=VARCHAR},
+      judge_result = #{judgeResult,jdbcType=INTEGER},
+      can_next = #{canNext,jdbcType=BIT},
+      operation = #{operation,jdbcType=VARCHAR},
+      operation_object = #{operationObject,jdbcType=VARCHAR},
+      operation_content = #{operationContent,jdbcType=VARCHAR},
+      criterion_standard_id = #{criterionStandardId,jdbcType=INTEGER},
+      criterion_standard = #{criterionStandard,jdbcType=VARCHAR},
+      criterion_type = #{criterionType,jdbcType=INTEGER},
+      criterion_value_unit = #{criterionValueUnit,jdbcType=VARCHAR},
+      criterion_desc = #{criterionDesc,jdbcType=VARCHAR},
+      guide_url = #{guideUrl,jdbcType=VARCHAR},
+      key_process = #{keyProcess,jdbcType=BIT},
+      depend_on_device = #{dependOnDevice,jdbcType=BIT},
+      caution = #{caution,jdbcType=VARCHAR},
+      commander = #{commander,jdbcType=VARCHAR},
+      verfier = #{verfier,jdbcType=VARCHAR},
+      soldier = #{soldier,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      change_flag = #{changeFlag,jdbcType=INTEGER},
+      deleted = #{deleted,jdbcType=BIT},
+      created_at = #{createdAt,jdbcType=TIMESTAMP},
+      updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      calculate = #{calculate,jdbcType=VARCHAR},
+      parallel_execute = #{parallelExecute,jdbcType=INTEGER}
+    where exe_step_id = #{exeStepId,jdbcType=CHAR}
+  </update>
+</mapper>

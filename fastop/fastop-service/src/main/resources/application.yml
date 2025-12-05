@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: service-designer
+  profiles:
+    active: dev
+  datasource:
+    druid:
+      url: jdbc:mysql://localhost:3304/autosys_1014
+      username: root
+      password: Fastop@123
+
+server:
+    port: 10001
+    servlet:
+      context-path: /fastop
+
+mybatis:
+    mapper-locations: classpath:/mapper/*.xml

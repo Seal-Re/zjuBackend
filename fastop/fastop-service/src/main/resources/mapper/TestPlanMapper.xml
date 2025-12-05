@@ -1,0 +1,656 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hengtiansoft.fastop.model.planner.dto.TestPlanMapper">
+  <resultMap id="BaseResultMap" type="com.hengtiansoft.fastop.model.planner.entity.TestPlan">
+    <id column="plan_id" jdbcType="CHAR" property="planId" />
+    <result column="entity_struct_id" jdbcType="INTEGER" property="entityStructId" />
+    <result column="entity_id" jdbcType="INTEGER" property="entityId" />
+    <result column="subject_id" jdbcType="INTEGER" property="subjectId" />
+    <result column="fun_group_id" jdbcType="INTEGER" property="funGroupId" />
+    <result column="suite_id" jdbcType="INTEGER" property="suiteId" />
+    <result column="military" jdbcType="BIT" property="military" />
+    <result column="plan_start_time" jdbcType="TIMESTAMP" property="planStartTime" />
+    <result column="plan_end_time" jdbcType="TIMESTAMP" property="planEndTime" />
+    <result column="actual_start_time" jdbcType="TIMESTAMP" property="actualStartTime" />
+    <result column="actual_end_time" jdbcType="TIMESTAMP" property="actualEndTime" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="plan_number" jdbcType="VARCHAR" property="planNumber" />
+    <result column="plan_round" jdbcType="INTEGER" property="planRound" />
+    <result column="plan_name" jdbcType="VARCHAR" property="planName" />
+    <result column="area_id" jdbcType="INTEGER" property="areaId" />
+    <result column="dispatcher_id" jdbcType="CHAR" property="dispatcherId" />
+    <result column="commander_id" jdbcType="CHAR" property="commanderId" />
+    <result column="executor_group_id" jdbcType="VARCHAR" property="executorGroupId" />
+    <result column="comm_assign" jdbcType="VARCHAR" property="commAssign" />
+    <result column="execut_assign" jdbcType="VARCHAR" property="executAssign" />
+    <result column="verify_assign" jdbcType="VARCHAR" property="verifyAssign" />
+    <result column="updatable" jdbcType="BIT" property="updatable" />
+    <result column="archived" jdbcType="BIT" property="archived" />
+    <result column="deleted" jdbcType="BIT" property="deleted" />
+    <result column="base_type" jdbcType="INTEGER" property="baseType" />
+    <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+    <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+    <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+    <result column="updated_by" jdbcType="VARCHAR" property="updatedBy" />
+    <result column="sync" jdbcType="BIT" property="sync" />
+    <result column="management" jdbcType="VARCHAR" property="management" />
+    <result column="for_record_data" jdbcType="INTEGER" property="forRecordData" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    plan_id, entity_struct_id, entity_id, subject_id, fun_group_id, suite_id, military, 
+    plan_start_time, plan_end_time, actual_start_time, actual_end_time, status, plan_number, 
+    plan_round, plan_name, area_id, dispatcher_id, commander_id, executor_group_id, comm_assign, 
+    execut_assign, verify_assign, updatable, archived, deleted, base_type, created_at, 
+    updated_at, created_by, updated_by, sync, management, for_record_data
+  </sql>
+  <select id="selectByExample" parameterType="com.hengtiansoft.fastop.model.planner.entity.TestPlanExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from test_plan
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from test_plan
+    where plan_id = #{planId,jdbcType=CHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from test_plan
+    where plan_id = #{planId,jdbcType=CHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.hengtiansoft.fastop.model.planner.entity.TestPlanExample">
+    delete from test_plan
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.hengtiansoft.fastop.model.planner.entity.TestPlan">
+    insert into test_plan (plan_id, entity_struct_id, entity_id, 
+      subject_id, fun_group_id, suite_id, 
+      military, plan_start_time, plan_end_time, 
+      actual_start_time, actual_end_time, status, 
+      plan_number, plan_round, plan_name, 
+      area_id, dispatcher_id, commander_id, 
+      executor_group_id, comm_assign, execut_assign, 
+      verify_assign, updatable, archived, 
+      deleted, base_type, created_at, 
+      updated_at, created_by, updated_by, 
+      sync, management, for_record_data
+      )
+    values (#{planId,jdbcType=CHAR}, #{entityStructId,jdbcType=INTEGER}, #{entityId,jdbcType=INTEGER}, 
+      #{subjectId,jdbcType=INTEGER}, #{funGroupId,jdbcType=INTEGER}, #{suiteId,jdbcType=INTEGER}, 
+      #{military,jdbcType=BIT}, #{planStartTime,jdbcType=TIMESTAMP}, #{planEndTime,jdbcType=TIMESTAMP}, 
+      #{actualStartTime,jdbcType=TIMESTAMP}, #{actualEndTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, 
+      #{planNumber,jdbcType=VARCHAR}, #{planRound,jdbcType=INTEGER}, #{planName,jdbcType=VARCHAR}, 
+      #{areaId,jdbcType=INTEGER}, #{dispatcherId,jdbcType=CHAR}, #{commanderId,jdbcType=CHAR}, 
+      #{executorGroupId,jdbcType=VARCHAR}, #{commAssign,jdbcType=VARCHAR}, #{executAssign,jdbcType=VARCHAR}, 
+      #{verifyAssign,jdbcType=VARCHAR}, #{updatable,jdbcType=BIT}, #{archived,jdbcType=BIT}, 
+      #{deleted,jdbcType=BIT}, #{baseType,jdbcType=INTEGER}, #{createdAt,jdbcType=TIMESTAMP}, 
+      #{updatedAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, 
+      #{sync,jdbcType=BIT}, #{management,jdbcType=VARCHAR}, #{forRecordData,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.hengtiansoft.fastop.model.planner.entity.TestPlan">
+    insert into test_plan
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="planId != null">
+        plan_id,
+      </if>
+      <if test="entityStructId != null">
+        entity_struct_id,
+      </if>
+      <if test="entityId != null">
+        entity_id,
+      </if>
+      <if test="subjectId != null">
+        subject_id,
+      </if>
+      <if test="funGroupId != null">
+        fun_group_id,
+      </if>
+      <if test="suiteId != null">
+        suite_id,
+      </if>
+      <if test="military != null">
+        military,
+      </if>
+      <if test="planStartTime != null">
+        plan_start_time,
+      </if>
+      <if test="planEndTime != null">
+        plan_end_time,
+      </if>
+      <if test="actualStartTime != null">
+        actual_start_time,
+      </if>
+      <if test="actualEndTime != null">
+        actual_end_time,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="planNumber != null">
+        plan_number,
+      </if>
+      <if test="planRound != null">
+        plan_round,
+      </if>
+      <if test="planName != null">
+        plan_name,
+      </if>
+      <if test="areaId != null">
+        area_id,
+      </if>
+      <if test="dispatcherId != null">
+        dispatcher_id,
+      </if>
+      <if test="commanderId != null">
+        commander_id,
+      </if>
+      <if test="executorGroupId != null">
+        executor_group_id,
+      </if>
+      <if test="commAssign != null">
+        comm_assign,
+      </if>
+      <if test="executAssign != null">
+        execut_assign,
+      </if>
+      <if test="verifyAssign != null">
+        verify_assign,
+      </if>
+      <if test="updatable != null">
+        updatable,
+      </if>
+      <if test="archived != null">
+        archived,
+      </if>
+      <if test="deleted != null">
+        deleted,
+      </if>
+      <if test="baseType != null">
+        base_type,
+      </if>
+      <if test="createdAt != null">
+        created_at,
+      </if>
+      <if test="updatedAt != null">
+        updated_at,
+      </if>
+      <if test="createdBy != null">
+        created_by,
+      </if>
+      <if test="updatedBy != null">
+        updated_by,
+      </if>
+      <if test="sync != null">
+        sync,
+      </if>
+      <if test="management != null">
+        management,
+      </if>
+      <if test="forRecordData != null">
+        for_record_data,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="planId != null">
+        #{planId,jdbcType=CHAR},
+      </if>
+      <if test="entityStructId != null">
+        #{entityStructId,jdbcType=INTEGER},
+      </if>
+      <if test="entityId != null">
+        #{entityId,jdbcType=INTEGER},
+      </if>
+      <if test="subjectId != null">
+        #{subjectId,jdbcType=INTEGER},
+      </if>
+      <if test="funGroupId != null">
+        #{funGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="suiteId != null">
+        #{suiteId,jdbcType=INTEGER},
+      </if>
+      <if test="military != null">
+        #{military,jdbcType=BIT},
+      </if>
+      <if test="planStartTime != null">
+        #{planStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="planEndTime != null">
+        #{planEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="actualStartTime != null">
+        #{actualStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="actualEndTime != null">
+        #{actualEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="planNumber != null">
+        #{planNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="planRound != null">
+        #{planRound,jdbcType=INTEGER},
+      </if>
+      <if test="planName != null">
+        #{planName,jdbcType=VARCHAR},
+      </if>
+      <if test="areaId != null">
+        #{areaId,jdbcType=INTEGER},
+      </if>
+      <if test="dispatcherId != null">
+        #{dispatcherId,jdbcType=CHAR},
+      </if>
+      <if test="commanderId != null">
+        #{commanderId,jdbcType=CHAR},
+      </if>
+      <if test="executorGroupId != null">
+        #{executorGroupId,jdbcType=VARCHAR},
+      </if>
+      <if test="commAssign != null">
+        #{commAssign,jdbcType=VARCHAR},
+      </if>
+      <if test="executAssign != null">
+        #{executAssign,jdbcType=VARCHAR},
+      </if>
+      <if test="verifyAssign != null">
+        #{verifyAssign,jdbcType=VARCHAR},
+      </if>
+      <if test="updatable != null">
+        #{updatable,jdbcType=BIT},
+      </if>
+      <if test="archived != null">
+        #{archived,jdbcType=BIT},
+      </if>
+      <if test="deleted != null">
+        #{deleted,jdbcType=BIT},
+      </if>
+      <if test="baseType != null">
+        #{baseType,jdbcType=INTEGER},
+      </if>
+      <if test="createdAt != null">
+        #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null">
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="sync != null">
+        #{sync,jdbcType=BIT},
+      </if>
+      <if test="management != null">
+        #{management,jdbcType=VARCHAR},
+      </if>
+      <if test="forRecordData != null">
+        #{forRecordData,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.hengtiansoft.fastop.model.planner.entity.TestPlanExample" resultType="java.lang.Long">
+    select count(*) from test_plan
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update test_plan
+    <set>
+      <if test="record.planId != null">
+        plan_id = #{record.planId,jdbcType=CHAR},
+      </if>
+      <if test="record.entityStructId != null">
+        entity_struct_id = #{record.entityStructId,jdbcType=INTEGER},
+      </if>
+      <if test="record.entityId != null">
+        entity_id = #{record.entityId,jdbcType=INTEGER},
+      </if>
+      <if test="record.subjectId != null">
+        subject_id = #{record.subjectId,jdbcType=INTEGER},
+      </if>
+      <if test="record.funGroupId != null">
+        fun_group_id = #{record.funGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="record.suiteId != null">
+        suite_id = #{record.suiteId,jdbcType=INTEGER},
+      </if>
+      <if test="record.military != null">
+        military = #{record.military,jdbcType=BIT},
+      </if>
+      <if test="record.planStartTime != null">
+        plan_start_time = #{record.planStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.planEndTime != null">
+        plan_end_time = #{record.planEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.actualStartTime != null">
+        actual_start_time = #{record.actualStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.actualEndTime != null">
+        actual_end_time = #{record.actualEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.status != null">
+        status = #{record.status,jdbcType=INTEGER},
+      </if>
+      <if test="record.planNumber != null">
+        plan_number = #{record.planNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="record.planRound != null">
+        plan_round = #{record.planRound,jdbcType=INTEGER},
+      </if>
+      <if test="record.planName != null">
+        plan_name = #{record.planName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.areaId != null">
+        area_id = #{record.areaId,jdbcType=INTEGER},
+      </if>
+      <if test="record.dispatcherId != null">
+        dispatcher_id = #{record.dispatcherId,jdbcType=CHAR},
+      </if>
+      <if test="record.commanderId != null">
+        commander_id = #{record.commanderId,jdbcType=CHAR},
+      </if>
+      <if test="record.executorGroupId != null">
+        executor_group_id = #{record.executorGroupId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.commAssign != null">
+        comm_assign = #{record.commAssign,jdbcType=VARCHAR},
+      </if>
+      <if test="record.executAssign != null">
+        execut_assign = #{record.executAssign,jdbcType=VARCHAR},
+      </if>
+      <if test="record.verifyAssign != null">
+        verify_assign = #{record.verifyAssign,jdbcType=VARCHAR},
+      </if>
+      <if test="record.updatable != null">
+        updatable = #{record.updatable,jdbcType=BIT},
+      </if>
+      <if test="record.archived != null">
+        archived = #{record.archived,jdbcType=BIT},
+      </if>
+      <if test="record.deleted != null">
+        deleted = #{record.deleted,jdbcType=BIT},
+      </if>
+      <if test="record.baseType != null">
+        base_type = #{record.baseType,jdbcType=INTEGER},
+      </if>
+      <if test="record.createdAt != null">
+        created_at = #{record.createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updatedAt != null">
+        updated_at = #{record.updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.createdBy != null">
+        created_by = #{record.createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="record.updatedBy != null">
+        updated_by = #{record.updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sync != null">
+        sync = #{record.sync,jdbcType=BIT},
+      </if>
+      <if test="record.management != null">
+        management = #{record.management,jdbcType=VARCHAR},
+      </if>
+      <if test="record.forRecordData != null">
+        for_record_data = #{record.forRecordData,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update test_plan
+    set plan_id = #{record.planId,jdbcType=CHAR},
+      entity_struct_id = #{record.entityStructId,jdbcType=INTEGER},
+      entity_id = #{record.entityId,jdbcType=INTEGER},
+      subject_id = #{record.subjectId,jdbcType=INTEGER},
+      fun_group_id = #{record.funGroupId,jdbcType=INTEGER},
+      suite_id = #{record.suiteId,jdbcType=INTEGER},
+      military = #{record.military,jdbcType=BIT},
+      plan_start_time = #{record.planStartTime,jdbcType=TIMESTAMP},
+      plan_end_time = #{record.planEndTime,jdbcType=TIMESTAMP},
+      actual_start_time = #{record.actualStartTime,jdbcType=TIMESTAMP},
+      actual_end_time = #{record.actualEndTime,jdbcType=TIMESTAMP},
+      status = #{record.status,jdbcType=INTEGER},
+      plan_number = #{record.planNumber,jdbcType=VARCHAR},
+      plan_round = #{record.planRound,jdbcType=INTEGER},
+      plan_name = #{record.planName,jdbcType=VARCHAR},
+      area_id = #{record.areaId,jdbcType=INTEGER},
+      dispatcher_id = #{record.dispatcherId,jdbcType=CHAR},
+      commander_id = #{record.commanderId,jdbcType=CHAR},
+      executor_group_id = #{record.executorGroupId,jdbcType=VARCHAR},
+      comm_assign = #{record.commAssign,jdbcType=VARCHAR},
+      execut_assign = #{record.executAssign,jdbcType=VARCHAR},
+      verify_assign = #{record.verifyAssign,jdbcType=VARCHAR},
+      updatable = #{record.updatable,jdbcType=BIT},
+      archived = #{record.archived,jdbcType=BIT},
+      deleted = #{record.deleted,jdbcType=BIT},
+      base_type = #{record.baseType,jdbcType=INTEGER},
+      created_at = #{record.createdAt,jdbcType=TIMESTAMP},
+      updated_at = #{record.updatedAt,jdbcType=TIMESTAMP},
+      created_by = #{record.createdBy,jdbcType=VARCHAR},
+      updated_by = #{record.updatedBy,jdbcType=VARCHAR},
+      sync = #{record.sync,jdbcType=BIT},
+      management = #{record.management,jdbcType=VARCHAR},
+      for_record_data = #{record.forRecordData,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hengtiansoft.fastop.model.planner.entity.TestPlan">
+    update test_plan
+    <set>
+      <if test="entityStructId != null">
+        entity_struct_id = #{entityStructId,jdbcType=INTEGER},
+      </if>
+      <if test="entityId != null">
+        entity_id = #{entityId,jdbcType=INTEGER},
+      </if>
+      <if test="subjectId != null">
+        subject_id = #{subjectId,jdbcType=INTEGER},
+      </if>
+      <if test="funGroupId != null">
+        fun_group_id = #{funGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="suiteId != null">
+        suite_id = #{suiteId,jdbcType=INTEGER},
+      </if>
+      <if test="military != null">
+        military = #{military,jdbcType=BIT},
+      </if>
+      <if test="planStartTime != null">
+        plan_start_time = #{planStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="planEndTime != null">
+        plan_end_time = #{planEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="actualStartTime != null">
+        actual_start_time = #{actualStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="actualEndTime != null">
+        actual_end_time = #{actualEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="planNumber != null">
+        plan_number = #{planNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="planRound != null">
+        plan_round = #{planRound,jdbcType=INTEGER},
+      </if>
+      <if test="planName != null">
+        plan_name = #{planName,jdbcType=VARCHAR},
+      </if>
+      <if test="areaId != null">
+        area_id = #{areaId,jdbcType=INTEGER},
+      </if>
+      <if test="dispatcherId != null">
+        dispatcher_id = #{dispatcherId,jdbcType=CHAR},
+      </if>
+      <if test="commanderId != null">
+        commander_id = #{commanderId,jdbcType=CHAR},
+      </if>
+      <if test="executorGroupId != null">
+        executor_group_id = #{executorGroupId,jdbcType=VARCHAR},
+      </if>
+      <if test="commAssign != null">
+        comm_assign = #{commAssign,jdbcType=VARCHAR},
+      </if>
+      <if test="executAssign != null">
+        execut_assign = #{executAssign,jdbcType=VARCHAR},
+      </if>
+      <if test="verifyAssign != null">
+        verify_assign = #{verifyAssign,jdbcType=VARCHAR},
+      </if>
+      <if test="updatable != null">
+        updatable = #{updatable,jdbcType=BIT},
+      </if>
+      <if test="archived != null">
+        archived = #{archived,jdbcType=BIT},
+      </if>
+      <if test="deleted != null">
+        deleted = #{deleted,jdbcType=BIT},
+      </if>
+      <if test="baseType != null">
+        base_type = #{baseType,jdbcType=INTEGER},
+      </if>
+      <if test="createdAt != null">
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null">
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="sync != null">
+        sync = #{sync,jdbcType=BIT},
+      </if>
+      <if test="management != null">
+        management = #{management,jdbcType=VARCHAR},
+      </if>
+      <if test="forRecordData != null">
+        for_record_data = #{forRecordData,jdbcType=INTEGER},
+      </if>
+    </set>
+    where plan_id = #{planId,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hengtiansoft.fastop.model.planner.entity.TestPlan">
+    update test_plan
+    set entity_struct_id = #{entityStructId,jdbcType=INTEGER},
+      entity_id = #{entityId,jdbcType=INTEGER},
+      subject_id = #{subjectId,jdbcType=INTEGER},
+      fun_group_id = #{funGroupId,jdbcType=INTEGER},
+      suite_id = #{suiteId,jdbcType=INTEGER},
+      military = #{military,jdbcType=BIT},
+      plan_start_time = #{planStartTime,jdbcType=TIMESTAMP},
+      plan_end_time = #{planEndTime,jdbcType=TIMESTAMP},
+      actual_start_time = #{actualStartTime,jdbcType=TIMESTAMP},
+      actual_end_time = #{actualEndTime,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=INTEGER},
+      plan_number = #{planNumber,jdbcType=VARCHAR},
+      plan_round = #{planRound,jdbcType=INTEGER},
+      plan_name = #{planName,jdbcType=VARCHAR},
+      area_id = #{areaId,jdbcType=INTEGER},
+      dispatcher_id = #{dispatcherId,jdbcType=CHAR},
+      commander_id = #{commanderId,jdbcType=CHAR},
+      executor_group_id = #{executorGroupId,jdbcType=VARCHAR},
+      comm_assign = #{commAssign,jdbcType=VARCHAR},
+      execut_assign = #{executAssign,jdbcType=VARCHAR},
+      verify_assign = #{verifyAssign,jdbcType=VARCHAR},
+      updatable = #{updatable,jdbcType=BIT},
+      archived = #{archived,jdbcType=BIT},
+      deleted = #{deleted,jdbcType=BIT},
+      base_type = #{baseType,jdbcType=INTEGER},
+      created_at = #{createdAt,jdbcType=TIMESTAMP},
+      updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      sync = #{sync,jdbcType=BIT},
+      management = #{management,jdbcType=VARCHAR},
+      for_record_data = #{forRecordData,jdbcType=INTEGER}
+    where plan_id = #{planId,jdbcType=CHAR}
+  </update>
+</mapper>
