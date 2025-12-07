@@ -26,9 +26,9 @@ public class TestSuiteController {
 
     @ApiOperation("新增清单")
     @PostMapping("/add")
-    public Response addTestSuite(@RequestBody TestSuite testSuite) {
-        LOG.info("开始新增清单: {}", testSuite);
-        return testSuiteService.add(testSuite);
+    public Response addTestSuite(@RequestBody TestSuiteRequestDto testSuiteRequestDto) {
+        LOG.info("开始新增清单: {}", testSuiteRequestDto);
+        return testSuiteService.add(testSuiteRequestDto);
     }
 
     @ApiOperation("修改清单")

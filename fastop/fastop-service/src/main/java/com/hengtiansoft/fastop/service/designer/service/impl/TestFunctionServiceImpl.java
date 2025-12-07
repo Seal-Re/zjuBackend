@@ -76,8 +76,8 @@ public class TestFunctionServiceImpl implements TestFunctionService {
 
         testFunction.setDeleted(Boolean.FALSE);
 
-        testFunction.setChangeFlag(0);
-        testFunction.setApproveStatus(0);
+        testFunction.setChangeFlag(StatusContants.tfun_cha_newfun);
+        testFunction.setApproveStatus(StatusContants.tfun_app_unsubmit);
 
         testFunction.setDesigner(null);
         testFunction.setProofer(null);

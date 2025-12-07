@@ -9,14 +9,20 @@ import com.hengtiansoft.fastop.model.designer.dto.TestSuiteRequestDto;
 import com.hengtiansoft.fastop.model.designer.entity.TestSuite;
 import com.hengtiansoft.fastop.model.designer.entity.TestSuiteExample;
 import com.hengtiansoft.fastop.service.designer.service.FunctionSuiteService;
+import com.hengtiansoft.fastop.service.designer.service.TestFunctionService;
 import com.hengtiansoft.fastop.service.designer.service.TestSuiteService;
+import com.hengtiansoft.fastop.model.designer.dto.FunSuiteIdConnectDto;
+import com.hengtiansoft.fastop.model.designer.entity.TestFunction;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -28,8 +34,17 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     @Autowired
     private FunctionSuiteService functionSuiteService;
 
+    @Autowired
+    private TestFunctionService testFunctionService;
+
     @Override
-    public Response add(TestSuite testSuite) {
+    public Response add(TestSuiteRequestDto testSuiteRequestDto) {
+        TestSuite testSuite = new TestSuite();
+        BeanUtils.copyProperties(testSuiteRequestDto, testSuite);
+        if (testSuite.getTestBaseId() == null && testSuiteRequestDto.getEntityStructId() != null) {
+             testSuite.setTestBaseId(testSuiteRequestDto.getEntityStructId());
+        }
+
         TestSuiteExample checkExample = new TestSuiteExample();
         TestSuiteExample.Criteria checkCriteria = checkExample.createCriteria();
 
@@ -72,10 +87,39 @@ public class TestSuiteServiceImpl implements TestSuiteService {
         //确保插入的数据项的状态为待审签
         testSuite.setListApprStatus(StatusContants.suite_list_app_unapp);
 
+        // Set defaults if null
+        if (testSuite.getPlaneEffectMin() == null) testSuite.setPlaneEffectMin(0);
+        if (testSuite.getPlaneEffectMax() == null) testSuite.setPlaneEffectMax(0);
+
         // 执行数据库插入操作
         int rows = testSuiteMapper.insertSelective(testSuite);
 
         if (rows > 0) {
+            // Handle Binding (Task 4)
+            if (testSuiteRequestDto.getFunIds() != null && !testSuiteRequestDto.getFunIds().isEmpty()) {
+                FunSuiteIdConnectDto connectDto = new FunSuiteIdConnectDto();
+                connectDto.setSuiteId(testSuite.getSuiteId());
+
+                // Need to fetch TestFunction objects because createFunctionSuite expects them
+                // Or I can modify createFunctionSuite to take IDs.
+                // But createFunctionSuite takes FunSuiteIdConnectDto which has List<TestFunction>.
+                // So I need to fetch them.
+                Map<Integer, TestFunction> functionsMap = testFunctionService.getFunctionsByIds(testSuiteRequestDto.getFunIds());
+                List<TestFunction> functions = new ArrayList<>(functionsMap.values());
+
+                // Sort them by order of IDs in the request if needed?
+                // The map doesn't preserve order.
+                // Let's rely on the list order from request.
+                List<TestFunction> orderedFunctions = new ArrayList<>();
+                for (Integer id : testSuiteRequestDto.getFunIds()) {
+                    if (functionsMap.containsKey(id)) {
+                        orderedFunctions.add(functionsMap.get(id));
+                    }
+                }
+
+                connectDto.setTestFunctions(orderedFunctions);
+                functionSuiteService.createFunctionSuite(connectDto);
+            }
             return ResponseFactory.success("新增成功");
         } else {
             return ResponseFactory.failure("新增失败，数据库操作未成功。");

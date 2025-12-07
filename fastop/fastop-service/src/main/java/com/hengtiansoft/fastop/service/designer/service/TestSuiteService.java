@@ -6,7 +6,7 @@ import com.hengtiansoft.fastop.model.designer.entity.TestSuite;
 
 public interface TestSuiteService {
 
-    Response add(TestSuite testSuite);
+    Response add(TestSuiteRequestDto testSuiteRequestDto);
 
     Response update(TestSuiteRequestDto testSuiteRequestDto);
 

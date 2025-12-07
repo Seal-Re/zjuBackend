@@ -14,4 +14,8 @@ public interface TestPlanService {
 
 
     Response listAll();
+
+    Response dispatchPlan(String planId);
+    Response startPlan(String planId);
+    Response pausePlan(String planId);
 }

@@ -12,8 +12,9 @@ import com.hengtiansoft.fastop.model.designer.entity.TestSuite;
 import com.hengtiansoft.fastop.model.planner.dto.TestPlanDelBatchDto;
 import com.hengtiansoft.fastop.model.planner.dto.TestPlanMapper;
 import com.hengtiansoft.fastop.model.planner.dto.TestPlanRequestDto;
-import com.hengtiansoft.fastop.model.planner.entity.TestPlan;
-import com.hengtiansoft.fastop.model.planner.entity.TestPlanExample;
+import com.hengtiansoft.fastop.model.planner.dto.ExeFunctionMapper;
+import com.hengtiansoft.fastop.model.planner.dto.ExeStepMapper;
+import com.hengtiansoft.fastop.model.planner.entity.*;
 import com.hengtiansoft.fastop.model.planner.utils.TestPlanEnum;
 import com.hengtiansoft.fastop.service.designer.service.TestBaseService;
 import com.hengtiansoft.fastop.service.designer.service.TestSuiteService;
@@ -28,8 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,6 +48,12 @@ public class TestPlanServiceImpl implements TestPlanService {
 
     @Autowired
     private TestPlanMapper testPlanMapper;
+
+    @Autowired
+    private ExeFunctionMapper exeFunctionMapper;
+
+    @Autowired
+    private ExeStepMapper exeStepMapper;
 
     @Override
     @Transactional(rollbackFor = {Exception.class})
@@ -286,6 +292,104 @@ public class TestPlanServiceImpl implements TestPlanService {
         TestPlanExample.Criteria criteria = testPlanExample.createCriteria();
         List<TestPlan> listTestPlan = testPlanMapper.selectByExample(testPlanExample);
         return ResponseFactory.success(listTestPlan);
+    }
+
+    @Override
+    public Response dispatchPlan(String planId) {
+        if (StringUtils.isBlank(planId)) {
+            return ResponseFactory.failure("planId is null");
+        }
+        TestPlan testPlan = testPlanMapper.selectByPrimaryKey(planId);
+        if (testPlan == null) {
+            return ResponseFactory.failure("Plan not found");
+        }
+
+        // Validate Plan status (must be UNEXE or DISPATCH)
+        // Assuming UNEXE=0, DISPATCH=0? The enum says DISPATCH.getKey() for create.
+        // Let's assume UNEXE is also OK or maybe just DISPATCH.
+        // Task description: "Validate Plan status (must be UNEXE or DISPATCH)."
+        if (!testPlan.getStatus().equals(TestPlanEnum.DISPATCH.getKey()) && !testPlan.getStatus().equals(TestPlanStatusContants.PLAN_STATUS_UNEXE)) {
+             return ResponseFactory.failure("Status invalid for dispatch");
+        }
+
+        // Aggregate data
+        Map<String, Object> dispatchData = new HashMap<>();
+        dispatchData.put("plan", testPlan);
+
+        ExeFunctionExample exeFunctionExample = new ExeFunctionExample();
+        exeFunctionExample.createCriteria().andPlanIdEqualTo(planId);
+        List<ExeFunction> exeFunctions = exeFunctionMapper.selectByExample(exeFunctionExample);
+        dispatchData.put("functions", exeFunctions);
+
+        List<ExeStep> allSteps = new ArrayList<>();
+        if (CollectionUtil.isNotEmpty(exeFunctions)) {
+            for (ExeFunction func : exeFunctions) {
+                ExeStepExample exeStepExample = new ExeStepExample();
+                exeStepExample.createCriteria().andExeFunctionIdEqualTo(func.getExeFunctionId());
+                List<ExeStep> steps = exeStepMapper.selectByExample(exeStepExample);
+                if (CollectionUtil.isNotEmpty(steps)) {
+                    allSteps.addAll(steps);
+                }
+            }
+        }
+        dispatchData.put("steps", allSteps);
+
+        return ResponseFactory.success(dispatchData);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Response startPlan(String planId) {
+        if (StringUtils.isBlank(planId)) {
+            return ResponseFactory.failure("planId is null");
+        }
+        TestPlan testPlan = testPlanMapper.selectByPrimaryKey(planId);
+        if (testPlan == null) {
+            return ResponseFactory.failure("Plan not found");
+        }
+
+        testPlan.setStatus(TestPlanStatusContants.PLAN_STATUS_EXEING); // 2
+        testPlan.setActualStartTime(new Date());
+        testPlanMapper.updateByPrimaryKeySelective(testPlan);
+
+        // Cascade Update: All ExeFunction records under this plan must also update their status to EXEING.
+        ExeFunctionExample example = new ExeFunctionExample();
+        example.createCriteria().andPlanIdEqualTo(planId);
+        List<ExeFunction> exeFunctions = exeFunctionMapper.selectByExample(example);
+
+        for (ExeFunction exeFunc : exeFunctions) {
+            exeFunc.setExeStatus(TestPlanStatusContants.PLAN_STATUS_EXEING); // Assuming ExeStatus follows same constants
+            exeFunctionMapper.updateByPrimaryKeySelective(exeFunc);
+        }
+
+        return ResponseFactory.success("Plan started");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Response pausePlan(String planId) {
+        if (StringUtils.isBlank(planId)) {
+            return ResponseFactory.failure("planId is null");
+        }
+        TestPlan testPlan = testPlanMapper.selectByPrimaryKey(planId);
+        if (testPlan == null) {
+            return ResponseFactory.failure("Plan not found");
+        }
+
+        testPlan.setStatus(TestPlanStatusContants.PLAN_STATUS_PAUSE); // 3
+        testPlanMapper.updateByPrimaryKeySelective(testPlan);
+
+        // Cascade Update: All ExeFunction records under this plan must also update their status to PAUSE.
+        ExeFunctionExample example = new ExeFunctionExample();
+        example.createCriteria().andPlanIdEqualTo(planId);
+        List<ExeFunction> exeFunctions = exeFunctionMapper.selectByExample(example);
+
+        for (ExeFunction exeFunc : exeFunctions) {
+            exeFunc.setExeStatus(TestPlanStatusContants.PLAN_STATUS_PAUSE);
+            exeFunctionMapper.updateByPrimaryKeySelective(exeFunc);
+        }
+
+        return ResponseFactory.success("Plan paused");
     }
 
 }

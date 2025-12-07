@@ -6,4 +6,6 @@ public interface ExeStepService {
 
     int deleteExeStep(String exeFunctionId);
 
+    void conveyTestStep2ExeStep(Integer funId, String exeFunctionId);
+
 }
