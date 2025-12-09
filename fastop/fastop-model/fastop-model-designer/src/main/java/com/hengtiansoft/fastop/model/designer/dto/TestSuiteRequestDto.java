@@ -27,4 +27,6 @@ public class TestSuiteRequestDto {
 
     private String approveAssign;
 
+    private Integer testBaseId;
+
 }

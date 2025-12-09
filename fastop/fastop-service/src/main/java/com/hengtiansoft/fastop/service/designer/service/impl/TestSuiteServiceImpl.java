@@ -15,6 +15,8 @@ import com.hengtiansoft.fastop.model.designer.dto.FunSuiteIdConnectDto;
 import com.hengtiansoft.fastop.model.designer.entity.TestFunction;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,8 @@ import java.util.Map;
 @Service
 public class TestSuiteServiceImpl implements TestSuiteService {
 
+    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     private TestSuiteMapper testSuiteMapper;
 
@@ -38,13 +42,11 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     private TestFunctionService testFunctionService;
 
     @Override
-    public Response add(TestSuiteRequestDto testSuiteRequestDto) {
-        TestSuite testSuite = new TestSuite();
-        BeanUtils.copyProperties(testSuiteRequestDto, testSuite);
-        if (testSuite.getTestBaseId() == null && testSuiteRequestDto.getEntityStructId() != null) {
-             testSuite.setTestBaseId(testSuiteRequestDto.getEntityStructId());
+    public Response add(TestSuite testSuite) {
+        if (testSuite.getTestBaseId() == null)
+        {
+            return ResponseFactory.failure("TestBaseId 为空");
         }
-
         TestSuiteExample checkExample = new TestSuiteExample();
         TestSuiteExample.Criteria checkCriteria = checkExample.createCriteria();
 
@@ -93,10 +95,10 @@ public class TestSuiteServiceImpl implements TestSuiteService {
 
         // 执行数据库插入操作
         int rows = testSuiteMapper.insertSelective(testSuite);
-
+        LOG.info("int变量rows:" + rows);
         if (rows > 0) {
             // Handle Binding (Task 4)
-            if (testSuiteRequestDto.getFunIds() != null && !testSuiteRequestDto.getFunIds().isEmpty()) {
+            if (testSuite.getFunIds() != null && !testSuite.getFunIds().isEmpty()) {
                 FunSuiteIdConnectDto connectDto = new FunSuiteIdConnectDto();
                 connectDto.setSuiteId(testSuite.getSuiteId());
 
@@ -111,7 +113,7 @@ public class TestSuiteServiceImpl implements TestSuiteService {
                 // The map doesn't preserve order.
                 // Let's rely on the list order from request.
                 List<TestFunction> orderedFunctions = new ArrayList<>();
-                for (Integer id : testSuiteRequestDto.getFunIds()) {
+                for (Integer id : testSuite.getFunIds()) {
                     if (functionsMap.containsKey(id)) {
                         orderedFunctions.add(functionsMap.get(id));
                     }

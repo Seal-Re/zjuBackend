@@ -221,7 +221,7 @@ public class TestFunctionServiceImpl implements TestFunctionService {
     public Response check(Integer funId, String checkWorker, Integer level) {
 
         if (funId == null || checkWorker == null || level == null || level < StatusContants.funs_app_submit || level > StatusContants.funs_app_approver) {
-            return ResponseFactory.failure( "参数错误或审签级别不在有效范围 (0-4)");
+            return ResponseFactory.failure( "参数错误或审签级别不在有效范围 (0-5)");
         }
 
         TestFunction function = testFunctionMapper.selectByPrimaryKey(funId);

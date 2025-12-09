@@ -19,7 +19,7 @@
 **Verification**: Check `changeFlag` is 4 and `approveStatus` is 0 in DB.
 
 ### Task 2: Build Function Hierarchy
-**URL**: `POST /designer/testFunctionModule/add`
+**URL**: `POST /designer/module/add`
 **Input**:
 ```json
 {
@@ -28,7 +28,16 @@
 }
 ```
 
-**URL**: `POST /designer/testFunctionStep/add`
+**URL**: `POST /designer/case/add`
+**Input**:
+```json
+{
+  "stepName": "Case 1",
+  "moduleId": 3
+}
+```
+
+**URL**: `POST /designer/step/add`
 **Input**:
 ```json
 {
@@ -41,8 +50,39 @@
 **URL**: `POST /designer/testFunction/check`
 **Input**:
 ```
-funId=1&checkWorker=worker1&level=0
+funId=1209&checkWorker=worker1&level=0
 ```
+
+**URL**: `POST /designer/testFunction/check`
+**Input**:
+```
+funId=1209&checkWorker=worker1&level=1
+```
+
+**URL**: `POST /designer/testFunction/check`
+**Input**:
+```
+funId=1209&checkWorker=worker1&level=2
+```
+
+**URL**: `POST /designer/testFunction/check`
+**Input**:
+```
+funId=1209&checkWorker=worker1&level=3
+```
+
+**URL**: `POST /designer/testFunction/check`
+**Input**:
+```
+funId=1209&checkWorker=worker1&level=4
+```
+
+**URL**: `POST /designer/testFunction/check`
+**Input**:
+```
+funId=1209&checkWorker=worker1&level=5
+```
+
 
 ### Task 4: Create Test Suite & Binding
 **URL**: `POST /designer/testSuite/add`
@@ -50,8 +90,8 @@ funId=1&checkWorker=worker1&level=0
 ```json
 {
   "suiteName": "Suite 1",
-  "testBaseId": 1,
-  "funIds": [1, 2]
+  "entityStructId": 1,
+  "funIds": [1209]
 }
 ```
 **Verification**: Check `test_suite` created and `function_suite` records inserted.
