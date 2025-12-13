@@ -8,6 +8,9 @@ public interface TestSuiteService {
 
     Response add(TestSuite testSuite);
 
+    // Added createTestSuite to Interface to match Impl
+    boolean createTestSuite(TestSuiteRequestDto nTestSuite);
+
     Response update(TestSuiteRequestDto testSuiteRequestDto);
 
     Response delete(Integer suiteId);
