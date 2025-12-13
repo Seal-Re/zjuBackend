@@ -4,14 +4,18 @@ import com.hengtiansoft.fastop.base.common.constants.Status.CommonConstants;
 import com.hengtiansoft.fastop.base.common.constants.Status.StatusContants;
 import com.hengtiansoft.fastop.base.common.entity.Response.Response;
 import com.hengtiansoft.fastop.base.common.factory.ResponseFactory;
+// import com.hengtiansoft.fastop.base.common.exception.AppRTException; // Missing in Target
 import com.hengtiansoft.fastop.model.designer.dto.TestSuiteMapper;
 import com.hengtiansoft.fastop.model.designer.dto.TestSuiteRequestDto;
 import com.hengtiansoft.fastop.model.designer.entity.TestSuite;
 import com.hengtiansoft.fastop.model.designer.entity.TestSuiteExample;
 import com.hengtiansoft.fastop.service.designer.service.FunctionSuiteService;
+import com.hengtiansoft.fastop.service.designer.service.TestFunctionService;
 import com.hengtiansoft.fastop.service.designer.service.TestSuiteService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +32,9 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     @Autowired
     private FunctionSuiteService functionSuiteService;
 
+    @Autowired
+    private TestFunctionService testFunctionService;
+
     @Override
     public Response add(TestSuite testSuite) {
         TestSuiteExample checkExample = new TestSuiteExample();
@@ -40,7 +47,6 @@ public class TestSuiteServiceImpl implements TestSuiteService {
         List<TestSuite> suites = testSuiteMapper.selectByExample(checkExample);
 
         if (suites.size() >= CommonConstants.NUM_1) {
-            // 存在审前通过的清单，返回失败响应
             StringBuilder sb = new StringBuilder();
             sb.append("新增失败，已经存在审前通过的清单:");
             suites.forEach((i -> sb.append("【").append(i.getSuiteName()).append("】").append(",")));
@@ -48,7 +54,6 @@ public class TestSuiteServiceImpl implements TestSuiteService {
             return ResponseFactory.failure(sb.substring(0, sb.length() - 1));
         }
 
-        // 构造查询 Example
         TestSuiteExample maxVersionExample = new TestSuiteExample();
         maxVersionExample.createCriteria()
                 .andTestBaseIdEqualTo(testSuite.getTestBaseId());
@@ -59,7 +64,6 @@ public class TestSuiteServiceImpl implements TestSuiteService {
 
         TestSuite maxSuite = null;
         if (maxVersionSuites != null && !maxVersionSuites.isEmpty()) {
-            // 取排序后的第一个，版本号最大的清单
             maxSuite = maxVersionSuites.get(0);
         }
 
@@ -69,10 +73,8 @@ public class TestSuiteServiceImpl implements TestSuiteService {
             testSuite.setVersion(maxSuite.getVersion() + CommonConstants.NUM_1);
         }
 
-        //确保插入的数据项的状态为待审签
         testSuite.setListApprStatus(StatusContants.suite_list_app_unapp);
 
-        // 执行数据库插入操作
         int rows = testSuiteMapper.insertSelective(testSuite);
 
         if (rows > 0) {
@@ -80,6 +82,36 @@ public class TestSuiteServiceImpl implements TestSuiteService {
         } else {
             return ResponseFactory.failure("新增失败，数据库操作未成功。");
         }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean createTestSuite(TestSuiteRequestDto nTestSuite) {
+        if (nTestSuite.getSubjectId() == null || nTestSuite.getEntityStructId() == null
+                || StringUtils.isAllBlank(nTestSuite.getSuiteName())) {
+            return false;
+        }
+
+        TestSuite tSuite = new TestSuite();
+
+        BeanUtils.copyProperties(nTestSuite, tSuite);
+        tSuite.setListApprStatus(StatusContants.suite_list_app_unapp);
+
+        testSuiteMapper.insertSelective(tSuite);
+
+        if (tSuite.getSuiteId() == null) {
+            return false;
+        }
+
+        if (nTestSuite.getFunIds() != null && nTestSuite.getFunIds().size() > CommonConstants.NUM_0) {
+            List<Integer> funIds = nTestSuite.getFunIds();
+            int targetSuiteId = tSuite.getSuiteId();
+            // TODO: Feature pending. Logic for 'testFunctionService.copyCreateBySuite(funIds, targetSuiteId)' is required here.
+            // This logic is expected to synchronously create/link FunctionSuite associations or copies.
+            // Due to missing methods in the Target interface, this call is commented out or pending implementation.
+            // testFunctionService.copyCreateBySuite(funIds, targetSuiteId);
+        }
+
+        return true;
     }
 
     @Override
@@ -97,7 +129,6 @@ public class TestSuiteServiceImpl implements TestSuiteService {
         record.setSuiteName(testSuiteRequestDto.getSuiteName());
         record.setSuiteDesc(testSuiteRequestDto.getSuiteDesc());
 
-        //确保更新的数据项的状态为待审签
         record.setListApprStatus(StatusContants.suite_list_app_unapp);
 
         int result = testSuiteMapper.updateByPrimaryKeySelective(record);
@@ -214,7 +245,6 @@ public class TestSuiteServiceImpl implements TestSuiteService {
 
     @Override
     public boolean isCanEdit(TestSuite tSuite) {
-        // 若测试集清单审签状态不是 待校对 或 待 批准 则可以对测试集进行修改
         if (!(tSuite.getListApprStatus().equals(StatusContants.suite_list_app_proof)
                 || tSuite.getListApprStatus().equals(StatusContants.suite_list_app_approve))) {
             return true;
