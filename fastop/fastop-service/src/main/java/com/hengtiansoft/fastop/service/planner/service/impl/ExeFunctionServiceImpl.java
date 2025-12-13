@@ -124,9 +124,7 @@ public class ExeFunctionServiceImpl implements ExeFunctionService {
                 TestFunction function = testFunctionMap.get(functionSuite.getTestFunId());
                 String exeFunId = saveExeFunction(functionSuite, planId, function);
 
-                /*TODO
-                conveyTestStep2ExeStep(testFunction, exeFunId);
-                 */
+                exeStepService.conveyTestStep2ExeStep(function.getFunId(), exeFunId);
             }
         }
 

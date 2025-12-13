@@ -66,4 +66,25 @@ public class TestPlanController {
         return testPlanService.listAll();
     }
 
+    @ApiOperation("派发/同步计划")
+    @GetMapping("/dispatch/{planId}")
+    public Response dispatchPlan(@PathVariable("planId") String planId){
+        LOG.info("Dispatch plan: {}", planId);
+        return testPlanService.dispatchPlan(planId);
+    }
+
+    @ApiOperation("开始计划")
+    @PostMapping("/start/{planId}")
+    public Response startPlan(@PathVariable("planId") String planId){
+        LOG.info("Start plan: {}", planId);
+        return testPlanService.startPlan(planId);
+    }
+
+    @ApiOperation("暂停计划")
+    @PostMapping("/pause/{planId}")
+    public Response pausePlan(@PathVariable("planId") String planId){
+        LOG.info("Pause plan: {}", planId);
+        return testPlanService.pausePlan(planId);
+    }
+
 }
