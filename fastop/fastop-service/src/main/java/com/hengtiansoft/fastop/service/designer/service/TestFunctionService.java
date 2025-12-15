@@ -23,4 +23,7 @@ public interface TestFunctionService {
     Integer countKeyProcessByFunId(Integer funId);
 
     Map<Integer, TestFunction> getFunctionsByIds(Collection<Integer> funIds);
+
+    // Added for TestSuite sync creation logic
+    void copyTestFunctionForSuite(Integer funId, Integer targetSuiteId, Integer funOrder);
 }
