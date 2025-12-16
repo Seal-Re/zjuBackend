@@ -64,10 +64,5 @@ public class TestFunctionStepController {
         return testFunctionStepService.listAll();
     }
 
-    @ApiOperation("审签")
-    @GetMapping("/checkByStepId")
-    public Response checkByStepId(@RequestParam Integer stepId) {
-        return  testFunctionStepService.checkStep(stepId);
-    }
 
 }

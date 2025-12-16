@@ -17,6 +17,8 @@ public class TestFunctionModule {
 
     private Integer moduleStatus;
 
+    private Integer update;
+
     public Integer getModuleId() {
         return moduleId;
     }
@@ -79,5 +81,13 @@ public class TestFunctionModule {
 
     public void setModuleStatus(Integer moduleStatus) {
         this.moduleStatus = moduleStatus;
+    }
+
+    public Integer getUpdate() {
+        return update;
+    }
+
+    public void setUpdate(Integer update) {
+        this.update = update;
     }
 }

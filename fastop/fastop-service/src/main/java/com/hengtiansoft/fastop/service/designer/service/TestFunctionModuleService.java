@@ -3,6 +3,8 @@ package com.hengtiansoft.fastop.service.designer.service;
 import com.hengtiansoft.fastop.base.common.entity.Response.Response;
 import com.hengtiansoft.fastop.model.designer.entity.TestFunctionModule;
 
+import java.util.List;
+
 public interface TestFunctionModuleService {
 
     Response add(TestFunctionModule testFunctionModule);
@@ -17,8 +19,7 @@ public interface TestFunctionModuleService {
 
     Response listAll();
 
-    Response checkByModuleId(Integer ModuleId);
+    List<TestFunctionModule> getUpdateAll();
 
-    Boolean deleteCase(Integer ModuleId);
-
+    Response deletePhy(Integer moduleId);
 }

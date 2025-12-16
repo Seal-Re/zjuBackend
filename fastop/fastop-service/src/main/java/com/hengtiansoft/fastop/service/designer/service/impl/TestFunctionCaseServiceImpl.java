@@ -23,25 +23,14 @@ public class TestFunctionCaseServiceImpl implements TestFunctionCaseService {
     private TestFunctionModuleService testFunctionModuleService;
 
     @Autowired
-    private TestFunctionStepService testFunctionStepService;
-
-    @Autowired
     private TestFunctionCaseMapper testFunctionCaseMapper;
-
-    @Autowired
-    private TestFunctionStepMapper testFunctionStepMapper;
 
     @Override
     public Response add(TestFunctionCase testFunctionCase) {
-        if(testFunctionCase.getModuleId() == null){
-            return ResponseFactory.failure("添加失败, 上层module不存在");
-        }
-        if(!testFunctionModuleService.getByModuleId(testFunctionCase.getModuleId()).isSuccess()) {
-            return ResponseFactory.failure("添加失败, 上层module不存在");
-        }
 
-        testFunctionCase.setCaseStatus(StatusContants.judge_result_unjudge);
+        testFunctionCase.setCaseStatus(StatusContants.step_status_unuse);
         testFunctionCase.setCaseDate(String.valueOf(new Date()));
+        testFunctionCase.setUpdate(StatusContants.step_update_change);
         // TODO
         testFunctionCase.setChangeUser(null);
 
@@ -59,7 +48,7 @@ public class TestFunctionCaseServiceImpl implements TestFunctionCaseService {
         if (tFCase == null) {
             return ResponseFactory.failure("用例不存在");
         }
-
+        tFCase.setUpdate(StatusContants.step_update_change);
         int result = testFunctionCaseMapper.updateByPrimaryKeySelective(testFunctionCase);
 
         if (result > CommonConstants.NUM_0) {
@@ -74,13 +63,11 @@ public class TestFunctionCaseServiceImpl implements TestFunctionCaseService {
         if (tFCase == null) {
             return ResponseFactory.failure("用例不存在");
         }
-        int result = testFunctionCaseMapper.deleteByPrimaryKey(caseId);
-
+        tFCase.setUpdate(StatusContants.step_update_change);
+        tFCase.setCaseStatus(StatusContants.step_status_del);
+        int result = testFunctionCaseMapper.updateByPrimaryKeySelective(tFCase);
         if (result > CommonConstants.NUM_0) {
-            if (deleteStep(caseId)) {
-                return ResponseFactory.success("删除成功");
-            }
-            return ResponseFactory.failure("删除步骤失败");
+            return ResponseFactory.success("删除成功");
         }
         return ResponseFactory.failure("删除用例失败");
     }
@@ -126,71 +113,42 @@ public class TestFunctionCaseServiceImpl implements TestFunctionCaseService {
     }
 
     @Override
-    public Response checkByCaseId(Integer CaseId) {
-        if (CaseId == null || CaseId <= 0) {
-            return ResponseFactory.failure("CaseId 不能为空或无效");
-        }
-
-        TestFunctionCase testFunctionCase = testFunctionCaseMapper.selectByPrimaryKey(CaseId);
-
-        if (testFunctionCase == null) {
-            return ResponseFactory.failure("未找到 caseId 为 [" + CaseId + "] 对应的测试功能模块");
-        }
-
-        TestFunctionStepExample example = new TestFunctionStepExample();
-        example.createCriteria().andCaseIdEqualTo(CaseId);
-
-        List<TestFunctionStep> StepList = testFunctionStepMapper.selectByExample(example);
-
-        StringBuilder messageBuilder = new StringBuilder();
-        Response subCheckResult;
-        boolean allPassed = true;
-
-        for (TestFunctionStep Step : StepList) {
-
-            if (Step.getStepStatus() == StatusContants.judge_result_passed) {
-                messageBuilder.append("\nStepId: [")
-                        .append(Step.getStepId())
-                        .append("] 状态为: 已审签, 跳过检查。\n");
-                continue;
-            }
-            messageBuilder.append("\nStepId: [")
-                    .append(Step.getStepId())
-                    .append("] 状态为: 未审签。\n");
-            allPassed = false;
-        }
-
-        if (allPassed) {
-            return ResponseFactory.success("所有模块检查并审签成功" + messageBuilder.toString());
-        } else {
-            return ResponseFactory.failure("部分模块检查成功但更新失败" + messageBuilder.toString());
-        }
+    public List<TestFunctionCase> getUpdateAll() {
+        TestFunctionCaseExample testFunctionCaseExample = new TestFunctionCaseExample();
+        List<TestFunctionCase> list = testFunctionCaseMapper.selectByExample(testFunctionCaseExample);
+        return list;
     }
 
     @Override
-    public Boolean deleteStep(Integer caseId) {
-        Response<List<TestFunctionStep>> selectStep = testFunctionStepService.getByCaseId(caseId); // 建议加上泛型以确保类型安全
-
-        if (!selectStep.isSuccess()) {
-            return Boolean.FALSE;
+    public Response deletePhy(Integer caseId) {
+        if (caseId == null) {
+            return ResponseFactory.failure("caseId is null");
         }
-
-        List<TestFunctionStep> lTFStep = selectStep.getData();
-        if (lTFStep == null || lTFStep.isEmpty()) {
-            return Boolean.TRUE;
+        TestFunctionCase testFunctionCase = testFunctionCaseMapper.selectByPrimaryKey(caseId);
+        if (testFunctionCase == null) {
+            return ResponseFactory.failure("cant find it" );
         }
-
-        for (TestFunctionStep testFunctionStep : lTFStep) {
-            Response result = testFunctionStepService.delete(testFunctionStep.getStepId());
-
-            if (!result.isSuccess()) {
-                return Boolean.FALSE;
-            }
+        int result = testFunctionCaseMapper.deleteByPrimaryKey(caseId);
+        if (result > 0) {
+            return ResponseFactory.success("success");
         }
-
-        return Boolean.TRUE;
+        return ResponseFactory.failure("fail");
     }
 
+    @Override
+    public Response updateByModuleIds(List<Integer> testFunctionModuleIds) {
+        if (testFunctionModuleIds == null || testFunctionModuleIds.isEmpty()) {
+            return ResponseFactory.success("列表为空，无需更新");
+        }
 
+        TestFunctionCase record = new TestFunctionCase();
+        record.setUpdate(StatusContants.step_update_change);
 
+        TestFunctionCaseExample example = new TestFunctionCaseExample();
+        example.createCriteria().andCaseIdIn(testFunctionModuleIds);
+
+        int rows = testFunctionCaseMapper.updateByExampleSelective(record, example);
+
+        return ResponseFactory.success("更新成功，共更新了 " + rows + " 条数据");
+    }
 }

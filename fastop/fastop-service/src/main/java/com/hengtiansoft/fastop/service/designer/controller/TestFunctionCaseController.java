@@ -64,10 +64,4 @@ public class TestFunctionCaseController {
         return testFunctionCaseService.listAll();
     }
 
-    @ApiOperation("子用例审签")
-    @PostMapping("/checkByCaseId")
-    public Response checkByCaseId(@RequestParam Integer caseId) {
-        return testFunctionCaseService.checkByCaseId(caseId);
-    }
-
 }

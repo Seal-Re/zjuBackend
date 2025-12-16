@@ -9,6 +9,8 @@ import com.hengtiansoft.fastop.model.designer.dto.TestFunctionInfoRequestDto;
 import com.hengtiansoft.fastop.model.designer.dto.TestFunctionMapper;
 import com.hengtiansoft.fastop.model.designer.entity.TestFunction;
 import com.hengtiansoft.fastop.model.designer.entity.TestFunctionExample;
+import com.hengtiansoft.fastop.model.designer.entity.TestFunctionModule;
+import com.hengtiansoft.fastop.service.designer.service.TestFunctionModuleService;
 import com.hengtiansoft.fastop.service.designer.service.TestFunctionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -23,6 +25,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class TestFunctionServiceImpl implements TestFunctionService {
+
+    @Autowired
+    private TestFunctionModuleService  testFunctionModuleService;
 
     @Autowired
     private TestFunctionMapper testFunctionMapper;
@@ -163,6 +168,13 @@ public class TestFunctionServiceImpl implements TestFunctionService {
         }
 
         int count = testFunctionMapper.deleteByPrimaryKey(funId);
+        Response tFModulesResponse = testFunctionModuleService.getByFunId(funId);
+        if (tFModulesResponse.isSuccess()) {
+            List<TestFunctionModule> tFModules = (List<TestFunctionModule>) tFModulesResponse.getData();
+            for (TestFunctionModule tFModule : tFModules) {
+                testFunctionModuleService.delete(tFModule.getModuleId());
+            }
+        }
 
         if (count > 0) {
             return ResponseFactory.success(true);

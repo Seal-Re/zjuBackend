@@ -633,6 +633,66 @@ public class TestFunctionModuleExample {
             addCriterion("module_status not between", value1, value2, "moduleStatus");
             return (Criteria) this;
         }
+
+        public Criteria andUpdateIsNull() {
+            addCriterion("update is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateIsNotNull() {
+            addCriterion("update is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateEqualTo(Integer value) {
+            addCriterion("update =", value, "update");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateNotEqualTo(Integer value) {
+            addCriterion("update <>", value, "update");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateGreaterThan(Integer value) {
+            addCriterion("update >", value, "update");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateGreaterThanOrEqualTo(Integer value) {
+            addCriterion("update >=", value, "update");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateLessThan(Integer value) {
+            addCriterion("update <", value, "update");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateLessThanOrEqualTo(Integer value) {
+            addCriterion("update <=", value, "update");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateIn(List<Integer> values) {
+            addCriterion("update in", values, "update");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateNotIn(List<Integer> values) {
+            addCriterion("update not in", values, "update");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateBetween(Integer value1, Integer value2) {
+            addCriterion("update between", value1, value2, "update");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateNotBetween(Integer value1, Integer value2) {
+            addCriterion("update not between", value1, value2, "update");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

@@ -90,6 +90,15 @@ public interface StatusContants {
 	public static final int  judge_result_passed = 1;	// 判定通过
 	public static final int  judge_result_unpass = 2;	// 判定不通过
 
+	// 步骤状态
+	public static final int step_status_unuse = 0;
+	public static final int step_status_inuse = 1;
+	public static final int step_status_del = 2;
+
+	// 步骤更新标志
+	public static final int step_update_unchange = 0;
+	public static final int step_update_change = 1;
+
 	// 测试对象类型
 	public static final int  unknown = 0;	// 未知
 	public static final int  test_plan = 1;	// 测试计划

@@ -2,6 +2,9 @@ package com.hengtiansoft.fastop.service.designer.service;
 
 import com.hengtiansoft.fastop.base.common.entity.Response.Response;
 import com.hengtiansoft.fastop.model.designer.entity.TestFunctionCase;
+import com.hengtiansoft.fastop.model.designer.entity.TestFunctionModule;
+
+import java.util.List;
 
 public interface TestFunctionCaseService {
 
@@ -17,8 +20,9 @@ public interface TestFunctionCaseService {
 
     Response listAll();
 
-    Response checkByCaseId(Integer moduleId);
+    List<TestFunctionCase> getUpdateAll();
 
-    Boolean deleteStep(Integer caseId);
+    Response deletePhy(Integer caseId);
 
+    Response updateByModuleIds(List<Integer> testFunctionModuleIds);
 }

@@ -4,15 +4,9 @@ import com.hengtiansoft.fastop.base.common.constants.Status.CommonConstants;
 import com.hengtiansoft.fastop.base.common.constants.Status.StatusContants;
 import com.hengtiansoft.fastop.base.common.entity.Response.Response;
 import com.hengtiansoft.fastop.base.common.factory.ResponseFactory;
-import com.hengtiansoft.fastop.model.designer.dto.TestFunctionCaseMapper;
 import com.hengtiansoft.fastop.model.designer.dto.TestFunctionModuleMapper;
-import com.hengtiansoft.fastop.model.designer.entity.TestFunctionCaseExample;
-import com.hengtiansoft.fastop.model.designer.entity.TestFunctionModule;
-import com.hengtiansoft.fastop.model.designer.entity.TestFunctionModuleExample;
-import com.hengtiansoft.fastop.model.designer.entity.TestFunctionCase;
-import com.hengtiansoft.fastop.service.designer.service.TestFunctionCaseService;
+import com.hengtiansoft.fastop.model.designer.entity.*;
 import com.hengtiansoft.fastop.service.designer.service.TestFunctionModuleService;
-import com.hengtiansoft.fastop.service.designer.service.TestFunctionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,29 +17,15 @@ import java.util.List;
 public class TestFunctionModuleServiceImpl implements TestFunctionModuleService {
 
     @Autowired
-    private TestFunctionService testFunctionService;
-
-    @Autowired
-    private TestFunctionCaseService testFunctionCaseService;
-
-    @Autowired
     private TestFunctionModuleMapper testFunctionModuleMapper;
-
-    @Autowired
-    private TestFunctionCaseMapper testFunctionCaseMapper;
 
     @Override
     public Response add(TestFunctionModule testFunctionModule) {
-        if(testFunctionModule.getFunId() == null){
-            return ResponseFactory.failure("添加失败, 上层fun不存在");
-        }
-        if(!testFunctionService.getById(testFunctionModule.getFunId()).isSuccess()) {
-            return ResponseFactory.failure("添加失败, 上层fun不存在");
-        }
 
-        testFunctionModule.setModuleStatus(StatusContants.judge_result_unjudge);
+        testFunctionModule.setModuleStatus(StatusContants.step_status_unuse);
         testFunctionModule.setModuleDate(String.valueOf(new Date()));
-        // TODO
+        testFunctionModule.setUpdate(StatusContants.step_update_change);
+        //TODO
         testFunctionModule.setChangeUser(null);
         int count = testFunctionModuleMapper.insertSelective(testFunctionModule);
 
@@ -61,7 +41,7 @@ public class TestFunctionModuleServiceImpl implements TestFunctionModuleService 
         if (tFModule == null) {
             return ResponseFactory.failure("用例不存在");
         }
-
+        tFModule.setUpdate(StatusContants.step_update_change);
         int result = testFunctionModuleMapper.updateByPrimaryKeySelective(testFunctionModule);
 
         if (result > CommonConstants.NUM_0) {
@@ -76,15 +56,13 @@ public class TestFunctionModuleServiceImpl implements TestFunctionModuleService 
         if (tFModule == null) {
             return ResponseFactory.failure("用例不存在");
         }
-        int result = testFunctionModuleMapper.deleteByPrimaryKey(ModuleId);
-
+        tFModule.setUpdate(StatusContants.step_update_change);
+        tFModule.setModuleStatus(StatusContants.step_status_del);
+        int result = testFunctionModuleMapper.updateByPrimaryKeySelective(tFModule);
         if (result > CommonConstants.NUM_0) {
-            if (deleteCase(ModuleId)) {
-                return ResponseFactory.success("删除成功");
-            }
-            return ResponseFactory.failure("删除步骤失败");
+            return ResponseFactory.success("用例删除成功");
         }
-        return ResponseFactory.failure("删除用例失败");
+        return ResponseFactory.failure("用例删除失败");
     }
 
     @Override
@@ -128,94 +106,25 @@ public class TestFunctionModuleServiceImpl implements TestFunctionModuleService 
     }
 
     @Override
-    public Response checkByModuleId(Integer moduleId) {
-        if (moduleId == null || moduleId <= 0) {
-            return ResponseFactory.failure("moduleId 不能为空或无效");
-        }
-
-        TestFunctionModule testFunctionModule = testFunctionModuleMapper.selectByPrimaryKey(moduleId);
-
-        if (testFunctionModule == null ) {
-            return ResponseFactory.failure("未找到 moduleId 为 [" + moduleId + "] 对应的测试功能模块");
-        }
-
-        TestFunctionCaseExample example = new TestFunctionCaseExample();
-        example.createCriteria().andModuleIdEqualTo(moduleId);
-
-        List<TestFunctionCase> CaseList = testFunctionCaseMapper.selectByExample(example);
-
-
-        StringBuilder messageBuilder = new StringBuilder();
-        Response subCheckResult;
-        boolean allPassed = true;
-
-        for (TestFunctionCase Case : CaseList) {
-
-            if (Case.getCaseStatus() != StatusContants.judge_result_unjudge) {
-                messageBuilder.append("CaseId: [")
-                        .append(Case.getCaseId())
-                        .append("] 状态为: 已审签, 跳过检查。\n");
-                continue;
-            }
-
-            subCheckResult = testFunctionCaseService.checkByCaseId(Case.getCaseId());
-
-            if (!subCheckResult.isSuccess()) {
-                allPassed = false;
-                String errorMessage = String.format(
-                        "检查 CaseId: [%d] 时发现未审签子级项目，检查失败信息：%s",
-                        Case.getCaseId(),
-                        subCheckResult.getMsg()
-                );
-                return ResponseFactory.failure(messageBuilder.toString() + "\n\n" + errorMessage);
-            }
-
-            Case.setCaseStatus(StatusContants.judge_result_passed);
-            int updateCount = testFunctionCaseMapper.updateByPrimaryKeySelective(Case);
-
-            if (updateCount > 0) {
-                messageBuilder.append("\nCaseId: [")
-                        .append(Case.getCaseId())
-                        .append("] 审签成功！\n");
-            } else {
-                allPassed = false;
-                messageBuilder.append("\nCaseId: [")
-                        .append(Case.getCaseId())
-                        .append("] 审签通过，但数据库更新失败！\n");
-            }
-        }
-
-        if (allPassed) {
-            return ResponseFactory.success("所有模块检查并审签成功" + messageBuilder.toString());
-        } else {
-            return ResponseFactory.failure("部分模块检查成功但更新失败" + messageBuilder.toString());
-        }
+    public List<TestFunctionModule> getUpdateAll() {
+        TestFunctionModuleExample testFunctionModuleExample = new TestFunctionModuleExample();
+        List<TestFunctionModule> list = testFunctionModuleMapper.selectByExample(testFunctionModuleExample);
+        return list;
     }
 
     @Override
-    public Boolean deleteCase(Integer ModuleId) {
-        Response<List<TestFunctionCase>> selectCase = testFunctionCaseService.getByCaseId(ModuleId); 
-
-        if (!selectCase.isSuccess()) {
-            return Boolean.FALSE;
+    public Response deletePhy(Integer moduleId) {
+        if (moduleId == null) {
+            return ResponseFactory.failure("moduleId is null");
         }
-
-        List<TestFunctionCase> lTFCase = selectCase.getData();
-        if (lTFCase == null || lTFCase.isEmpty()) {
-            return Boolean.TRUE;
+        TestFunctionModule testFunctionmodule = testFunctionModuleMapper.selectByPrimaryKey(moduleId);
+        if (testFunctionmodule == null) {
+            return ResponseFactory.failure("cant find it" );
         }
-
-        for (TestFunctionCase testFunctionCase : lTFCase) {
-            Response result = testFunctionCaseService.delete(testFunctionCase.getCaseId());
-
-            if (!result.isSuccess()) {
-                return Boolean.FALSE;
-            }
+        int result = testFunctionModuleMapper.deleteByPrimaryKey(moduleId);
+        if (result > 0) {
+            return ResponseFactory.success("success");
         }
-
-        return Boolean.TRUE;
+        return ResponseFactory.failure("fail");
     }
-
-
-
 }

@@ -68,22 +68,5 @@ public class TestFunctionModuleController {
         return testFunctionModuleService.listAll();
     }
 
-    @ApiOperation("审签用例")
-    @GetMapping("/checkByModuleId")
-    public Response checkByFunId(@RequestParam Integer moduleId) {
-        LOG.info("审签用例, moduleId: {}", moduleId);
-        return testFunctionModuleService.checkByModuleId(moduleId);
-    }
-
-    @ApiOperation("批量审签")
-    @GetMapping("/checkList")
-    public Response checkList(@RequestParam List<Integer> listId) {
-        LOG.info("批量审签用例, moduleId: {}", listId);
-        List<Response> responses = new ArrayList<>();
-        listId.forEach(id -> {
-            responses.add(testFunctionModuleService.checkByModuleId(id));
-        });
-        return ResponseFactory.success(responses);
-    }
 
 }
