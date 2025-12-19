@@ -1,0 +1,456 @@
+{
+  "info": {
+    "_postman_id": "24568dee-9abc-41ac-83cb-631d220c7fb8",
+    "name": "FastopLocalLifeCircle",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Task 1: Create Test Function",
+      "id": "9f42bdfc-9028-443c-835f-edf14e8c36f6",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"funName\": \"Test Function 1\",\r\n  \"num\": 1001,\r\n  \"testBaseId\": 1,\r\n  \"planeEffectMin\": 1,\r\n  \"planeEffectMax\": 100,\r\n  \"versionDescription\": \"Initial version\",\r\n  \"military\": false\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "127.0.0.1:10001/fastop/designer/testFunction/add",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "10001",
+          "path": [
+            "fastop",
+            "designer",
+            "testFunction",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Task 2: Build Function Hierarchy",
+      "id": "766418ee-e0b7-4e66-b55e-488d0c75e2d4",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "127.0.0.1:10001/fastop//designer/testFunctionModule/add",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "10001",
+          "path": [
+            "fastop",
+            "",
+            "designer",
+            "testFunctionModule",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "case",
+      "id": "7f6fdfd9-6a7e-4a96-b72a-afd495ff3448",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"stepName\": \"Case 1\",\r\n  \"moduleId\": 3\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "127.0.0.1:10001/fastop/designer/case/add",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "10001",
+          "path": [
+            "fastop",
+            "designer",
+            "case",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "step",
+      "id": "279bbfd7-480e-4e9e-b315-f27ac5bf09d0",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"stepName\": \"Step 1\",\r\n  \"caseId\": 5005\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "127.0.0.1:10001/fastop/designer/step/add",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "10001",
+          "path": [
+            "fastop",
+            "designer",
+            "step",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Task 3: Function Approval",
+      "id": "a444acb7-5ea1-4a2f-94ad-b8c521d8039e",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "127.0.0.1:10001/fastop/designer/testFunction/check?funId=1209&checkWorker=worker1&level=0",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "10001",
+          "path": [
+            "fastop",
+            "designer",
+            "testFunction",
+            "check"
+          ],
+          "query": [
+            {
+              "key": "funId",
+              "value": "1209"
+            },
+            {
+              "key": "checkWorker",
+              "value": "worker1"
+            },
+            {
+              "key": "level",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "level1",
+      "id": "68e86718-51a8-454a-b6e2-aa985455fca4",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "127.0.0.1:10001/fastop/designer/testFunction/check?funId=1209&checkWorker=worker1&level=1",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "10001",
+          "path": [
+            "fastop",
+            "designer",
+            "testFunction",
+            "check"
+          ],
+          "query": [
+            {
+              "key": "funId",
+              "value": "1209"
+            },
+            {
+              "key": "checkWorker",
+              "value": "worker1"
+            },
+            {
+              "key": "level",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "level2",
+      "id": "55919983-9852-4c20-9457-3e1b8d2a75a0",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "127.0.0.1:10001/fastop/designer/testFunction/check?funId=1209&checkWorker=worker1&level=2",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "10001",
+          "path": [
+            "fastop",
+            "designer",
+            "testFunction",
+            "check"
+          ],
+          "query": [
+            {
+              "key": "funId",
+              "value": "1209"
+            },
+            {
+              "key": "checkWorker",
+              "value": "worker1"
+            },
+            {
+              "key": "level",
+              "value": "2"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "level3",
+      "id": "07a22528-dcee-4e90-9b8d-15ba911313a3",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "127.0.0.1:10001/fastop/designer/testFunction/check?funId=1209&checkWorker=worker1&level=3",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "10001",
+          "path": [
+            "fastop",
+            "designer",
+            "testFunction",
+            "check"
+          ],
+          "query": [
+            {
+              "key": "funId",
+              "value": "1209"
+            },
+            {
+              "key": "checkWorker",
+              "value": "worker1"
+            },
+            {
+              "key": "level",
+              "value": "3"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "level4",
+      "id": "489cef2e-d14c-48ba-a0cf-f40e56c7de92",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "127.0.0.1:10001/fastop/designer/testFunction/check?funId=1209&checkWorker=worker1&level=4",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "10001",
+          "path": [
+            "fastop",
+            "designer",
+            "testFunction",
+            "check"
+          ],
+          "query": [
+            {
+              "key": "funId",
+              "value": "1209"
+            },
+            {
+              "key": "checkWorker",
+              "value": "worker1"
+            },
+            {
+              "key": "level",
+              "value": "4"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "level5",
+      "id": "045dde7c-0c67-4b3f-bb1a-ce97eea7f68f",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "127.0.0.1:10001/fastop/designer/testFunction/check?funId=1209&checkWorker=worker1&level=5",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "10001",
+          "path": [
+            "fastop",
+            "designer",
+            "testFunction",
+            "check"
+          ],
+          "query": [
+            {
+              "key": "funId",
+              "value": "1209"
+            },
+            {
+              "key": "checkWorker",
+              "value": "worker1"
+            },
+            {
+              "key": "level",
+              "value": "5"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Task 4: Create Test Suite & Binding",
+      "id": "369de5ac-19c5-4452-9119-1587bc6784e9",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"suiteName\": \"Suite 1\",\r\n  \"entityStructId\": 1,\r\n  \"testBaseId\": 1,\r\n  \"planeEffectMin\": 0,\r\n  \"planeEffectMax\": 9999,\r\n  \"funIds\": [1209]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "127.0.0.1:10001/fastop/designer/testSuite/add",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "10001",
+          "path": [
+            "fastop",
+            "designer",
+            "testSuite",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create FunctionSuite",
+      "id": "686a9848-1b1a-4244-b249-4d3673a1af37",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"suiteId\": 347,\r\n  \"testFunctions\":[\r\n    1208,\r\n    1209\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "127.0.0.1:10001/fastop/functionSuite/createFunctionSuite",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "10001",
+          "path": [
+            "fastop",
+            "functionSuite",
+            "createFunctionSuite"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Task 5: Suite Approval",
+      "id": "6b0d83e2-cca6-406a-a551-83dc66a40bb4",
+      "request": {
+        "method": "POST",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Create Test Plan",
+      "id": "a1071990-6a76-4d44-a9a5-b9754973e042",
+      "request": {
+        "method": "POST",
+        "header": []
+      },
+      "response": []
+    }
+  ]
+}
