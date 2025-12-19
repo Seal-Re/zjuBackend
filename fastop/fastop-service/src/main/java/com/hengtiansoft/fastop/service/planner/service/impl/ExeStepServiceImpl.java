@@ -39,9 +39,6 @@ public class ExeStepServiceImpl implements ExeStepService {
     @Autowired
     private TestFunctionStepMapper testFunctionStepMapper;
 
-    @Autowired
-    private TestFunctionStepService testFunctionStepService;
-
     @Override
     @Transactional(readOnly = false)
     public int deleteExeStep(String exeFunctionId) {

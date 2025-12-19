@@ -45,16 +45,8 @@ public class ExeFunctionServiceImpl implements ExeFunctionService {
     private TestFunctionService testFunctionService;
 
     @Autowired
-    private TestFunctionStepService testFunctionStepService;
-
-    @Autowired
     private ExeFunctionMapper exeFunctionMapper;
 
-    @Autowired
-    private ExeStepMapper exeStepMapper;
-
-    @Autowired
-    private TestPlanService testPlanService;
 
     @Override
     public Response getExeFunctionInExeListByPlanId(String planId) {

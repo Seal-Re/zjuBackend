@@ -89,10 +89,44 @@ funId=1209&checkWorker=worker1&level=5
 ```json
 {
   "suiteName": "Suite 1",
+  "entityStructId": 1,
   "testBaseId": 1,
-  "funIds": [1, 2]
+  "planeEffectMin": 0,
+  "planeEffectMax": 9999,
+  "funIds": [1209]
 }
 ```
+
+**URL**: `POST /functionSuite/createFunctionSuite`
+**Input**:
+```json
+{
+  "suiteId": 347,
+  "testFunctions":[
+    {
+        "funId": 1208,
+        "funName": "Test Function 1",
+        "num": 1001,
+        "testBaseId": 1,
+        "planeEffectMin": 1,
+        "planeEffectMax": 100,
+        "versionDescription": "Initial version",
+        "military": false
+    },
+    {
+        "funId": 1209,
+        "funName": "Test Function 1",
+        "num": 1001,
+        "testBaseId": 1,
+        "planeEffectMin": 1,
+        "planeEffectMax": 100,
+        "versionDescription": "Initial version",
+        "military": false
+    }
+  ]
+}
+```
+
 **Verification**: Check `test_suite` created and `function_suite` records inserted.
 
 ### Task 5: Suite Approval
