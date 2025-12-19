@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hengtiansoft.fastop.model.designer.dto.TestFunctionModuleMapper">
+  <resultMap id="BaseResultMap" type="com.hengtiansoft.fastop.model.designer.entity.TestFunctionModule">
+    <id column="module_id" jdbcType="INTEGER" property="moduleId" />
+    <result column="module_name" jdbcType="VARCHAR" property="moduleName" />
+    <result column="change_user" jdbcType="VARCHAR" property="changeUser" />
+    <result column="module_description" jdbcType="VARCHAR" property="moduleDescription" />
+    <result column="module_note" jdbcType="VARCHAR" property="moduleNote" />
+    <result column="module_date" jdbcType="VARCHAR" property="moduleDate" />
+    <result column="fun_id" jdbcType="INTEGER" property="funId" />
+    <result column="module_status" jdbcType="INTEGER" property="moduleStatus" />
+    <result column="update" jdbcType="INTEGER" property="update" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    module_id, module_name, change_user, module_description, module_note, module_date, 
+    fun_id, module_status, update
+  </sql>
+  <select id="selectByExample" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionModuleExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from test_function_module
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from test_function_module
+    where module_id = #{moduleId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from test_function_module
+    where module_id = #{moduleId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionModuleExample">
+    delete from test_function_module
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionModule">
+    insert into test_function_module (module_id, module_name, change_user, 
+      module_description, module_note, module_date, 
+      fun_id, module_status, update
+      )
+    values (#{moduleId,jdbcType=INTEGER}, #{moduleName,jdbcType=VARCHAR}, #{changeUser,jdbcType=VARCHAR}, 
+      #{moduleDescription,jdbcType=VARCHAR}, #{moduleNote,jdbcType=VARCHAR}, #{moduleDate,jdbcType=VARCHAR}, 
+      #{funId,jdbcType=INTEGER}, #{moduleStatus,jdbcType=INTEGER}, #{update,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionModule">
+    insert into test_function_module
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="moduleId != null">
+        module_id,
+      </if>
+      <if test="moduleName != null">
+        module_name,
+      </if>
+      <if test="changeUser != null">
+        change_user,
+      </if>
+      <if test="moduleDescription != null">
+        module_description,
+      </if>
+      <if test="moduleNote != null">
+        module_note,
+      </if>
+      <if test="moduleDate != null">
+        module_date,
+      </if>
+      <if test="funId != null">
+        fun_id,
+      </if>
+      <if test="moduleStatus != null">
+        module_status,
+      </if>
+      <if test="update != null">
+        update,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="moduleId != null">
+        #{moduleId,jdbcType=INTEGER},
+      </if>
+      <if test="moduleName != null">
+        #{moduleName,jdbcType=VARCHAR},
+      </if>
+      <if test="changeUser != null">
+        #{changeUser,jdbcType=VARCHAR},
+      </if>
+      <if test="moduleDescription != null">
+        #{moduleDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="moduleNote != null">
+        #{moduleNote,jdbcType=VARCHAR},
+      </if>
+      <if test="moduleDate != null">
+        #{moduleDate,jdbcType=VARCHAR},
+      </if>
+      <if test="funId != null">
+        #{funId,jdbcType=INTEGER},
+      </if>
+      <if test="moduleStatus != null">
+        #{moduleStatus,jdbcType=INTEGER},
+      </if>
+      <if test="update != null">
+        #{update,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionModuleExample" resultType="java.lang.Long">
+    select count(*) from test_function_module
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update test_function_module
+    <set>
+      <if test="record.moduleId != null">
+        module_id = #{record.moduleId,jdbcType=INTEGER},
+      </if>
+      <if test="record.moduleName != null">
+        module_name = #{record.moduleName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.changeUser != null">
+        change_user = #{record.changeUser,jdbcType=VARCHAR},
+      </if>
+      <if test="record.moduleDescription != null">
+        module_description = #{record.moduleDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="record.moduleNote != null">
+        module_note = #{record.moduleNote,jdbcType=VARCHAR},
+      </if>
+      <if test="record.moduleDate != null">
+        module_date = #{record.moduleDate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funId != null">
+        fun_id = #{record.funId,jdbcType=INTEGER},
+      </if>
+      <if test="record.moduleStatus != null">
+        module_status = #{record.moduleStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.update != null">
+        update = #{record.update,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update test_function_module
+    set module_id = #{record.moduleId,jdbcType=INTEGER},
+      module_name = #{record.moduleName,jdbcType=VARCHAR},
+      change_user = #{record.changeUser,jdbcType=VARCHAR},
+      module_description = #{record.moduleDescription,jdbcType=VARCHAR},
+      module_note = #{record.moduleNote,jdbcType=VARCHAR},
+      module_date = #{record.moduleDate,jdbcType=VARCHAR},
+      fun_id = #{record.funId,jdbcType=INTEGER},
+      module_status = #{record.moduleStatus,jdbcType=INTEGER},
+      update = #{record.update,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionModule">
+    update test_function_module
+    <set>
+      <if test="moduleName != null">
+        module_name = #{moduleName,jdbcType=VARCHAR},
+      </if>
+      <if test="changeUser != null">
+        change_user = #{changeUser,jdbcType=VARCHAR},
+      </if>
+      <if test="moduleDescription != null">
+        module_description = #{moduleDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="moduleNote != null">
+        module_note = #{moduleNote,jdbcType=VARCHAR},
+      </if>
+      <if test="moduleDate != null">
+        module_date = #{moduleDate,jdbcType=VARCHAR},
+      </if>
+      <if test="funId != null">
+        fun_id = #{funId,jdbcType=INTEGER},
+      </if>
+      <if test="moduleStatus != null">
+        module_status = #{moduleStatus,jdbcType=INTEGER},
+      </if>
+      <if test="update != null">
+        update = #{update,jdbcType=INTEGER},
+      </if>
+    </set>
+    where module_id = #{moduleId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionModule">
+    update test_function_module
+    set module_name = #{moduleName,jdbcType=VARCHAR},
+      change_user = #{changeUser,jdbcType=VARCHAR},
+      module_description = #{moduleDescription,jdbcType=VARCHAR},
+      module_note = #{moduleNote,jdbcType=VARCHAR},
+      module_date = #{moduleDate,jdbcType=VARCHAR},
+      fun_id = #{funId,jdbcType=INTEGER},
+      module_status = #{moduleStatus,jdbcType=INTEGER},
+      update = #{update,jdbcType=INTEGER}
+    where module_id = #{moduleId,jdbcType=INTEGER}
+  </update>
+</mapper>

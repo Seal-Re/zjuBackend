@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hengtiansoft.fastop.model.designer.dto.TestSuiteMapper">
+  <resultMap id="BaseResultMap" type="com.hengtiansoft.fastop.model.designer.entity.TestSuite">
+    <id column="suite_id" jdbcType="INTEGER" property="suiteId" />
+    <result column="suite_name" jdbcType="VARCHAR" property="suiteName" />
+    <result column="suite_desc" jdbcType="VARCHAR" property="suiteDesc" />
+    <result column="version" jdbcType="INTEGER" property="version" />
+    <result column="plane_effect_min" jdbcType="INTEGER" property="planeEffectMin" />
+    <result column="plane_effect_max" jdbcType="INTEGER" property="planeEffectMax" />
+    <result column="proofer" jdbcType="VARCHAR" property="proofer" />
+    <result column="approver" jdbcType="VARCHAR" property="approver" />
+    <result column="submitter" jdbcType="VARCHAR" property="submitter" />
+    <result column="test_base_id" jdbcType="INTEGER" property="testBaseId" />
+    <result column="list_appr_status" jdbcType="INTEGER" property="listApprStatus" />
+    <result column="military" jdbcType="BIT" property="military" />
+    <result column="key_process" jdbcType="BIT" property="keyProcess" />
+    <result column="appr_chain" jdbcType="VARCHAR" property="apprChain" />
+    <result column="deleted" jdbcType="BIT" property="deleted" />
+    <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+    <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+    <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+    <result column="updated_by" jdbcType="VARCHAR" property="updatedBy" />
+    <result column="mesdce_code" jdbcType="VARCHAR" property="mesdceCode" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    suite_id, suite_name, suite_desc, version, plane_effect_min, plane_effect_max, proofer, 
+    approver, submitter, test_base_id, list_appr_status, military, key_process, appr_chain, 
+    deleted, created_at, updated_at, created_by, updated_by, mesdce_code
+  </sql>
+  <select id="selectByExample" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestSuiteExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from test_suite
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from test_suite
+    where suite_id = #{suiteId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from test_suite
+    where suite_id = #{suiteId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestSuiteExample">
+    delete from test_suite
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestSuite">
+    insert into test_suite (suite_id, suite_name, suite_desc, 
+      version, plane_effect_min, plane_effect_max, 
+      proofer, approver, submitter, 
+      test_base_id, list_appr_status, military, 
+      key_process, appr_chain, deleted, 
+      created_at, updated_at, created_by, 
+      updated_by, mesdce_code)
+    values (#{suiteId,jdbcType=INTEGER}, #{suiteName,jdbcType=VARCHAR}, #{suiteDesc,jdbcType=VARCHAR}, 
+      #{version,jdbcType=INTEGER}, #{planeEffectMin,jdbcType=INTEGER}, #{planeEffectMax,jdbcType=INTEGER}, 
+      #{proofer,jdbcType=VARCHAR}, #{approver,jdbcType=VARCHAR}, #{submitter,jdbcType=VARCHAR}, 
+      #{testBaseId,jdbcType=INTEGER}, #{listApprStatus,jdbcType=INTEGER}, #{military,jdbcType=BIT}, 
+      #{keyProcess,jdbcType=BIT}, #{apprChain,jdbcType=VARCHAR}, #{deleted,jdbcType=BIT}, 
+      #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, 
+      #{updatedBy,jdbcType=VARCHAR}, #{mesdceCode,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestSuite">
+    insert into test_suite
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="suiteId != null">
+        suite_id,
+      </if>
+      <if test="suiteName != null">
+        suite_name,
+      </if>
+      <if test="suiteDesc != null">
+        suite_desc,
+      </if>
+      <if test="version != null">
+        version,
+      </if>
+      <if test="planeEffectMin != null">
+        plane_effect_min,
+      </if>
+      <if test="planeEffectMax != null">
+        plane_effect_max,
+      </if>
+      <if test="proofer != null">
+        proofer,
+      </if>
+      <if test="approver != null">
+        approver,
+      </if>
+      <if test="submitter != null">
+        submitter,
+      </if>
+      <if test="testBaseId != null">
+        test_base_id,
+      </if>
+      <if test="listApprStatus != null">
+        list_appr_status,
+      </if>
+      <if test="military != null">
+        military,
+      </if>
+      <if test="keyProcess != null">
+        key_process,
+      </if>
+      <if test="apprChain != null">
+        appr_chain,
+      </if>
+      <if test="deleted != null">
+        deleted,
+      </if>
+      <if test="createdAt != null">
+        created_at,
+      </if>
+      <if test="updatedAt != null">
+        updated_at,
+      </if>
+      <if test="createdBy != null">
+        created_by,
+      </if>
+      <if test="updatedBy != null">
+        updated_by,
+      </if>
+      <if test="mesdceCode != null">
+        mesdce_code,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="suiteId != null">
+        #{suiteId,jdbcType=INTEGER},
+      </if>
+      <if test="suiteName != null">
+        #{suiteName,jdbcType=VARCHAR},
+      </if>
+      <if test="suiteDesc != null">
+        #{suiteDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=INTEGER},
+      </if>
+      <if test="planeEffectMin != null">
+        #{planeEffectMin,jdbcType=INTEGER},
+      </if>
+      <if test="planeEffectMax != null">
+        #{planeEffectMax,jdbcType=INTEGER},
+      </if>
+      <if test="proofer != null">
+        #{proofer,jdbcType=VARCHAR},
+      </if>
+      <if test="approver != null">
+        #{approver,jdbcType=VARCHAR},
+      </if>
+      <if test="submitter != null">
+        #{submitter,jdbcType=VARCHAR},
+      </if>
+      <if test="testBaseId != null">
+        #{testBaseId,jdbcType=INTEGER},
+      </if>
+      <if test="listApprStatus != null">
+        #{listApprStatus,jdbcType=INTEGER},
+      </if>
+      <if test="military != null">
+        #{military,jdbcType=BIT},
+      </if>
+      <if test="keyProcess != null">
+        #{keyProcess,jdbcType=BIT},
+      </if>
+      <if test="apprChain != null">
+        #{apprChain,jdbcType=VARCHAR},
+      </if>
+      <if test="deleted != null">
+        #{deleted,jdbcType=BIT},
+      </if>
+      <if test="createdAt != null">
+        #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null">
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="mesdceCode != null">
+        #{mesdceCode,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestSuiteExample" resultType="java.lang.Long">
+    select count(*) from test_suite
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update test_suite
+    <set>
+      <if test="record.suiteId != null">
+        suite_id = #{record.suiteId,jdbcType=INTEGER},
+      </if>
+      <if test="record.suiteName != null">
+        suite_name = #{record.suiteName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.suiteDesc != null">
+        suite_desc = #{record.suiteDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="record.version != null">
+        version = #{record.version,jdbcType=INTEGER},
+      </if>
+      <if test="record.planeEffectMin != null">
+        plane_effect_min = #{record.planeEffectMin,jdbcType=INTEGER},
+      </if>
+      <if test="record.planeEffectMax != null">
+        plane_effect_max = #{record.planeEffectMax,jdbcType=INTEGER},
+      </if>
+      <if test="record.proofer != null">
+        proofer = #{record.proofer,jdbcType=VARCHAR},
+      </if>
+      <if test="record.approver != null">
+        approver = #{record.approver,jdbcType=VARCHAR},
+      </if>
+      <if test="record.submitter != null">
+        submitter = #{record.submitter,jdbcType=VARCHAR},
+      </if>
+      <if test="record.testBaseId != null">
+        test_base_id = #{record.testBaseId,jdbcType=INTEGER},
+      </if>
+      <if test="record.listApprStatus != null">
+        list_appr_status = #{record.listApprStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.military != null">
+        military = #{record.military,jdbcType=BIT},
+      </if>
+      <if test="record.keyProcess != null">
+        key_process = #{record.keyProcess,jdbcType=BIT},
+      </if>
+      <if test="record.apprChain != null">
+        appr_chain = #{record.apprChain,jdbcType=VARCHAR},
+      </if>
+      <if test="record.deleted != null">
+        deleted = #{record.deleted,jdbcType=BIT},
+      </if>
+      <if test="record.createdAt != null">
+        created_at = #{record.createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updatedAt != null">
+        updated_at = #{record.updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.createdBy != null">
+        created_by = #{record.createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="record.updatedBy != null">
+        updated_by = #{record.updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mesdceCode != null">
+        mesdce_code = #{record.mesdceCode,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update test_suite
+    set suite_id = #{record.suiteId,jdbcType=INTEGER},
+      suite_name = #{record.suiteName,jdbcType=VARCHAR},
+      suite_desc = #{record.suiteDesc,jdbcType=VARCHAR},
+      version = #{record.version,jdbcType=INTEGER},
+      plane_effect_min = #{record.planeEffectMin,jdbcType=INTEGER},
+      plane_effect_max = #{record.planeEffectMax,jdbcType=INTEGER},
+      proofer = #{record.proofer,jdbcType=VARCHAR},
+      approver = #{record.approver,jdbcType=VARCHAR},
+      submitter = #{record.submitter,jdbcType=VARCHAR},
+      test_base_id = #{record.testBaseId,jdbcType=INTEGER},
+      list_appr_status = #{record.listApprStatus,jdbcType=INTEGER},
+      military = #{record.military,jdbcType=BIT},
+      key_process = #{record.keyProcess,jdbcType=BIT},
+      appr_chain = #{record.apprChain,jdbcType=VARCHAR},
+      deleted = #{record.deleted,jdbcType=BIT},
+      created_at = #{record.createdAt,jdbcType=TIMESTAMP},
+      updated_at = #{record.updatedAt,jdbcType=TIMESTAMP},
+      created_by = #{record.createdBy,jdbcType=VARCHAR},
+      updated_by = #{record.updatedBy,jdbcType=VARCHAR},
+      mesdce_code = #{record.mesdceCode,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestSuite">
+    update test_suite
+    <set>
+      <if test="suiteName != null">
+        suite_name = #{suiteName,jdbcType=VARCHAR},
+      </if>
+      <if test="suiteDesc != null">
+        suite_desc = #{suiteDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null">
+        version = #{version,jdbcType=INTEGER},
+      </if>
+      <if test="planeEffectMin != null">
+        plane_effect_min = #{planeEffectMin,jdbcType=INTEGER},
+      </if>
+      <if test="planeEffectMax != null">
+        plane_effect_max = #{planeEffectMax,jdbcType=INTEGER},
+      </if>
+      <if test="proofer != null">
+        proofer = #{proofer,jdbcType=VARCHAR},
+      </if>
+      <if test="approver != null">
+        approver = #{approver,jdbcType=VARCHAR},
+      </if>
+      <if test="submitter != null">
+        submitter = #{submitter,jdbcType=VARCHAR},
+      </if>
+      <if test="testBaseId != null">
+        test_base_id = #{testBaseId,jdbcType=INTEGER},
+      </if>
+      <if test="listApprStatus != null">
+        list_appr_status = #{listApprStatus,jdbcType=INTEGER},
+      </if>
+      <if test="military != null">
+        military = #{military,jdbcType=BIT},
+      </if>
+      <if test="keyProcess != null">
+        key_process = #{keyProcess,jdbcType=BIT},
+      </if>
+      <if test="apprChain != null">
+        appr_chain = #{apprChain,jdbcType=VARCHAR},
+      </if>
+      <if test="deleted != null">
+        deleted = #{deleted,jdbcType=BIT},
+      </if>
+      <if test="createdAt != null">
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null">
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="mesdceCode != null">
+        mesdce_code = #{mesdceCode,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where suite_id = #{suiteId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestSuite">
+    update test_suite
+    set suite_name = #{suiteName,jdbcType=VARCHAR},
+      suite_desc = #{suiteDesc,jdbcType=VARCHAR},
+      version = #{version,jdbcType=INTEGER},
+      plane_effect_min = #{planeEffectMin,jdbcType=INTEGER},
+      plane_effect_max = #{planeEffectMax,jdbcType=INTEGER},
+      proofer = #{proofer,jdbcType=VARCHAR},
+      approver = #{approver,jdbcType=VARCHAR},
+      submitter = #{submitter,jdbcType=VARCHAR},
+      test_base_id = #{testBaseId,jdbcType=INTEGER},
+      list_appr_status = #{listApprStatus,jdbcType=INTEGER},
+      military = #{military,jdbcType=BIT},
+      key_process = #{keyProcess,jdbcType=BIT},
+      appr_chain = #{apprChain,jdbcType=VARCHAR},
+      deleted = #{deleted,jdbcType=BIT},
+      created_at = #{createdAt,jdbcType=TIMESTAMP},
+      updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      mesdce_code = #{mesdceCode,jdbcType=VARCHAR}
+    where suite_id = #{suiteId,jdbcType=INTEGER}
+  </update>
+</mapper>

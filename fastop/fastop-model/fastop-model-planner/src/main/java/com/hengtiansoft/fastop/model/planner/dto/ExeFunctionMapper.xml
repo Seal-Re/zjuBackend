@@ -1,0 +1,751 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hengtiansoft.fastop.model.planner.dto.ExeFunctionMapper">
+  <resultMap id="BaseResultMap" type="com.hengtiansoft.fastop.model.planner.entity.ExeFunction">
+    <id column="exe_function_id" jdbcType="CHAR" property="exeFunctionId" />
+    <result column="function_name" jdbcType="VARCHAR" property="functionName" />
+    <result column="plan_id" jdbcType="CHAR" property="planId" />
+    <result column="function_id" jdbcType="CHAR" property="functionId" />
+    <result column="version" jdbcType="INTEGER" property="version" />
+    <result column="flow_version" jdbcType="INTEGER" property="flowVersion" />
+    <result column="num" jdbcType="INTEGER" property="num" />
+    <result column="security" jdbcType="INTEGER" property="security" />
+    <result column="expect_time" jdbcType="INTEGER" property="expectTime" />
+    <result column="test_caution_id" jdbcType="VARCHAR" property="testCautionId" />
+    <result column="subject_source_id" jdbcType="VARCHAR" property="subjectSourceId" />
+    <result column="exe_function_order" jdbcType="INTEGER" property="exeFunctionOrder" />
+    <result column="current_step_num" jdbcType="INTEGER" property="currentStepNum" />
+    <result column="exe_status" jdbcType="INTEGER" property="exeStatus" />
+    <result column="verify_status" jdbcType="INTEGER" property="verifyStatus" />
+    <result column="verify_num" jdbcType="INTEGER" property="verifyNum" />
+    <result column="military_status" jdbcType="INTEGER" property="militaryStatus" />
+    <result column="military_num" jdbcType="INTEGER" property="militaryNum" />
+    <result column="version_description" jdbcType="VARCHAR" property="versionDescription" />
+    <result column="military" jdbcType="BIT" property="military" />
+    <result column="key_pro_count" jdbcType="INTEGER" property="keyProCount" />
+    <result column="change_flag" jdbcType="INTEGER" property="changeFlag" />
+    <result column="flow_version_line" jdbcType="VARCHAR" property="flowVersionLine" />
+    <result column="depends_on" jdbcType="VARCHAR" property="dependsOn" />
+    <result column="result_comments" jdbcType="VARCHAR" property="resultComments" />
+    <result column="caution" jdbcType="VARCHAR" property="caution" />
+    <result column="is_ready" jdbcType="BIT" property="isReady" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="deleted" jdbcType="BIT" property="deleted" />
+    <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+    <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+    <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+    <result column="updated_by" jdbcType="VARCHAR" property="updatedBy" />
+    <result column="cal_before_time" jdbcType="TIMESTAMP" property="calBeforeTime" />
+    <result column="cal_time" jdbcType="VARCHAR" property="calTime" />
+    <result column="execute_time" jdbcType="INTEGER" property="executeTime" />
+    <result column="redo_count" jdbcType="VARCHAR" property="redoCount" />
+    <result column="detect_id" jdbcType="VARCHAR" property="detectId" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    exe_function_id, function_name, plan_id, function_id, version, flow_version, num, 
+    security, expect_time, test_caution_id, subject_source_id, exe_function_order, current_step_num, 
+    exe_status, verify_status, verify_num, military_status, military_num, version_description, 
+    military, key_pro_count, change_flag, flow_version_line, depends_on, result_comments, 
+    caution, is_ready, start_time, end_time, deleted, created_at, updated_at, created_by, 
+    updated_by, cal_before_time, cal_time, execute_time, redo_count, detect_id
+  </sql>
+  <select id="selectByExample" parameterType="com.hengtiansoft.fastop.model.planner.entity.ExeFunctionExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from exe_function
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from exe_function
+    where exe_function_id = #{exeFunctionId,jdbcType=CHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from exe_function
+    where exe_function_id = #{exeFunctionId,jdbcType=CHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.hengtiansoft.fastop.model.planner.entity.ExeFunctionExample">
+    delete from exe_function
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.hengtiansoft.fastop.model.planner.entity.ExeFunction">
+    insert into exe_function (exe_function_id, function_name, plan_id, 
+      function_id, version, flow_version, 
+      num, security, expect_time, 
+      test_caution_id, subject_source_id, exe_function_order, 
+      current_step_num, exe_status, verify_status, 
+      verify_num, military_status, military_num, 
+      version_description, military, key_pro_count, 
+      change_flag, flow_version_line, depends_on, 
+      result_comments, caution, is_ready, 
+      start_time, end_time, deleted, 
+      created_at, updated_at, created_by, 
+      updated_by, cal_before_time, cal_time, 
+      execute_time, redo_count, detect_id
+      )
+    values (#{exeFunctionId,jdbcType=CHAR}, #{functionName,jdbcType=VARCHAR}, #{planId,jdbcType=CHAR}, 
+      #{functionId,jdbcType=CHAR}, #{version,jdbcType=INTEGER}, #{flowVersion,jdbcType=INTEGER}, 
+      #{num,jdbcType=INTEGER}, #{security,jdbcType=INTEGER}, #{expectTime,jdbcType=INTEGER}, 
+      #{testCautionId,jdbcType=VARCHAR}, #{subjectSourceId,jdbcType=VARCHAR}, #{exeFunctionOrder,jdbcType=INTEGER}, 
+      #{currentStepNum,jdbcType=INTEGER}, #{exeStatus,jdbcType=INTEGER}, #{verifyStatus,jdbcType=INTEGER}, 
+      #{verifyNum,jdbcType=INTEGER}, #{militaryStatus,jdbcType=INTEGER}, #{militaryNum,jdbcType=INTEGER}, 
+      #{versionDescription,jdbcType=VARCHAR}, #{military,jdbcType=BIT}, #{keyProCount,jdbcType=INTEGER}, 
+      #{changeFlag,jdbcType=INTEGER}, #{flowVersionLine,jdbcType=VARCHAR}, #{dependsOn,jdbcType=VARCHAR}, 
+      #{resultComments,jdbcType=VARCHAR}, #{caution,jdbcType=VARCHAR}, #{isReady,jdbcType=BIT}, 
+      #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{deleted,jdbcType=BIT}, 
+      #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, 
+      #{updatedBy,jdbcType=VARCHAR}, #{calBeforeTime,jdbcType=TIMESTAMP}, #{calTime,jdbcType=VARCHAR}, 
+      #{executeTime,jdbcType=INTEGER}, #{redoCount,jdbcType=VARCHAR}, #{detectId,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.hengtiansoft.fastop.model.planner.entity.ExeFunction">
+    insert into exe_function
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="exeFunctionId != null">
+        exe_function_id,
+      </if>
+      <if test="functionName != null">
+        function_name,
+      </if>
+      <if test="planId != null">
+        plan_id,
+      </if>
+      <if test="functionId != null">
+        function_id,
+      </if>
+      <if test="version != null">
+        version,
+      </if>
+      <if test="flowVersion != null">
+        flow_version,
+      </if>
+      <if test="num != null">
+        num,
+      </if>
+      <if test="security != null">
+        security,
+      </if>
+      <if test="expectTime != null">
+        expect_time,
+      </if>
+      <if test="testCautionId != null">
+        test_caution_id,
+      </if>
+      <if test="subjectSourceId != null">
+        subject_source_id,
+      </if>
+      <if test="exeFunctionOrder != null">
+        exe_function_order,
+      </if>
+      <if test="currentStepNum != null">
+        current_step_num,
+      </if>
+      <if test="exeStatus != null">
+        exe_status,
+      </if>
+      <if test="verifyStatus != null">
+        verify_status,
+      </if>
+      <if test="verifyNum != null">
+        verify_num,
+      </if>
+      <if test="militaryStatus != null">
+        military_status,
+      </if>
+      <if test="militaryNum != null">
+        military_num,
+      </if>
+      <if test="versionDescription != null">
+        version_description,
+      </if>
+      <if test="military != null">
+        military,
+      </if>
+      <if test="keyProCount != null">
+        key_pro_count,
+      </if>
+      <if test="changeFlag != null">
+        change_flag,
+      </if>
+      <if test="flowVersionLine != null">
+        flow_version_line,
+      </if>
+      <if test="dependsOn != null">
+        depends_on,
+      </if>
+      <if test="resultComments != null">
+        result_comments,
+      </if>
+      <if test="caution != null">
+        caution,
+      </if>
+      <if test="isReady != null">
+        is_ready,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+      <if test="deleted != null">
+        deleted,
+      </if>
+      <if test="createdAt != null">
+        created_at,
+      </if>
+      <if test="updatedAt != null">
+        updated_at,
+      </if>
+      <if test="createdBy != null">
+        created_by,
+      </if>
+      <if test="updatedBy != null">
+        updated_by,
+      </if>
+      <if test="calBeforeTime != null">
+        cal_before_time,
+      </if>
+      <if test="calTime != null">
+        cal_time,
+      </if>
+      <if test="executeTime != null">
+        execute_time,
+      </if>
+      <if test="redoCount != null">
+        redo_count,
+      </if>
+      <if test="detectId != null">
+        detect_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="exeFunctionId != null">
+        #{exeFunctionId,jdbcType=CHAR},
+      </if>
+      <if test="functionName != null">
+        #{functionName,jdbcType=VARCHAR},
+      </if>
+      <if test="planId != null">
+        #{planId,jdbcType=CHAR},
+      </if>
+      <if test="functionId != null">
+        #{functionId,jdbcType=CHAR},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=INTEGER},
+      </if>
+      <if test="flowVersion != null">
+        #{flowVersion,jdbcType=INTEGER},
+      </if>
+      <if test="num != null">
+        #{num,jdbcType=INTEGER},
+      </if>
+      <if test="security != null">
+        #{security,jdbcType=INTEGER},
+      </if>
+      <if test="expectTime != null">
+        #{expectTime,jdbcType=INTEGER},
+      </if>
+      <if test="testCautionId != null">
+        #{testCautionId,jdbcType=VARCHAR},
+      </if>
+      <if test="subjectSourceId != null">
+        #{subjectSourceId,jdbcType=VARCHAR},
+      </if>
+      <if test="exeFunctionOrder != null">
+        #{exeFunctionOrder,jdbcType=INTEGER},
+      </if>
+      <if test="currentStepNum != null">
+        #{currentStepNum,jdbcType=INTEGER},
+      </if>
+      <if test="exeStatus != null">
+        #{exeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="verifyStatus != null">
+        #{verifyStatus,jdbcType=INTEGER},
+      </if>
+      <if test="verifyNum != null">
+        #{verifyNum,jdbcType=INTEGER},
+      </if>
+      <if test="militaryStatus != null">
+        #{militaryStatus,jdbcType=INTEGER},
+      </if>
+      <if test="militaryNum != null">
+        #{militaryNum,jdbcType=INTEGER},
+      </if>
+      <if test="versionDescription != null">
+        #{versionDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="military != null">
+        #{military,jdbcType=BIT},
+      </if>
+      <if test="keyProCount != null">
+        #{keyProCount,jdbcType=INTEGER},
+      </if>
+      <if test="changeFlag != null">
+        #{changeFlag,jdbcType=INTEGER},
+      </if>
+      <if test="flowVersionLine != null">
+        #{flowVersionLine,jdbcType=VARCHAR},
+      </if>
+      <if test="dependsOn != null">
+        #{dependsOn,jdbcType=VARCHAR},
+      </if>
+      <if test="resultComments != null">
+        #{resultComments,jdbcType=VARCHAR},
+      </if>
+      <if test="caution != null">
+        #{caution,jdbcType=VARCHAR},
+      </if>
+      <if test="isReady != null">
+        #{isReady,jdbcType=BIT},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deleted != null">
+        #{deleted,jdbcType=BIT},
+      </if>
+      <if test="createdAt != null">
+        #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null">
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="calBeforeTime != null">
+        #{calBeforeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="calTime != null">
+        #{calTime,jdbcType=VARCHAR},
+      </if>
+      <if test="executeTime != null">
+        #{executeTime,jdbcType=INTEGER},
+      </if>
+      <if test="redoCount != null">
+        #{redoCount,jdbcType=VARCHAR},
+      </if>
+      <if test="detectId != null">
+        #{detectId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.hengtiansoft.fastop.model.planner.entity.ExeFunctionExample" resultType="java.lang.Long">
+    select count(*) from exe_function
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update exe_function
+    <set>
+      <if test="record.exeFunctionId != null">
+        exe_function_id = #{record.exeFunctionId,jdbcType=CHAR},
+      </if>
+      <if test="record.functionName != null">
+        function_name = #{record.functionName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.planId != null">
+        plan_id = #{record.planId,jdbcType=CHAR},
+      </if>
+      <if test="record.functionId != null">
+        function_id = #{record.functionId,jdbcType=CHAR},
+      </if>
+      <if test="record.version != null">
+        version = #{record.version,jdbcType=INTEGER},
+      </if>
+      <if test="record.flowVersion != null">
+        flow_version = #{record.flowVersion,jdbcType=INTEGER},
+      </if>
+      <if test="record.num != null">
+        num = #{record.num,jdbcType=INTEGER},
+      </if>
+      <if test="record.security != null">
+        security = #{record.security,jdbcType=INTEGER},
+      </if>
+      <if test="record.expectTime != null">
+        expect_time = #{record.expectTime,jdbcType=INTEGER},
+      </if>
+      <if test="record.testCautionId != null">
+        test_caution_id = #{record.testCautionId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.subjectSourceId != null">
+        subject_source_id = #{record.subjectSourceId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.exeFunctionOrder != null">
+        exe_function_order = #{record.exeFunctionOrder,jdbcType=INTEGER},
+      </if>
+      <if test="record.currentStepNum != null">
+        current_step_num = #{record.currentStepNum,jdbcType=INTEGER},
+      </if>
+      <if test="record.exeStatus != null">
+        exe_status = #{record.exeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.verifyStatus != null">
+        verify_status = #{record.verifyStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.verifyNum != null">
+        verify_num = #{record.verifyNum,jdbcType=INTEGER},
+      </if>
+      <if test="record.militaryStatus != null">
+        military_status = #{record.militaryStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.militaryNum != null">
+        military_num = #{record.militaryNum,jdbcType=INTEGER},
+      </if>
+      <if test="record.versionDescription != null">
+        version_description = #{record.versionDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="record.military != null">
+        military = #{record.military,jdbcType=BIT},
+      </if>
+      <if test="record.keyProCount != null">
+        key_pro_count = #{record.keyProCount,jdbcType=INTEGER},
+      </if>
+      <if test="record.changeFlag != null">
+        change_flag = #{record.changeFlag,jdbcType=INTEGER},
+      </if>
+      <if test="record.flowVersionLine != null">
+        flow_version_line = #{record.flowVersionLine,jdbcType=VARCHAR},
+      </if>
+      <if test="record.dependsOn != null">
+        depends_on = #{record.dependsOn,jdbcType=VARCHAR},
+      </if>
+      <if test="record.resultComments != null">
+        result_comments = #{record.resultComments,jdbcType=VARCHAR},
+      </if>
+      <if test="record.caution != null">
+        caution = #{record.caution,jdbcType=VARCHAR},
+      </if>
+      <if test="record.isReady != null">
+        is_ready = #{record.isReady,jdbcType=BIT},
+      </if>
+      <if test="record.startTime != null">
+        start_time = #{record.startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.endTime != null">
+        end_time = #{record.endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.deleted != null">
+        deleted = #{record.deleted,jdbcType=BIT},
+      </if>
+      <if test="record.createdAt != null">
+        created_at = #{record.createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updatedAt != null">
+        updated_at = #{record.updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.createdBy != null">
+        created_by = #{record.createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="record.updatedBy != null">
+        updated_by = #{record.updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="record.calBeforeTime != null">
+        cal_before_time = #{record.calBeforeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.calTime != null">
+        cal_time = #{record.calTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.executeTime != null">
+        execute_time = #{record.executeTime,jdbcType=INTEGER},
+      </if>
+      <if test="record.redoCount != null">
+        redo_count = #{record.redoCount,jdbcType=VARCHAR},
+      </if>
+      <if test="record.detectId != null">
+        detect_id = #{record.detectId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update exe_function
+    set exe_function_id = #{record.exeFunctionId,jdbcType=CHAR},
+      function_name = #{record.functionName,jdbcType=VARCHAR},
+      plan_id = #{record.planId,jdbcType=CHAR},
+      function_id = #{record.functionId,jdbcType=CHAR},
+      version = #{record.version,jdbcType=INTEGER},
+      flow_version = #{record.flowVersion,jdbcType=INTEGER},
+      num = #{record.num,jdbcType=INTEGER},
+      security = #{record.security,jdbcType=INTEGER},
+      expect_time = #{record.expectTime,jdbcType=INTEGER},
+      test_caution_id = #{record.testCautionId,jdbcType=VARCHAR},
+      subject_source_id = #{record.subjectSourceId,jdbcType=VARCHAR},
+      exe_function_order = #{record.exeFunctionOrder,jdbcType=INTEGER},
+      current_step_num = #{record.currentStepNum,jdbcType=INTEGER},
+      exe_status = #{record.exeStatus,jdbcType=INTEGER},
+      verify_status = #{record.verifyStatus,jdbcType=INTEGER},
+      verify_num = #{record.verifyNum,jdbcType=INTEGER},
+      military_status = #{record.militaryStatus,jdbcType=INTEGER},
+      military_num = #{record.militaryNum,jdbcType=INTEGER},
+      version_description = #{record.versionDescription,jdbcType=VARCHAR},
+      military = #{record.military,jdbcType=BIT},
+      key_pro_count = #{record.keyProCount,jdbcType=INTEGER},
+      change_flag = #{record.changeFlag,jdbcType=INTEGER},
+      flow_version_line = #{record.flowVersionLine,jdbcType=VARCHAR},
+      depends_on = #{record.dependsOn,jdbcType=VARCHAR},
+      result_comments = #{record.resultComments,jdbcType=VARCHAR},
+      caution = #{record.caution,jdbcType=VARCHAR},
+      is_ready = #{record.isReady,jdbcType=BIT},
+      start_time = #{record.startTime,jdbcType=TIMESTAMP},
+      end_time = #{record.endTime,jdbcType=TIMESTAMP},
+      deleted = #{record.deleted,jdbcType=BIT},
+      created_at = #{record.createdAt,jdbcType=TIMESTAMP},
+      updated_at = #{record.updatedAt,jdbcType=TIMESTAMP},
+      created_by = #{record.createdBy,jdbcType=VARCHAR},
+      updated_by = #{record.updatedBy,jdbcType=VARCHAR},
+      cal_before_time = #{record.calBeforeTime,jdbcType=TIMESTAMP},
+      cal_time = #{record.calTime,jdbcType=VARCHAR},
+      execute_time = #{record.executeTime,jdbcType=INTEGER},
+      redo_count = #{record.redoCount,jdbcType=VARCHAR},
+      detect_id = #{record.detectId,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hengtiansoft.fastop.model.planner.entity.ExeFunction">
+    update exe_function
+    <set>
+      <if test="functionName != null">
+        function_name = #{functionName,jdbcType=VARCHAR},
+      </if>
+      <if test="planId != null">
+        plan_id = #{planId,jdbcType=CHAR},
+      </if>
+      <if test="functionId != null">
+        function_id = #{functionId,jdbcType=CHAR},
+      </if>
+      <if test="version != null">
+        version = #{version,jdbcType=INTEGER},
+      </if>
+      <if test="flowVersion != null">
+        flow_version = #{flowVersion,jdbcType=INTEGER},
+      </if>
+      <if test="num != null">
+        num = #{num,jdbcType=INTEGER},
+      </if>
+      <if test="security != null">
+        security = #{security,jdbcType=INTEGER},
+      </if>
+      <if test="expectTime != null">
+        expect_time = #{expectTime,jdbcType=INTEGER},
+      </if>
+      <if test="testCautionId != null">
+        test_caution_id = #{testCautionId,jdbcType=VARCHAR},
+      </if>
+      <if test="subjectSourceId != null">
+        subject_source_id = #{subjectSourceId,jdbcType=VARCHAR},
+      </if>
+      <if test="exeFunctionOrder != null">
+        exe_function_order = #{exeFunctionOrder,jdbcType=INTEGER},
+      </if>
+      <if test="currentStepNum != null">
+        current_step_num = #{currentStepNum,jdbcType=INTEGER},
+      </if>
+      <if test="exeStatus != null">
+        exe_status = #{exeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="verifyStatus != null">
+        verify_status = #{verifyStatus,jdbcType=INTEGER},
+      </if>
+      <if test="verifyNum != null">
+        verify_num = #{verifyNum,jdbcType=INTEGER},
+      </if>
+      <if test="militaryStatus != null">
+        military_status = #{militaryStatus,jdbcType=INTEGER},
+      </if>
+      <if test="militaryNum != null">
+        military_num = #{militaryNum,jdbcType=INTEGER},
+      </if>
+      <if test="versionDescription != null">
+        version_description = #{versionDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="military != null">
+        military = #{military,jdbcType=BIT},
+      </if>
+      <if test="keyProCount != null">
+        key_pro_count = #{keyProCount,jdbcType=INTEGER},
+      </if>
+      <if test="changeFlag != null">
+        change_flag = #{changeFlag,jdbcType=INTEGER},
+      </if>
+      <if test="flowVersionLine != null">
+        flow_version_line = #{flowVersionLine,jdbcType=VARCHAR},
+      </if>
+      <if test="dependsOn != null">
+        depends_on = #{dependsOn,jdbcType=VARCHAR},
+      </if>
+      <if test="resultComments != null">
+        result_comments = #{resultComments,jdbcType=VARCHAR},
+      </if>
+      <if test="caution != null">
+        caution = #{caution,jdbcType=VARCHAR},
+      </if>
+      <if test="isReady != null">
+        is_ready = #{isReady,jdbcType=BIT},
+      </if>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deleted != null">
+        deleted = #{deleted,jdbcType=BIT},
+      </if>
+      <if test="createdAt != null">
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null">
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="calBeforeTime != null">
+        cal_before_time = #{calBeforeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="calTime != null">
+        cal_time = #{calTime,jdbcType=VARCHAR},
+      </if>
+      <if test="executeTime != null">
+        execute_time = #{executeTime,jdbcType=INTEGER},
+      </if>
+      <if test="redoCount != null">
+        redo_count = #{redoCount,jdbcType=VARCHAR},
+      </if>
+      <if test="detectId != null">
+        detect_id = #{detectId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where exe_function_id = #{exeFunctionId,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hengtiansoft.fastop.model.planner.entity.ExeFunction">
+    update exe_function
+    set function_name = #{functionName,jdbcType=VARCHAR},
+      plan_id = #{planId,jdbcType=CHAR},
+      function_id = #{functionId,jdbcType=CHAR},
+      version = #{version,jdbcType=INTEGER},
+      flow_version = #{flowVersion,jdbcType=INTEGER},
+      num = #{num,jdbcType=INTEGER},
+      security = #{security,jdbcType=INTEGER},
+      expect_time = #{expectTime,jdbcType=INTEGER},
+      test_caution_id = #{testCautionId,jdbcType=VARCHAR},
+      subject_source_id = #{subjectSourceId,jdbcType=VARCHAR},
+      exe_function_order = #{exeFunctionOrder,jdbcType=INTEGER},
+      current_step_num = #{currentStepNum,jdbcType=INTEGER},
+      exe_status = #{exeStatus,jdbcType=INTEGER},
+      verify_status = #{verifyStatus,jdbcType=INTEGER},
+      verify_num = #{verifyNum,jdbcType=INTEGER},
+      military_status = #{militaryStatus,jdbcType=INTEGER},
+      military_num = #{militaryNum,jdbcType=INTEGER},
+      version_description = #{versionDescription,jdbcType=VARCHAR},
+      military = #{military,jdbcType=BIT},
+      key_pro_count = #{keyProCount,jdbcType=INTEGER},
+      change_flag = #{changeFlag,jdbcType=INTEGER},
+      flow_version_line = #{flowVersionLine,jdbcType=VARCHAR},
+      depends_on = #{dependsOn,jdbcType=VARCHAR},
+      result_comments = #{resultComments,jdbcType=VARCHAR},
+      caution = #{caution,jdbcType=VARCHAR},
+      is_ready = #{isReady,jdbcType=BIT},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      deleted = #{deleted,jdbcType=BIT},
+      created_at = #{createdAt,jdbcType=TIMESTAMP},
+      updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      cal_before_time = #{calBeforeTime,jdbcType=TIMESTAMP},
+      cal_time = #{calTime,jdbcType=VARCHAR},
+      execute_time = #{executeTime,jdbcType=INTEGER},
+      redo_count = #{redoCount,jdbcType=VARCHAR},
+      detect_id = #{detectId,jdbcType=VARCHAR}
+    where exe_function_id = #{exeFunctionId,jdbcType=CHAR}
+  </update>
+</mapper>
