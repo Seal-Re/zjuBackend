@@ -56,7 +56,6 @@
                 <version>${spring-boot.version}</version>
                 <configuration>
                     <mainClass>com.hengtiansoft.fastop.dal.designer.FastopDalDesignerApplication</mainClass>
-                    <skip>true</skip>
                 </configuration>
                 <executions>
                     <execution>
