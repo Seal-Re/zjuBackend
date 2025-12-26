@@ -86,6 +86,7 @@
                 <version>${spring-boot.version}</version>
                 <configuration>
                     <mainClass>com.hengtiansoft.fastop.base.common.FastopBaseCommonApplication</mainClass>
+                    <skip>true</skip>
                 </configuration>
                 <executions>
                     <execution>

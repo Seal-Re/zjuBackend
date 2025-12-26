@@ -125,6 +125,7 @@
                 <version>2.7.18</version>
                 <configuration>
                     <mainClass>com.hengtiansoft.fastop.service.FastopServiceApplication</mainClass>
+                    <skip>true</skip>
                 </configuration>
                 <executions>
                     <execution>
