@@ -10,9 +10,7 @@ import com.hengtiansoft.fastop.model.designer.dto.TestFunctionModuleMapper;
 import com.hengtiansoft.fastop.model.designer.dto.TestFunctionStepMapper;
 import com.hengtiansoft.fastop.model.designer.entity.*;
 import com.hengtiansoft.fastop.model.planner.dto.ExeStepMapper;
-import com.hengtiansoft.fastop.model.planner.entity.ExeStep;
-import com.hengtiansoft.fastop.model.planner.entity.ExeStepExample;
-import com.hengtiansoft.fastop.model.planner.entity.ExeStepWithBLOBs;
+import com.hengtiansoft.fastop.model.planner.entity.*;
 import com.hengtiansoft.fastop.service.designer.service.TestFunctionStepService;
 import com.hengtiansoft.fastop.service.planner.service.ExeStepService;
 import org.springframework.beans.BeanUtils;
@@ -106,19 +104,19 @@ public class ExeStepServiceImpl implements ExeStepService {
      * Since we are removing RPCs and instructed not to create missing entities (Device, Driver),
      * we will return the basic structure.
      */
-    public List<ExeStep> listExeSteps(String exeFunctionId) {
+    public Response listExeSteps(String exeFunctionId) {
         // Reference uses custom mapper `getExeStepStruct` which returns DTOs.
         // Target mapper is basic.
         ExeStepExample example = new ExeStepExample();
         example.createCriteria().andExeFunctionIdEqualTo(exeFunctionId);
-        return exeStepMapper.selectByExample(example);
+        return ResponseFactory.success(exeStepMapper.selectByExample(example));
     }
 
     /**
      * 更新指定测试步骤下正在执行的步骤为暂停状态
      */
     @Transactional(readOnly = false)
-    public boolean updateStepExeToPause(String exeFunctionId) {
+    public Response updateStepExeToPause(String exeFunctionId) {
         boolean result = true;
 
         ExeStepExample example = new ExeStepExample();
@@ -137,7 +135,10 @@ public class ExeStepServiceImpl implements ExeStepService {
                 result = false;
             }
         }
-        return result;
+        if (result) {
+            return ResponseFactory.success("更新成功");
+        }
+        return ResponseFactory.failure("更新失败");
     }
 
     /**
@@ -147,32 +148,36 @@ public class ExeStepServiceImpl implements ExeStepService {
         return exeStepMapper.selectByPrimaryKey(exeStepId);
     }
 
-    /*
-     * TODO: Feature pending due to missing entity [StepStateContext]
-     * Method: updateStepStatusByOption
-     */
+    @Override
     @Transactional(readOnly = false)
-    public boolean updateStepStatusByOption(String exeStepId, String option) {
+    public Response updateStepStatusByOption(String exeStepId, String option) {
         ExeStepWithBLOBs exeStep = (ExeStepWithBLOBs) exeStepMapper.selectByPrimaryKey(exeStepId);
-        if (exeStep == null) return false;
+        if (exeStep == null)
+            return ResponseFactory.failure("exeStep is null");
 
         int targetStatus = -1;
 
         if ("runStep".equals(option)) {
             targetStatus = TestPlanStatusContants.PLAN_STATUS_EXEING;
-        } else if ("runPause".equals(option)) {
+        } else if ("Pause".equals(option)) {
             targetStatus = TestPlanStatusContants.PLAN_STATUS_PAUSE;
-        } else if ("doOperated".equals(option)) {
-            // targetStatus = OPERATED?
         } else if ("doFinish".equals(option)) {
             targetStatus = TestPlanStatusContants.PLAN_STATUS_FINISH;
         }
 
         if (targetStatus != -1) {
             exeStep.setExeStatus(targetStatus);
-            return exeStepMapper.updateByPrimaryKeySelective(exeStep) > 0;
+            Integer result = exeStepMapper.updateByPrimaryKeySelective(exeStep);
+            if (result > 0) {
+                return ResponseFactory.success("exeStep updated successfully");
+            }
+            else {
+                return ResponseFactory.failure("exeStep updated failed");
+            }
         }
-        return false;
+        else {
+            return ResponseFactory.failure("exeStep invivid");
+        }
     }
 
     /**
@@ -237,5 +242,6 @@ public class ExeStepServiceImpl implements ExeStepService {
         return exeStepMapper.selectByExample(stepExample);
         */
     }
+
 
 }

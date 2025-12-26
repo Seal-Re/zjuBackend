@@ -25,14 +25,14 @@ public class ExeFunctionController {
     private ExeFunctionService exeFunctionService;
 
     @ApiOperation("获取指定测试作业计划下正在执行的功能")
-    @GetMapping("/testFunctions/inexe/{planId}")
+    @GetMapping("/inexe/{planId}")
     public Response getExeFunctionInExe(@PathVariable("planId") String planId){
         LOG.info("start getting ExeFunctionInExe by planId",planId);
         return exeFunctionService.getExeFunctionInExeListByPlanId(planId);
     }
 
     @ApiOperation("获取指定测试功能ID的功能")
-    @GetMapping("/testFunctions/id/{functionId}")
+    @GetMapping("/id/{functionId}")
     public Response getExeFunctionById(@PathVariable("functionId") String functionId) {
         LOG.info("start getting ExeFunctionById by functionId",functionId);
         return exeFunctionService.getExeFunctionByFunctionId(functionId);

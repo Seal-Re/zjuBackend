@@ -8,4 +8,8 @@ public interface ExeStepService {
 
     void conveyTestStep2ExeStep(Integer funId, String exeFunctionId);
 
+    Response listExeSteps(String exeFunctionId);
+    Response updateStepExeToPause(String exeFunctionId);
+    Response updateStepStatusByOption(String exeStepId, String option);
+
 }
