@@ -439,10 +439,7 @@
       "id": "6b0d83e2-cca6-406a-a551-83dc66a40bb4",
       "request": {
         "method": "POST",
-        "header": [],
-        "url": {
-          "raw": ""
-        }
+        "header": []
       },
       "response": []
     },
@@ -451,34 +448,7 @@
       "id": "a1071990-6a76-4d44-a9a5-b9754973e042",
       "request": {
         "method": "POST",
-        "header": [],
-        "url": {
-          "raw": ""
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "查询派发",
-      "id": "c8623d58-99aa-4258-bc04-cbff91ea4bcd",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": ""
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "查询执行功能",
-      "id": "1913fc85-ca14-49f5-9660-acd0548fcc28",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": ""
-        }
+        "header": []
       },
       "response": []
     }
