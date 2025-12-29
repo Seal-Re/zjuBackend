@@ -1,3 +1,4 @@
 mybatis:
+  type-aliase-package: com.hengtiansoft.fastop.planner.dal
   configuration:
     map-underscore-to-camel-case: true
