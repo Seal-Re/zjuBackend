@@ -1,41 +1,55 @@
 package com.hengtiansoft.fastop.service.planner.service.impl;
 
-import com.hengtiansoft.fastop.base.common.constants.Status.StatusContants;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.Executor;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hengtiansoft.fastop.base.common.constants.Status.TestPlanStatusContants;
-import com.hengtiansoft.fastop.base.common.constants.Status.CommonConstants;
 import com.hengtiansoft.fastop.base.common.entity.Response.Response;
 import com.hengtiansoft.fastop.base.common.factory.ResponseFactory;
-import com.hengtiansoft.fastop.model.designer.dto.TestFunctionCaseMapper;
-import com.hengtiansoft.fastop.model.designer.dto.TestFunctionModuleMapper;
-import com.hengtiansoft.fastop.model.designer.dto.TestFunctionStepMapper;
 import com.hengtiansoft.fastop.model.designer.entity.*;
+import com.hengtiansoft.fastop.model.planner.dto.ExeStepCommandDto;
 import com.hengtiansoft.fastop.model.planner.dto.ExeStepMapper;
-import com.hengtiansoft.fastop.model.planner.entity.*;
+import com.hengtiansoft.fastop.model.planner.entity.ExeStep;
+import com.hengtiansoft.fastop.model.planner.entity.ExeStepExample;
+import com.hengtiansoft.fastop.model.planner.entity.ExeStepWithBLOBs;
+import com.hengtiansoft.fastop.model.planner.utils.ExeStepCommand;
+import com.hengtiansoft.fastop.service.designer.service.TestFunctionCaseService;
+import com.hengtiansoft.fastop.service.designer.service.TestFunctionModuleService;
 import com.hengtiansoft.fastop.service.designer.service.TestFunctionStepService;
 import com.hengtiansoft.fastop.service.planner.service.ExeStepService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class ExeStepServiceImpl implements ExeStepService {
 
     @Autowired
+    @Qualifier("taskExecutor")
+    private Executor executor;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
     private ExeStepMapper exeStepMapper;
 
     @Autowired
-    private TestFunctionModuleMapper testFunctionModuleMapper;
-
+    private TestFunctionCaseService testFunctionCaseService;
     @Autowired
-    private TestFunctionCaseMapper testFunctionCaseMapper;
-
+    private TestFunctionModuleService testFunctionModuleService;
     @Autowired
-    private TestFunctionStepMapper testFunctionStepMapper;
+    private TestFunctionStepService testFunctionStepService;
 
     @Override
     @Transactional(readOnly = false)
@@ -61,24 +75,21 @@ public class ExeStepServiceImpl implements ExeStepService {
     public void conveyTestStep2ExeStep(Integer funId, String exeFunctionId) {
         if (funId == null || exeFunctionId == null) return;
 
-        // Using Local Services / Mappers to traverse hierarchy: Module -> Case -> Step
-
-        // 1. Get Modules
-        TestFunctionModuleExample moduleExample = new TestFunctionModuleExample();
-        moduleExample.createCriteria().andFunIdEqualTo(funId);
-        List<TestFunctionModule> modules = testFunctionModuleMapper.selectByExample(moduleExample);
+        List<TestFunctionModule> modules = objectMapper.convertValue(
+                testFunctionModuleService.getByFunId(funId).getData(),
+                new TypeReference<List<TestFunctionModule>>() {});
 
         for (TestFunctionModule module : modules) {
             // 2. Get Cases
-            TestFunctionCaseExample caseExample = new TestFunctionCaseExample();
-            caseExample.createCriteria().andModuleIdEqualTo(module.getModuleId());
-            List<TestFunctionCase> cases = testFunctionCaseMapper.selectByExample(caseExample);
+            List<TestFunctionCase> cases = objectMapper.convertValue(
+                    testFunctionCaseService.getByModuleId(module.getModuleId()).getData(),
+                    new TypeReference<List<TestFunctionCase>>() {});
 
             for (TestFunctionCase testCase : cases) {
                 // 3. Get Steps
-                TestFunctionStepExample stepExample = new TestFunctionStepExample();
-                stepExample.createCriteria().andCaseIdEqualTo(testCase.getCaseId());
-                List<TestFunctionStep> steps = testFunctionStepMapper.selectByExample(stepExample);
+                List<TestFunctionStep> steps = objectMapper.convertValue(
+                        testFunctionStepService.getByCaseId(testCase.getCaseId()).getData(),
+                        new TypeReference<List<TestFunctionStep>>() {});
 
                 for (TestFunctionStep step : steps) {
                     ExeStepWithBLOBs exeStep = new ExeStepWithBLOBs();
@@ -117,28 +128,26 @@ public class ExeStepServiceImpl implements ExeStepService {
      */
     @Transactional(readOnly = false)
     public Response updateStepExeToPause(String exeFunctionId) {
-        boolean result = true;
+        ExeStepWithBLOBs updateRecord = new ExeStepWithBLOBs();
+        updateRecord.setExeStatus(TestPlanStatusContants.PLAN_STATUS_PAUSE);
 
         ExeStepExample example = new ExeStepExample();
-        List<Integer> statuses = new ArrayList<>();
-        // Assuming statuses for EXEING and OPERATED
-        statuses.add(TestPlanStatusContants.PLAN_STATUS_EXEING);
-        // statuses.add(StepStatusEnum.OPERATED.getKey()); // Need constant
+        List<Integer> targetStatuses = new ArrayList<>();
+        targetStatuses.add(TestPlanStatusContants.PLAN_STATUS_EXEING);
+        // targetStatuses.add(StepStatusEnum.OPERATED.getKey());
 
-        example.createCriteria().andExeFunctionIdEqualTo(exeFunctionId).andExeStatusIn(statuses);
+        example.createCriteria()
+                .andExeFunctionIdEqualTo(exeFunctionId)
+                .andExeStatusIn(targetStatuses);
 
-        List<ExeStep> steps = exeStepMapper.selectByExample(example);
+        try {
+            int rows = exeStepMapper.updateByExampleSelective(updateRecord, example);
 
-        for (ExeStep step : steps) {
-            step.setExeStatus(TestPlanStatusContants.PLAN_STATUS_PAUSE);
-            if (exeStepMapper.updateByPrimaryKeySelective((ExeStepWithBLOBs)step) <= 0) {
-                result = false;
-            }
+            return ResponseFactory.success("更新成功，暂停了 " + rows + " 个步骤");
+
+        } catch (Exception e) {
+            throw new RuntimeException("暂停步骤异常", e);
         }
-        if (result) {
-            return ResponseFactory.success("更新成功");
-        }
-        return ResponseFactory.failure("更新失败");
     }
 
     /**
@@ -151,11 +160,12 @@ public class ExeStepServiceImpl implements ExeStepService {
     @Override
     @Transactional(readOnly = false)
     public Response updateStepStatusByOption(String exeStepId, String option) {
-        ExeStepWithBLOBs exeStep = (ExeStepWithBLOBs) exeStepMapper.selectByPrimaryKey(exeStepId);
-        if (exeStep == null)
-            return ResponseFactory.failure("exeStep is null");
 
-        int targetStatus = -1;
+        if (exeStepId == null || option == null) {
+            return ResponseFactory.success("参数错误");
+        }
+
+        int targetStatus;
 
         if ("runStep".equals(option)) {
             targetStatus = TestPlanStatusContants.PLAN_STATUS_EXEING;
@@ -163,20 +173,20 @@ public class ExeStepServiceImpl implements ExeStepService {
             targetStatus = TestPlanStatusContants.PLAN_STATUS_PAUSE;
         } else if ("doFinish".equals(option)) {
             targetStatus = TestPlanStatusContants.PLAN_STATUS_FINISH;
+        } else {
+            return ResponseFactory.failure("无效的操作选项: " + option);
         }
 
-        if (targetStatus != -1) {
-            exeStep.setExeStatus(targetStatus);
-            Integer result = exeStepMapper.updateByPrimaryKeySelective(exeStep);
-            if (result > 0) {
-                return ResponseFactory.success("exeStep updated successfully");
-            }
-            else {
-                return ResponseFactory.failure("exeStep updated failed");
-            }
-        }
-        else {
-            return ResponseFactory.failure("exeStep invivid");
+        ExeStepWithBLOBs updateRecord = new ExeStepWithBLOBs();
+        updateRecord.setExeStepId(exeStepId);
+        updateRecord.setExeStatus(targetStatus);
+
+        int result = exeStepMapper.updateByPrimaryKeySelective(updateRecord);
+
+        if (result > 0) {
+            return ResponseFactory.success("状态更新成功，更新记录条目：" + result);
+        } else {
+            return ResponseFactory.failure("更新失败，未找到对应记录");
         }
     }
 
@@ -243,5 +253,41 @@ public class ExeStepServiceImpl implements ExeStepService {
         */
     }
 
+    public Response doV1(ExeStepCommand exeStepCommand) {
+        if (exeStepCommand == null || exeStepCommand.getUrl() == null || exeStepCommand.getExeStepId() == null) {
+            return ResponseFactory.failure("参数错误：Command URL ExeStepId不能为空, 接受数据：" + exeStepCommand);
+        }
 
+        executor.execute(() -> {
+            try {
+                processAsyncStep(exeStepCommand);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        return ResponseFactory.success("指令已接收，正在异步处理中");
+    }
+
+    private String processAsyncStep(ExeStepCommand sourceCommand) {
+        String stepId = sourceCommand.getExeStepId();
+
+        ExeStep exeStep = exeStepMapper.selectByPrimaryKey(stepId);
+
+        if (exeStep == null) {
+            return "未找到对应的 ExeStep, ID: " + stepId;
+        }
+
+        ExeStepCommandDto dto = new ExeStepCommandDto();
+        dto.setExeStep(exeStep);
+        dto.setCommand(sourceCommand.getCommand());
+
+        String targetUrl = sourceCommand.getUrl();
+        try {
+            String result = restTemplate.postForObject(targetUrl, dto, String.class);
+            return "发送 DTO 成功. URL: " + targetUrl + " ,Result: " + result;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 }

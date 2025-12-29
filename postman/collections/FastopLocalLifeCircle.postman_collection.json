@@ -459,8 +459,8 @@
       "response": []
     },
     {
-      "name": "查询派发",
-      "id": "c8623d58-99aa-4258-bc04-cbff91ea4bcd",
+      "name": "Task6 测试执行",
+      "id": "edf37b09-c839-4527-b90f-e8848eb64575",
       "request": {
         "method": "GET",
         "header": [],
@@ -471,8 +471,20 @@
       "response": []
     },
     {
-      "name": "查询执行功能",
-      "id": "1913fc85-ca14-49f5-9660-acd0548fcc28",
+      "name": "批量暂停",
+      "id": "49e1a5be-8395-4968-b401-ed8da993d601",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "New Request",
+      "id": "ce91a429-ced2-4681-ac03-7112688e533a",
       "request": {
         "method": "GET",
         "header": [],
