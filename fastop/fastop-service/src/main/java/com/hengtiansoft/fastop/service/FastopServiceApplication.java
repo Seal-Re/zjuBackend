@@ -9,7 +9,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         "com.hengtiansoft.fastop.model.planner.dto",
         "com.hengtiansoft.fastop.model.designer.dto"
 })
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {
+        "com.hengtiansoft.fastop.base.common.config",
+        "com.hengtiansoft.fastop.service"
+})
 public class FastopServiceApplication {
 
     public static void main(String[] args) {
