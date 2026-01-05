@@ -157,7 +157,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { useGlobalFilterStore } from '@/store/globalFilter'
-import { createTestFunction } from '@/api/designer'
+import { createTestFunction, getTestFunctions } from '@/api/designer'
 import { Delete } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
@@ -169,18 +169,27 @@ const professionOptions = [{ value: 'prof1', label: 'Profession A' }]
 const subsystemOptions = [{ value: 'sub1', label: 'Subsystem A' }]
 const testBaseOptions = [{ value: '1', label: 'Base 1' }]
 
-const tableData = ref([])
+const tableData = ref<any[]>([])
 
 const fetchData = async () => {
-    // In real app, pass filter params
     try {
-        // const res = await getTestFunctions({})
-        // Mock data for display since backend might be empty or hard to reach without real setup
-        tableData.value = [
-            { funName: 'Test Function 1', num: 1001, planeEffectMin: 1, planeEffectMax: 100, versionDescription: 'V1', changeFlag: 4, approveStatus: 0 }
-        ] as any
+        // Pass filter params from store
+        const res: any = await getTestFunctions({
+            model: filterStore.model,
+            profession: filterStore.profession,
+            subsystem: filterStore.subsystem,
+            testBase: filterStore.testBase
+        })
+        if (Array.isArray(res)) {
+            tableData.value = res
+        } else if (res && Array.isArray(res.data)) {
+            tableData.value = res.data
+        } else {
+             tableData.value = []
+        }
     } catch (e) {
         console.error(e)
+        tableData.value = []
     }
 }
 
