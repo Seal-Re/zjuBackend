@@ -18,8 +18,8 @@
         <el-form :model="form" label-width="80px">
             <el-form-item label="审批结果">
                 <el-radio-group v-model="form.result">
-                    <el-radio label="pass">通过</el-radio>
-                    <el-radio label="reject">驳回</el-radio>
+                    <el-radio value="pass">通过</el-radio>
+                    <el-radio value="reject">驳回</el-radio>
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="审批等级">

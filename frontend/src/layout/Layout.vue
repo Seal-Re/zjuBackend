@@ -44,7 +44,7 @@
           </template>
         </el-menu-item>
 
-        <el-menu-item index="/execution">
+        <el-menu-item index="/execution/run">
            <template #title>
             <el-icon><VideoPlay /></el-icon>
             <span>测试执行</span>

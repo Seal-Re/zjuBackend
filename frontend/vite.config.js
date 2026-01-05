@@ -12,7 +12,7 @@ export default defineConfig({
     server: {
         proxy: {
             '/api': {
-                target: 'http://localhost:10001/fastop', // Assuming backend runs on 8080
+                target: 'http://localhost:8080', // Assuming backend runs on 8080
                 changeOrigin: true,
                 rewrite: function (path) { return path.replace(/^\/api/, ''); }
             }
