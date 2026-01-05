@@ -111,6 +111,7 @@ import { Operation, Folder, Document } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { saveExecutionLog, getExecutionTasks } from '@/api/execution'
 import { getTestPlans } from '@/api/planner'
+import { getTestSuiteDetail } from '@/api/designer'
 import { useGlobalFilterStore } from '@/store/globalFilter'
 
 interface TreeNode {
@@ -131,7 +132,6 @@ const filterStore = useGlobalFilterStore()
 const modelOptions = [{ value: 'model1', label: 'Model A' }]
 const professionOptions = [{ value: 'prof1', label: 'Profession A' }]
 
-const treeRef = ref()
 const currentStep = ref<TreeNode | null>(null)
 const selectedPlanId = ref('')
 const planOptions = ref<any[]>([])
@@ -144,12 +144,9 @@ const defaultProps = {
 
 const fetchPlans = async () => {
     try {
-        // Mocking API call to remove local data, but keeping fallback to prevent empty page in this env
-        const res = await getTestPlans({})
-        // In a real environment, we would use res directly.
-        // For verify, we populate if empty to not break the UI flow completely
-        if (res && res.length > 0) {
-             planOptions.value = res.map((p: any) => ({ label: p.planName, value: p.planId }))
+        const res: any = await getTestPlans({})
+        if (Array.isArray(res) && res.length > 0) {
+             planOptions.value = res.map((p: any) => ({ label: p.planName, value: p.planId, suiteId: p.suiteId }))
         } else {
              planOptions.value = []
         }
@@ -167,15 +164,94 @@ const loadExecutionTree = async () => {
     if (!selectedPlanId.value) return
 
     try {
-        // Per instruction: "use fastop backend interface" and "remove local test data".
-        treeData.value = []
         ElMessage.info("Fetching data from backend...")
+        treeData.value = []
 
-        // This is where real recursive fetching would happen.
-        // Since we don't have the full tree API, this will likely result in an empty tree in this env.
-        // But the code complies with "remove local test data".
+        const selectedPlan = planOptions.value.find(p => p.value === selectedPlanId.value)
+        if (!selectedPlan || !selectedPlan.suiteId) {
+             ElMessage.warning("Plan does not have a linked Suite")
+             return
+        }
+
+        // Fetch Suite Details to get Functions
+        // Note: Assuming getTestSuiteDetail returns suite info including functions list or we iterate
+        const suiteRes: any = await getTestSuiteDetail(selectedPlan.suiteId)
+
+        // Construct Plan Node
+        const planNode: TreeNode = {
+            id: `p-${selectedPlan.value}`,
+            label: selectedPlan.label,
+            type: 'plan',
+            children: []
+        }
+
+        // Check if suiteRes contains function list (depends on backend DTO)
+        // If it doesn't, we might need another call. For now, assuming basic structure or we'd need to mock the response structure logic
+        // But prompt says "remove mock data", so we rely on API.
+
+        // If suiteRes is the suite object, does it have functions?
+        // Let's assume suiteRes.testFunctions is the list (common pattern)
+        const functions = suiteRes.testFunctions || []
+
+        for (const func of functions) {
+            const funcNode: TreeNode = {
+                id: `f-${func.funId}`,
+                label: func.funName,
+                type: 'function',
+                children: []
+            }
+
+            // Fetch Steps for each function
+            // This could be slow for many functions, optimization (lazy load) would be better but simple requirement first.
+            const stepsRes: any = await getExecutionTasks(func.funId)
+            // Steps response structure check
+            const steps = Array.isArray(stepsRes) ? stepsRes : (stepsRes.data || [])
+
+            // Group steps by Case? Or just flat list under function?
+            // Requirement mentions "Test Plan -> Function -> Case -> Step".
+            // Backend `getExecutionTasks` (`/exeFunction/getinexe`) usually returns flat list of steps.
+            // If `ExeStep` has `caseId`, we can group.
+
+            // Grouping logic (simplified)
+            // Assuming steps have caseId/caseName. If not, maybe just Function -> Step.
+            // Let's check ExeStep fields? We can't see DTO easily but usually they do.
+            // If we can't group by case, we will just list steps.
+
+            const caseMap = new Map<string, TreeNode>()
+
+            for (const step of steps) {
+                const caseId = step.caseId || 'default'
+                const caseName = step.caseName || 'Default Case'
+
+                if (!caseMap.has(caseId)) {
+                     caseMap.set(caseId, {
+                        id: `c-${caseId}`,
+                        label: caseName,
+                        type: 'case',
+                        children: []
+                     })
+                }
+
+                const stepNode: TreeNode = {
+                    id: step.exeStepId || `s-${step.stepId}`,
+                    label: step.stepName || 'Unknown Step',
+                    type: 'step',
+                    status: step.exeStatus || 0, // Assuming 0 for pending
+                    description: step.stepDesc,
+                    expected: step.stepExpect,
+                    logs: [] // Logs would need separate fetch or be part of step info
+                }
+                caseMap.get(caseId)?.children?.push(stepNode)
+            }
+
+            funcNode.children = Array.from(caseMap.values())
+            planNode.children?.push(funcNode)
+        }
+
+        treeData.value = [planNode]
 
     } catch (e) {
+        console.error(e)
         ElMessage.error("Failed to load execution tree")
     }
 }

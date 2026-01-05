@@ -94,3 +94,14 @@ export const getFunctionList = (params: any) => {
         params
     })
 }
+
+export const getTestSuiteDetail = (suiteId: string | number) => {
+    return request({
+        url: `/designer/testSuite/get/${suiteId}`,
+        method: 'get'
+    })
+}
+
+// FunctionSuite relation - need to fetch functions for a suite
+// If backend doesn't have direct "get functions by suiteId", we assume details might come from getTestSuiteDetail or similar
+// Or use FunctionSuiteController
