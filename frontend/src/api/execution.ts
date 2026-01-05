@@ -9,6 +9,14 @@ export const getExecutionTasks = (functionId: string) => {
     })
 }
 
+export const saveExecutionLog = (data: any) => {
+    return request({
+        url: '/exeFunction/log/save',
+        method: 'post',
+        data
+    })
+}
+
 export const startExecution = (data: any) => {
     return request({
         url: '/exeFunction/',
