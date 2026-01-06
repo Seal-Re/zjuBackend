@@ -67,7 +67,7 @@ public class TestFunctionController {
     }
 
     @ApiOperation("通用/条件查询模块")
-    @PostMapping("/query")
+    @GetMapping("/query")
     public Response queryTestFunction(@RequestBody TestFunctionInfoRequestDto tFunctionInfo) {
         LOG.debug("执行通用查询: {}", tFunctionInfo);
         return testFunctionService.query(tFunctionInfo);
@@ -77,5 +77,11 @@ public class TestFunctionController {
     @PostMapping("/check")
     public Response checkTestFunction(@RequestParam Integer funId, @RequestParam String checkWorker, @RequestParam Integer level) {
         return testFunctionService.check(funId, checkWorker, level);
+    }
+
+    @ApiOperation("获取审批列表")
+    @GetMapping("/getCheckTestFunction")
+    public Response getCheckTestFunction() {
+        return testFunctionService.getCheckTestFunction();
     }
 }

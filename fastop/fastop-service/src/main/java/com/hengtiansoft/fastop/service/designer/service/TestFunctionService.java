@@ -18,6 +18,7 @@ public interface TestFunctionService {
     Response listByTestBaseId(Integer testBaseId);
     Response query(TestFunctionInfoRequestDto tFunctionInfo);
     Response check(Integer funId, String checkWorker, Integer level);
+    Response getCheckTestFunction();
 
     Integer countMilitaryByFunId(Integer funId);
     Integer countKeyProcessByFunId(Integer funId);

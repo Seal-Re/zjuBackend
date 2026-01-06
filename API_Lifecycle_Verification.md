@@ -157,10 +157,24 @@ suiteId=1&checkWorker=worker1&level=0
 ### Task 7: Dispatch
 **URL**: `GET /planner/plan/dispatch/{planId}`
 
-### Task 8: Start Task
-**URL**: `POST /planner/plan/start/{planId}`
-**Verification**: `test_plan.status` = 2, `exe_function.exe_status` = 2.
+### Task 8: Get Task
+**URL**: `POST /exeFunction/getinexe/{functionId}`
 
 ### Task 9: Pause Task
-**URL**: `POST /planner/plan/pause/{planId}`
+**URL**: `POST /exeFunction/pause/{exeFunctionId}`
 **Verification**: `test_plan.status` = 3, `exe_function.exe_status` = 3.
+
+#### other Operate
+**URL**: `POST /exeFunction/stepOperate`
+input:@RequestBody Map<String, String> params
+
+### Task 10: Start Task
+**URL**: `POST /exeFunction/do`
+**Input**:
+```json
+{
+  "exeStepId": "sadsfsdf",
+  "deviceId": "sdfsdf",
+  "command": "sdfsdf",
+  "url": "http:fffff" 
+}

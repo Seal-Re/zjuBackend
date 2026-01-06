@@ -1,9 +1,27 @@
+import { PARAM_PARSER_BOOL } from 'vue-router/dist/experimental/index.mjs'
 import request from './request'
 
 // Module Library
+
+export const getTestBaseWithLimit = (params: any) => {
+  return request({
+    url: '/testBase/getTestBaseWithLimit',
+    method: 'get',
+    params
+  })
+}
+
 export const getTestFunctions = (params: any) => {
   return request({
-    url: '/designer/testFunction/list', // Need to confirm this path, usually list endpoints exist
+    url: '/designer/testFunction/listByBaseId', // Need to confirm this path, usually list endpoints exist
+    method: 'get',
+    params
+  })
+}
+
+export const getCheckTestFunction = (params: any) => {
+  return request({
+    url: '/designer/testFunction/getCheckTestFunction', 
     method: 'get',
     params
   })

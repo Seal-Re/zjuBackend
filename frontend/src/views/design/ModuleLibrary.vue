@@ -5,27 +5,26 @@
       <el-cascader
         v-model="filterStore.model"
         :options="modelOptions"
-        placeholder="机型"
+        :props="{ emitPath: false }"  placeholder="机型"
         @change="handleFilterChange"
-      />
+        clearable />
+
       <el-cascader
         v-model="filterStore.profession"
         :options="professionOptions"
-        placeholder="专业"
+        :props="{ emitPath: false }"  placeholder="专业"
         @change="handleFilterChange"
+        clearable
       />
+
       <el-cascader
         v-model="filterStore.subsystem"
         :options="subsystemOptions"
-        placeholder="子系统"
+        :props="{ emitPath: false }"  placeholder="子系统"
+        :disabled="!subsystemOptions.length"
         @change="handleFilterChange"
-      />
-      <el-cascader
-        v-model="filterStore.testBase"
-        :options="testBaseOptions"
-        placeholder="测试基线"
-        @change="handleFilterChange"
-      />
+        clearable
+      />  
 
       <div class="filter-actions">
         <el-button type="success" @click="fetchData">刷新</el-button>
@@ -155,42 +154,85 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useGlobalFilterStore } from '@/store/globalFilter'
-import { createTestFunction, getTestFunctions } from '@/api/designer'
+import { createTestFunction, getTestFunctions, getTestBaseWithLimit } from '@/api/designer'
 import { Delete } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
 const filterStore = useGlobalFilterStore()
 
 // Dummy options for filter
-const modelOptions = [{ value: 'model1', label: 'Model A' }]
-const professionOptions = [{ value: 'prof1', label: 'Profession A' }]
-const subsystemOptions = [{ value: 'sub1', label: 'Subsystem A' }]
-const testBaseOptions = [{ value: '1', label: 'Base 1' }]
+const modelOptions = [
+  { value: 'model1', label: 'Model A' },
+  { value: 'model2', label: 'Model B' }
+]
+const professionOptions = [
+  { value: 'prof1', label: '飞控' },
+  { value: 'prof2', label: '动力' }
+]
+
+const subsystemData: Record<string, any[]> = {
+  'prof1': [ 
+    { value: 'sub_fc_1', label: '主飞控' },
+    { value: 'sub_fc_2', label: '自动飞控' }
+  ],
+  'prof2': [ 
+    { value: 'sub_power_2', label: '燃油系统' }
+  ]
+}
+
+const subsystemOptions = computed(() => {
+  let currentProf = filterStore.profession
+  if (Array.isArray(currentProf) && currentProf.length > 0) {
+    currentProf = currentProf[0]
+  }
+  
+  return subsystemData[currentProf as string] || [] 
+})
 
 const tableData = ref<any[]>([])
 
 const fetchData = async () => {
     try {
-        // Pass filter params from store
-        const res: any = await getTestFunctions({
+        const res: any = await getTestBaseWithLimit({
             model: filterStore.model,
             profession: filterStore.profession,
-            subsystem: filterStore.subsystem,
-            testBase: filterStore.testBase
+            subsystem: filterStore.subsystem
         })
-        if (Array.isArray(res)) {
-            tableData.value = res
-        } else if (res && Array.isArray(res.data)) {
-            tableData.value = res.data
+
+        let testBaseId = 0;
+        if (Number.isInteger(res)) {
+            testBaseId = res
+        } else if (res && Number.isInteger(res.data)) {
+            testBaseId = res.data
         } else {
-             tableData.value = []
+            testBaseId = 0
         }
+
+        // Pass filter params from store
+        const res1: any = await getTestFunctions({
+            testBaseId: testBaseId
+        })
+
+        if (Array.isArray(res1)) {
+            tableData.value = res1;
+        } else if (res1 && Array.isArray(res1.data)) {
+            tableData.value = res1.data;
+        } else {
+            tableData.value = [];
+        }
+        
     } catch (e) {
         console.error(e)
         tableData.value = []
     }
+}
+
+const handleProfessionChange = () => {
+  filterStore.subsystem = ""
+  
+  fetchData()
 }
 
 const handleFilterChange = () => {
@@ -223,10 +265,25 @@ const removeDevice = (index: number) => form.devices.splice(index, 1)
 
 const submitCreate = async () => {
     try {
+        const res: any = await getTestBaseWithLimit({
+            model: filterStore.model,
+            profession: filterStore.profession,
+            subsystem: filterStore.subsystem
+        })
+
+        let testBaseId = 0;
+        if (Number.isInteger(res)) {
+            testBaseId = res
+        } else if (res && Number.isInteger(res.data)) {
+            testBaseId = res.data
+        } else {
+            testBaseId = 0
+        }
+
         await createTestFunction({
             funName: form.funName,
             num: Number(form.num),
-            testBaseId: 1, // hardcoded for now or from store
+            testBaseId: testBaseId, 
             planeEffectMin: form.planeEffectMin,
             planeEffectMax: form.planeEffectMax,
             versionDescription: form.versionDescription,

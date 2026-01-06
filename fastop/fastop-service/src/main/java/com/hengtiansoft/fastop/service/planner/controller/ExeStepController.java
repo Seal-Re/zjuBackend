@@ -19,7 +19,7 @@ import java.util.Map;
 @Slf4j
 @Api("测试执行功能管理模块")
 @RestController
-@RequestMapping("/exeFunction")
+@RequestMapping("/exeStep")
 public class ExeStepController {
 
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());

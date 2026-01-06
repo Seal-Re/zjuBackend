@@ -9,6 +9,7 @@ import com.hengtiansoft.fastop.service.designer.service.TestBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -17,23 +18,44 @@ public class TestBaseServiceImpl implements TestBaseService {
     @Autowired TestBaseMapper testBaseMapper;
 
     @Override
-    public Response getListByStructAndGroup(Integer structId, Integer groupId){
-        if (structId == null) {
-            return ResponseFactory.failure("查询失败，缺少structId");
-        }
-        if (groupId == null) {
-            return ResponseFactory.failure("查询失败，缺少groupId");
-        }
+    public Response getTestBaseWithLimit(String model, String profession, String subsystem){
+
+
 
         TestBaseExample example = new TestBaseExample();
         TestBaseExample.Criteria criteria = example.createCriteria();
 
-        criteria.andEntityStructIdEqualTo(structId);
-        criteria.andFunGroupIdEqualTo(groupId);
+        criteria.andModelEqualTo(model);
+        criteria.andProfessionEqualTo(profession);
+        criteria.andSubsystemEqualTo(subsystem);
 
         List<TestBase> testBases = testBaseMapper.selectByExample(example);
 
-        return ResponseFactory.success(testBases);
+        if(testBases.size()>0){
+            return ResponseFactory.success(testBases.get(0).getId());
+        }
+
+        TestBase testBase = new TestBase();
+
+        testBase.setModel(model);
+        testBase.setProfession(profession);
+        testBase.setSubsystem(subsystem);
+
+        testBase.setCreatedAt(new Date());
+        testBase.setUpdatedAt(new Date());
+
+        testBase.setDeleted(false);
+
+        testBaseMapper.insert(testBase);
+
+        List<TestBase> testBases1 = testBaseMapper.selectByExample(example);
+
+        if(testBases1.size()>0){
+            return ResponseFactory.success(testBases1.get(0).getId());
+        }
+        else
+            return ResponseFactory.failure("出现系统错误");
+
     }
 
     @Override

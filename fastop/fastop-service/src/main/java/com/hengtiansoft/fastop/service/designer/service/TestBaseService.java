@@ -5,7 +5,7 @@ import com.hengtiansoft.fastop.model.designer.entity.TestBase;
 
 public interface TestBaseService {
 
-    Response getListByStructAndGroup(Integer structId, Integer groupId);
+    Response getTestBaseWithLimit(String model, String profession, String subsystem);
 
     Response getTestBaseInfo(Integer targetGroupId, Integer baseType, Integer entityStructId);
 

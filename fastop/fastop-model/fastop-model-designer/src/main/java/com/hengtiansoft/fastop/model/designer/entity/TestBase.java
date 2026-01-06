@@ -23,6 +23,12 @@ public class TestBase {
 
     private String updatedBy;
 
+    private String model;
+
+    private String profession;
+
+    private String subsystem;
+
     public Integer getId() {
         return id;
     }
@@ -101,5 +107,29 @@ public class TestBase {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy == null ? null : updatedBy.trim();
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model == null ? null : model.trim();
+    }
+
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession == null ? null : profession.trim();
+    }
+
+    public String getSubsystem() {
+        return subsystem;
+    }
+
+    public void setSubsystem(String subsystem) {
+        this.subsystem = subsystem == null ? null : subsystem.trim();
     }
 }

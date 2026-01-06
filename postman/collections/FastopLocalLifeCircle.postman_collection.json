@@ -486,6 +486,55 @@
       "name": "New Request",
       "id": "ce91a429-ced2-4681-ac03-7112688e533a",
       "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"exeStepId\": \"c7afa0d3-91bf-41ed-9189-5785df04bcfc\",\r\n    \"option\": \"runStep\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "127.0.0.1:10001/fastop/exeFunction/stepOperate",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "10001",
+          "path": [
+            "fastop",
+            "exeFunction",
+            "stepOperate"
+          ],
+          "query": [
+            {
+              "key": "exeStepId",
+              "value": "2fae3b70-d30b-4f8f-ab98-2ad8f5d6f901",
+              "type": "text",
+              "uuid": "db63de7b-62f4-46f5-b792-aec9e2262d84",
+              "disabled": true
+            },
+            {
+              "key": "option",
+              "value": "runStep",
+              "type": "text",
+              "uuid": "b10cbb3a-6649-4914-8ab5-46102bdde257",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "New Request",
+      "id": "258c0b24-27f3-4b54-a099-59bc3455e519",
+      "request": {
         "method": "GET",
         "header": [],
         "url": {

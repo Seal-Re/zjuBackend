@@ -734,6 +734,216 @@ public class TestBaseExample {
             addCriterion("updated_by not between", value1, value2, "updatedBy");
             return (Criteria) this;
         }
+
+        public Criteria andModelIsNull() {
+            addCriterion("model is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andModelIsNotNull() {
+            addCriterion("model is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andModelEqualTo(String value) {
+            addCriterion("model =", value, "model");
+            return (Criteria) this;
+        }
+
+        public Criteria andModelNotEqualTo(String value) {
+            addCriterion("model <>", value, "model");
+            return (Criteria) this;
+        }
+
+        public Criteria andModelGreaterThan(String value) {
+            addCriterion("model >", value, "model");
+            return (Criteria) this;
+        }
+
+        public Criteria andModelGreaterThanOrEqualTo(String value) {
+            addCriterion("model >=", value, "model");
+            return (Criteria) this;
+        }
+
+        public Criteria andModelLessThan(String value) {
+            addCriterion("model <", value, "model");
+            return (Criteria) this;
+        }
+
+        public Criteria andModelLessThanOrEqualTo(String value) {
+            addCriterion("model <=", value, "model");
+            return (Criteria) this;
+        }
+
+        public Criteria andModelLike(String value) {
+            addCriterion("model like", value, "model");
+            return (Criteria) this;
+        }
+
+        public Criteria andModelNotLike(String value) {
+            addCriterion("model not like", value, "model");
+            return (Criteria) this;
+        }
+
+        public Criteria andModelIn(List<String> values) {
+            addCriterion("model in", values, "model");
+            return (Criteria) this;
+        }
+
+        public Criteria andModelNotIn(List<String> values) {
+            addCriterion("model not in", values, "model");
+            return (Criteria) this;
+        }
+
+        public Criteria andModelBetween(String value1, String value2) {
+            addCriterion("model between", value1, value2, "model");
+            return (Criteria) this;
+        }
+
+        public Criteria andModelNotBetween(String value1, String value2) {
+            addCriterion("model not between", value1, value2, "model");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfessionIsNull() {
+            addCriterion("profession is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfessionIsNotNull() {
+            addCriterion("profession is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfessionEqualTo(String value) {
+            addCriterion("profession =", value, "profession");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfessionNotEqualTo(String value) {
+            addCriterion("profession <>", value, "profession");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfessionGreaterThan(String value) {
+            addCriterion("profession >", value, "profession");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfessionGreaterThanOrEqualTo(String value) {
+            addCriterion("profession >=", value, "profession");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfessionLessThan(String value) {
+            addCriterion("profession <", value, "profession");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfessionLessThanOrEqualTo(String value) {
+            addCriterion("profession <=", value, "profession");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfessionLike(String value) {
+            addCriterion("profession like", value, "profession");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfessionNotLike(String value) {
+            addCriterion("profession not like", value, "profession");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfessionIn(List<String> values) {
+            addCriterion("profession in", values, "profession");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfessionNotIn(List<String> values) {
+            addCriterion("profession not in", values, "profession");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfessionBetween(String value1, String value2) {
+            addCriterion("profession between", value1, value2, "profession");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfessionNotBetween(String value1, String value2) {
+            addCriterion("profession not between", value1, value2, "profession");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubsystemIsNull() {
+            addCriterion("subsystem is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubsystemIsNotNull() {
+            addCriterion("subsystem is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubsystemEqualTo(String value) {
+            addCriterion("subsystem =", value, "subsystem");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubsystemNotEqualTo(String value) {
+            addCriterion("subsystem <>", value, "subsystem");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubsystemGreaterThan(String value) {
+            addCriterion("subsystem >", value, "subsystem");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubsystemGreaterThanOrEqualTo(String value) {
+            addCriterion("subsystem >=", value, "subsystem");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubsystemLessThan(String value) {
+            addCriterion("subsystem <", value, "subsystem");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubsystemLessThanOrEqualTo(String value) {
+            addCriterion("subsystem <=", value, "subsystem");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubsystemLike(String value) {
+            addCriterion("subsystem like", value, "subsystem");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubsystemNotLike(String value) {
+            addCriterion("subsystem not like", value, "subsystem");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubsystemIn(List<String> values) {
+            addCriterion("subsystem in", values, "subsystem");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubsystemNotIn(List<String> values) {
+            addCriterion("subsystem not in", values, "subsystem");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubsystemBetween(String value1, String value2) {
+            addCriterion("subsystem between", value1, value2, "subsystem");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubsystemNotBetween(String value1, String value2) {
+            addCriterion("subsystem not between", value1, value2, "subsystem");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

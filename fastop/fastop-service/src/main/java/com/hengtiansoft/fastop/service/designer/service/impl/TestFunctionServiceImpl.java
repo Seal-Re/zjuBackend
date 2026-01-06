@@ -293,6 +293,19 @@ public class TestFunctionServiceImpl implements TestFunctionService {
     }
 
     @Override
+    public Response getCheckTestFunction() {
+        TestFunctionExample example = new TestFunctionExample();
+        TestFunctionExample.Criteria criteria = example.createCriteria();
+
+        criteria.andDeletedEqualTo(false);
+        criteria.andApproveStatusBetween(1, 5);
+
+        List<TestFunction> testFunctions = testFunctionMapper.selectByExample(example);
+
+        return ResponseFactory.success(testFunctions);
+    }
+
+    @Override
     public Integer countMilitaryByFunId(Integer funId) {
         TestFunctionExample  testFunctionExample = new TestFunctionExample();
         testFunctionExample.createCriteria().andTestBaseIdEqualTo(funId)
