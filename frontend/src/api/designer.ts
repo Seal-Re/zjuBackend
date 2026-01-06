@@ -1,4 +1,3 @@
-import { PARAM_PARSER_BOOL } from 'vue-router/dist/experimental/index.mjs'
 import request from './request'
 
 // Module Library
