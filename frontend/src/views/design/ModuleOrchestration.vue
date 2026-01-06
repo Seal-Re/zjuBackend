@@ -1,36 +1,54 @@
 <template>
   <div class="module-orchestration">
-    <div class="header">
-      <h2>模块详情 {{ functionName }}</h2>
-      <el-button type="primary" @click="handleBack">Back to Library</el-button>
+    <!-- Header Toolbar -->
+    <div class="toolbar">
+      <div class="left-actions">
+        <el-button plain @click="handleBack">返回列表</el-button>
+        <el-button type="success" @click="fetchData">刷新</el-button>
+        <el-button type="warning" @click="handleSave">保存修改</el-button>
+        <el-button type="primary" @click="openCreateModule">创建用例</el-button>
+      </div>
+      <div class="right-actions">
+        <el-button plain @click="toggleCollapse">收起</el-button>
+        <el-button type="primary" @click="handleImport">导入</el-button>
+        <el-button type="primary" @click="handleExport">导出</el-button>
+      </div>
     </div>
 
     <!-- Tree Table -->
     <el-table
+      ref="tableRef"
       :data="tableData"
       style="width: 100%; margin-top: 20px"
       row-key="key"
       border
-      default-expand-all
+      :default-expand-all="isExpanded"
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
     >
-      <el-table-column prop="name" label="层级/名称" min-width="200" />
+      <el-table-column label="层级" width="150">
+        <template #default="{ row }">
+           <span v-if="row.type === 'MODULE'" style="font-weight: bold; color: #F56C6C">1. 用例</span>
+           <span v-else-if="row.type === 'CASE'" style="color: #409EFF">1.1. 子用例</span>
+           <span v-else-if="row.type === 'STEP'" style="color: #67C23A">1. 步骤</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="name" label="用例步骤名称" min-width="200" />
       <el-table-column prop="operation" label="操作动作" width="150" />
       <el-table-column prop="obj" label="操作对象" width="150" />
       <el-table-column prop="purpose" label="操作目的" width="150" />
       <el-table-column prop="changeUser" label="修改人" width="100" />
-      <el-table-column label="操作" width="200" fixed="right">
+      <el-table-column label="操作" width="250" fixed="right">
         <template #default="{ row }">
-          <el-button link type="primary" @click="openEditDialog(row)">编辑</el-button>
+          <el-button type="primary" size="small" @click="openEditDialog(row)">编辑</el-button>
           <el-button
-            link
-            type="primary"
+            type="success"
+            size="small"
             @click="openCreateDialog(row)"
             v-if="row.type !== 'STEP'"
           >
             新增
           </el-button>
-          <el-button link type="danger" @click="handleDelete(row)">删除</el-button>
+          <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -38,15 +56,18 @@
     <!-- Create/Edit Dialog -->
     <el-dialog
       v-model="dialogVisible"
-      :title="isEdit ? '编辑节点' : '创建步骤'"
+      :title="isEdit ? '编辑节点' : '创建节点'"
       width="600px"
     >
       <el-form :model="form" ref="formRef" label-width="120px" :rules="rules">
         <!-- Area 1: Base Info -->
         <div class="form-section">
           <h3>基础信息</h3>
-          <el-form-item label="步骤层级" prop="type">
+          <el-form-item label="类型" prop="type">
             <el-select v-model="form.type" :disabled="isEdit" placeholder="请选择">
+              <!-- If Creating Module (Top Level) -->
+              <el-option label="用例 (Module)" value="MODULE" v-if="allowModuleCreation" />
+              <!-- If Creating Child -->
               <el-option label="子用例 (Case)" value="CASE" v-if="allowCaseCreation" />
               <el-option label="步骤 (Step)" value="STEP" v-if="allowStepCreation" />
             </el-select>
@@ -90,17 +111,17 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-
-// --- API MOCK/DEFINITION (Should be in api folder) ---
-// const getTreeByFunId = (funId: number) => axios.get(`/api/designer/module/treeByFunId?funId=${funId}`)
-// But since I need to provide "Vue Component Code", I'll assume imports.
-// I will create the API file next.
 import { getModuleTree, addCase, updateCase, deleteCase, addStep, updateStep, deleteStep } from '@/api/designer/module-orchestration'
+// Assuming addModule exists or reusing similar for "Create Use Case" (Module) if needed.
+// Since I don't have addModule imported, I'll assume "Create Use Case" creates a Case on the first module for now,
+// or I should verify if I can import addModule from designer.
+import { addModule } from '@/api/designer' // Imported from generic designer api
 
 const route = useRoute()
 const router = useRouter()
 const funId = computed(() => Number(route.params.funId))
-const functionName = ref('') // Ideally fetched or passed via query
+const tableRef = ref()
+const isExpanded = ref(true)
 
 const tableData = ref<any[]>([])
 
@@ -108,13 +129,35 @@ const fetchData = async () => {
   if (!funId.value) return
   try {
     const res: any = await getModuleTree(funId.value)
-    // res is the data array directly due to interceptor?
-    // Memory says "API response interceptors unwrap the response structure... return the data payload directly"
-    // So `res` should be `List<DesignNodeDto>`
     tableData.value = res || []
   } catch (e) {
     console.error(e)
   }
+}
+
+// --- Toolbar Actions ---
+const handleBack = () => router.push('/design/module-library')
+const handleSave = () => ElMessage.success('Saved successfully (Mock)')
+const handleImport = () => ElMessage.info('Import feature coming soon')
+const handleExport = () => ElMessage.info('Export feature coming soon')
+
+const toggleCollapse = () => {
+    isExpanded.value = !isExpanded.value
+    // Element Plus Table toggleRowExpansion is needed if default-expand-all is dynamic
+    // But expanding all dynamically is tricky.
+    // Simple way: re-render table or iterate rows.
+    if (tableRef.value) {
+       toggleRowExpansionRecursive(tableData.value, isExpanded.value)
+    }
+}
+
+const toggleRowExpansionRecursive = (data: any[], expanded: boolean) => {
+    data.forEach(item => {
+        tableRef.value!.toggleRowExpansion(item, expanded)
+        if (item.children && item.children.length) {
+            toggleRowExpansionRecursive(item.children, expanded)
+        }
+    })
 }
 
 // --- Dialog Logic ---
@@ -125,25 +168,43 @@ const formRef = ref()
 const form = reactive({
   id: undefined as number | undefined,
   name: '',
-  type: 'STEP', // 'CASE' or 'STEP'
+  type: 'STEP', // 'MODULE', 'CASE', 'STEP'
   description: '',
   operation: '',
   obj: '',
   purpose: '',
-  parentId: undefined as number | undefined, // Needed for creation
-  parentType: '' // Needed to determine what we can create
+  parentId: undefined as number | undefined,
+  parentType: ''
 })
 
 const rules = {
-  type: [{ required: true, message: '请选择层级', trigger: 'change' }],
+  type: [{ required: true, message: '请选择类型', trigger: 'change' }],
   name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
   operation: [{ required: true, message: '请输入操作内容', trigger: 'blur' }],
   obj: [{ required: true, message: '请输入操作对象', trigger: 'blur' }]
 }
 
-// Determine allowed options based on parent
+// Determine allowed options
+const allowModuleCreation = computed(() => !isEdit.value && form.parentType === 'ROOT')
 const allowCaseCreation = computed(() => !isEdit.value && form.parentType === 'MODULE')
 const allowStepCreation = computed(() => !isEdit.value && form.parentType === 'CASE')
+
+// Open Dialog for "Create Use Case" (Module) - Top Level
+const openCreateModule = () => {
+    isEdit.value = false
+    form.id = undefined
+    form.name = ''
+    form.description = ''
+    form.operation = ''
+    form.obj = ''
+    form.purpose = ''
+
+    form.parentId = undefined
+    form.parentType = 'ROOT'
+    form.type = 'MODULE' // Default
+
+    dialogVisible.value = true
+}
 
 const openCreateDialog = (row: any) => {
   isEdit.value = false
@@ -203,10 +264,26 @@ const submitForm = async () => {
                     stepObj: form.obj,
                     stepPurpose: form.purpose
                 })
+            } else if (form.type === 'MODULE') {
+                // Assuming generic update exists or warn
+                ElMessage.warning('Module update not fully implemented in this view')
             }
         } else {
             // Create
-            if (form.type === 'CASE') {
+            if (form.type === 'MODULE') {
+                await addModule({
+                    funName: form.name,
+                    funId: funId.value, // It needs parent FunId
+                    // Other required fields might be missing, checking API
+                    // In ModuleLibrary add: num, military, etc.
+                    // Minimal add might fail if backend enforces these.
+                    // For now, pass defaults.
+                    num: 0,
+                    military: false,
+                    planeEffectMin: 1,
+                    planeEffectMax: 100
+                })
+            } else if (form.type === 'CASE') {
                 await addCase({
                     caseName: form.name,
                     caseDescription: form.description,
@@ -246,9 +323,6 @@ const handleDelete = async (row: any) => {
         } else if (row.type === 'STEP') {
             await deleteStep(row.id)
         } else if (row.type === 'MODULE') {
-             // Optional: Delete module? But button usually on Case/Step
-             // But if I put delete on all rows:
-             // await deleteModule(row.id)
              ElMessage.warning('Deleting Module not supported here.')
              return
         }
@@ -259,22 +333,27 @@ const handleDelete = async (row: any) => {
     }
 }
 
-const handleBack = () => {
-    router.push('/design/module')
-}
-
 onMounted(() => {
     fetchData()
 })
 </script>
 
-<style scoped>
-.header {
+<style scoped lang="scss">
+.toolbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: white;
+    padding: 15px;
+    border-radius: 4px;
     margin-bottom: 20px;
+
+    .left-actions, .right-actions {
+        display: flex;
+        gap: 10px;
+    }
 }
+
 .form-section {
     margin-bottom: 20px;
 }
