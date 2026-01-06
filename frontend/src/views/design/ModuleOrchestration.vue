@@ -1,7 +1,7 @@
 <template>
   <div class="module-orchestration">
     <div class="header">
-      <h2>Module Orchestration: {{ functionName }}</h2>
+      <h2>模块详情 {{ functionName }}</h2>
       <el-button type="primary" @click="handleBack">Back to Library</el-button>
     </div>
 
@@ -260,7 +260,7 @@ const handleDelete = async (row: any) => {
 }
 
 const handleBack = () => {
-    router.push('/design/module-library')
+    router.push('/design/module')
 }
 
 onMounted(() => {
