@@ -67,7 +67,7 @@ public class TestExampleServiceImpl implements TestExampleService {
 
         for (TestFunctionModule tFModule : tFModules) {
             Integer funId = tFModule.getFunId();
-            tFModule.setUpdate(StatusContants.step_update_unchange);
+            tFModule.setUpdated(StatusContants.step_update_unchange);
 
             if (tFModule.getModuleStatus() == StatusContants.step_status_del) {
                 Response result = testFunctionModuleService.update(tFModule);
@@ -123,7 +123,7 @@ public class TestExampleServiceImpl implements TestExampleService {
 
         for (TestFunctionCase tFCase : tFCases) {
             Integer moduleId = tFCase.getModuleId();
-            tFCase.setUpdate(StatusContants.step_update_unchange);
+            tFCase.setUpdated(StatusContants.step_update_unchange);
 
             if (tFCase.getCaseStatus() == StatusContants.step_status_del) {
                 Response result = testFunctionCaseService.update(tFCase);

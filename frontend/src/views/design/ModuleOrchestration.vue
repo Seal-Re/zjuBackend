@@ -136,7 +136,7 @@ const fetchData = async () => {
 }
 
 // --- Toolbar Actions ---
-const handleBack = () => router.push('/design/module-library')
+const handleBack = () => router.push('/design/module')
 const handleSave = () => ElMessage.success('Saved successfully (Mock)')
 const handleImport = () => ElMessage.info('Import feature coming soon')
 const handleExport = () => ElMessage.info('Export feature coming soon')

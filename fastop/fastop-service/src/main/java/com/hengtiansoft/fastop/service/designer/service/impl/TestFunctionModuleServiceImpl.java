@@ -34,7 +34,7 @@ public class TestFunctionModuleServiceImpl implements TestFunctionModuleService 
 
         testFunctionModule.setModuleStatus(StatusContants.step_status_unuse);
         testFunctionModule.setModuleDate(String.valueOf(new Date()));
-        testFunctionModule.setUpdate(StatusContants.step_update_change);
+        testFunctionModule.setUpdated(StatusContants.step_update_change);
         //TODO
         testFunctionModule.setChangeUser(null);
         int count = testFunctionModuleMapper.insertSelective(testFunctionModule);
@@ -51,7 +51,7 @@ public class TestFunctionModuleServiceImpl implements TestFunctionModuleService 
         if (tFModule == null) {
             return ResponseFactory.failure("用例不存在");
         }
-        tFModule.setUpdate(StatusContants.step_update_change);
+        tFModule.setUpdated(StatusContants.step_update_change);
         int result = testFunctionModuleMapper.updateByPrimaryKeySelective(testFunctionModule);
 
         if (result > CommonConstants.NUM_0) {
@@ -66,7 +66,7 @@ public class TestFunctionModuleServiceImpl implements TestFunctionModuleService 
         if (tFModule == null) {
             return ResponseFactory.failure("用例不存在");
         }
-        tFModule.setUpdate(StatusContants.step_update_change);
+        tFModule.setUpdated(StatusContants.step_update_change);
         tFModule.setModuleStatus(StatusContants.step_status_del);
         int result = testFunctionModuleMapper.updateByPrimaryKeySelective(tFModule);
         if (result > CommonConstants.NUM_0) {
