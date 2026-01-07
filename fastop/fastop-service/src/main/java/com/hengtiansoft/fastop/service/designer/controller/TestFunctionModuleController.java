@@ -68,5 +68,10 @@ public class TestFunctionModuleController {
         return testFunctionModuleService.listAll();
     }
 
-
+    @ApiOperation("查询用例树形结构")
+    @GetMapping("/treeByFunId")
+    public Response getTreeByFunId(@RequestParam Integer funId) {
+        LOG.info("查询用例树形结构, funId: {}", funId);
+        return testFunctionModuleService.getTreeByFunId(funId);
+    }
 }

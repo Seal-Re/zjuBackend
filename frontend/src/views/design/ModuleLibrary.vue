@@ -62,8 +62,8 @@
         </template>
       </el-table-column>
       <el-table-column label="操作" width="200">
-        <template #default>
-          <el-button link type="primary">详情</el-button>
+        <template #default="{ row }">
+          <el-button link type="primary" @click="goToDetails(row)">详情</el-button>
           <el-button link type="primary">升级</el-button>
           <el-button link type="primary">相关人员</el-button>
         </template>
@@ -159,7 +159,9 @@ import { useGlobalFilterStore } from '@/store/globalFilter'
 import { createTestFunction, getTestFunctions, getTestBaseWithLimit } from '@/api/designer'
 import { Delete } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const filterStore = useGlobalFilterStore()
 
 // Dummy options for filter
@@ -229,14 +231,12 @@ const fetchData = async () => {
     }
 }
 
-const handleProfessionChange = () => {
-  filterStore.subsystem = ""
-  
-  fetchData()
-}
-
 const handleFilterChange = () => {
     fetchData()
+}
+
+const goToDetails = (row: any) => {
+    router.push({ name: 'ModuleOrchestration', params: { funId: row.funId } })
 }
 
 // Dialog Logic

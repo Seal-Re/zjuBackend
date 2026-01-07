@@ -18,6 +18,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/design/ModuleLibrary.vue')
       },
       {
+        path: 'module/:funId',
+        name: 'ModuleOrchestration',
+        component: () => import('@/views/design/ModuleOrchestration.vue')
+      },
+      {
         path: 'suite',
         name: 'SuiteLibrary',
         component: () => import('@/views/design/SuiteLibrary.vue')
