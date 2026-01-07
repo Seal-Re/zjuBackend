@@ -30,7 +30,7 @@ public class TestFunctionCaseServiceImpl implements TestFunctionCaseService {
 
         testFunctionCase.setCaseStatus(StatusContants.step_status_unuse);
         testFunctionCase.setCaseDate(String.valueOf(new Date()));
-        testFunctionCase.setUpdated(StatusContants.step_update_change);
+        testFunctionCase.setUpdate(StatusContants.step_update_change);
         // TODO
         testFunctionCase.setChangeUser(null);
 
@@ -48,7 +48,7 @@ public class TestFunctionCaseServiceImpl implements TestFunctionCaseService {
         if (tFCase == null) {
             return ResponseFactory.failure("用例不存在");
         }
-        tFCase.setUpdated(StatusContants.step_update_change);
+        tFCase.setUpdate(StatusContants.step_update_change);
         int result = testFunctionCaseMapper.updateByPrimaryKeySelective(testFunctionCase);
 
         if (result > CommonConstants.NUM_0) {
@@ -63,7 +63,7 @@ public class TestFunctionCaseServiceImpl implements TestFunctionCaseService {
         if (tFCase == null) {
             return ResponseFactory.failure("用例不存在");
         }
-        tFCase.setUpdated(StatusContants.step_update_change);
+        tFCase.setUpdate(StatusContants.step_update_change);
         tFCase.setCaseStatus(StatusContants.step_status_del);
         int result = testFunctionCaseMapper.updateByPrimaryKeySelective(tFCase);
         if (result > CommonConstants.NUM_0) {
@@ -142,7 +142,7 @@ public class TestFunctionCaseServiceImpl implements TestFunctionCaseService {
         }
 
         TestFunctionCase record = new TestFunctionCase();
-        record.setUpdated(StatusContants.step_update_change);
+        record.setUpdate(StatusContants.step_update_change);
 
         TestFunctionCaseExample example = new TestFunctionCaseExample();
         example.createCriteria().andCaseIdIn(testFunctionModuleIds);

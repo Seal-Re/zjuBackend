@@ -37,7 +37,7 @@ export const createTestFunction = (data: any) => {
 // Function Hierarchy
 export const addModule = (data: any) => {
   return request({
-    url: '/designer/module/add',
+    url: '/designer/testFunctionModule/add',
     method: 'post',
     data
   })

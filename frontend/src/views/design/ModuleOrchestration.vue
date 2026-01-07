@@ -111,7 +111,7 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getModuleTree, addCase, updateCase, deleteCase, addStep, updateStep, deleteStep } from '@/api/designer/module-orchestration'
+import { getModuleTree, addCase, updateCase, deleteCase, addStep, updateStep, deleteStep, deleteModule } from '@/api/designer/module-orchestration'
 // Assuming addModule exists or reusing similar for "Create Use Case" (Module) if needed.
 // Since I don't have addModule imported, I'll assume "Create Use Case" creates a Case on the first module for now,
 // or I should verify if I can import addModule from designer.
@@ -136,7 +136,7 @@ const fetchData = async () => {
 }
 
 // --- Toolbar Actions ---
-const handleBack = () => router.push('/design/module')
+const handleBack = () => router.push('/design/module-library')
 const handleSave = () => ElMessage.success('Saved successfully (Mock)')
 const handleImport = () => ElMessage.info('Import feature coming soon')
 const handleExport = () => ElMessage.info('Export feature coming soon')
@@ -323,8 +323,7 @@ const handleDelete = async (row: any) => {
         } else if (row.type === 'STEP') {
             await deleteStep(row.id)
         } else if (row.type === 'MODULE') {
-             ElMessage.warning('Deleting Module not supported here.')
-             return
+             await deleteModule(row.id)
         }
         ElMessage.success('Deleted')
         fetchData()

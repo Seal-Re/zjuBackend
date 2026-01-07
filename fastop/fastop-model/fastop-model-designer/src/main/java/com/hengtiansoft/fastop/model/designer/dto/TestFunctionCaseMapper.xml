@@ -10,7 +10,7 @@
     <result column="case_date" jdbcType="VARCHAR" property="caseDate" />
     <result column="module_id" jdbcType="INTEGER" property="moduleId" />
     <result column="case_status" jdbcType="INTEGER" property="caseStatus" />
-    <result column="updated" jdbcType="INTEGER" property="updated" />
+    <result column="update" jdbcType="INTEGER" property="update" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -72,7 +72,7 @@
   </sql>
   <sql id="Base_Column_List">
     case_id, case_name, change_user, case_description, case_note, case_date, module_id, 
-    case_status, updated
+    case_status, update
   </sql>
   <select id="selectByExample" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionCaseExample" resultMap="BaseResultMap">
     select
@@ -108,11 +108,11 @@
   <insert id="insert" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionCase">
     insert into test_function_case (case_id, case_name, change_user, 
       case_description, case_note, case_date, 
-      module_id, case_status, updated
+      module_id, case_status, update
       )
     values (#{caseId,jdbcType=INTEGER}, #{caseName,jdbcType=VARCHAR}, #{changeUser,jdbcType=VARCHAR}, 
       #{caseDescription,jdbcType=VARCHAR}, #{caseNote,jdbcType=VARCHAR}, #{caseDate,jdbcType=VARCHAR}, 
-      #{moduleId,jdbcType=INTEGER}, #{caseStatus,jdbcType=INTEGER}, #{updated,jdbcType=INTEGER}
+      #{moduleId,jdbcType=INTEGER}, #{caseStatus,jdbcType=INTEGER}, #{update,jdbcType=INTEGER}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionCase">
@@ -142,8 +142,8 @@
       <if test="caseStatus != null">
         case_status,
       </if>
-      <if test="updated != null">
-        updated,
+      <if test="update != null">
+        update,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -171,8 +171,8 @@
       <if test="caseStatus != null">
         #{caseStatus,jdbcType=INTEGER},
       </if>
-      <if test="updated != null">
-        #{updated,jdbcType=INTEGER},
+      <if test="update != null">
+        #{update,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -209,8 +209,8 @@
       <if test="record.caseStatus != null">
         case_status = #{record.caseStatus,jdbcType=INTEGER},
       </if>
-      <if test="record.updated != null">
-        updated = #{record.updated,jdbcType=INTEGER},
+      <if test="record.update != null">
+        update = #{record.update,jdbcType=INTEGER},
       </if>
     </set>
     <if test="_parameter != null">
@@ -227,7 +227,7 @@
       case_date = #{record.caseDate,jdbcType=VARCHAR},
       module_id = #{record.moduleId,jdbcType=INTEGER},
       case_status = #{record.caseStatus,jdbcType=INTEGER},
-      updated = #{record.updated,jdbcType=INTEGER}
+      update = #{record.update,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -256,8 +256,8 @@
       <if test="caseStatus != null">
         case_status = #{caseStatus,jdbcType=INTEGER},
       </if>
-      <if test="updated != null">
-        updated = #{updated,jdbcType=INTEGER},
+      <if test="update != null">
+        update = #{update,jdbcType=INTEGER},
       </if>
     </set>
     where case_id = #{caseId,jdbcType=INTEGER}
@@ -271,7 +271,7 @@
       case_date = #{caseDate,jdbcType=VARCHAR},
       module_id = #{moduleId,jdbcType=INTEGER},
       case_status = #{caseStatus,jdbcType=INTEGER},
-      updated = #{updated,jdbcType=INTEGER}
+      update = #{update,jdbcType=INTEGER}
     where case_id = #{caseId,jdbcType=INTEGER}
   </update>
 </mapper>

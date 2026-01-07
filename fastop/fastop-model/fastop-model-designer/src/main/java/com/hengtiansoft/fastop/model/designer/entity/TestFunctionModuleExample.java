@@ -634,63 +634,63 @@ public class TestFunctionModuleExample {
             return (Criteria) this;
         }
 
-        public Criteria andUpdatedIsNull() {
-            addCriterion("updated is null");
+        public Criteria andUpdateIsNull() {
+            addCriterion("update is null");
             return (Criteria) this;
         }
 
-        public Criteria andUpdatedIsNotNull() {
-            addCriterion("updated is not null");
+        public Criteria andUpdateIsNotNull() {
+            addCriterion("update is not null");
             return (Criteria) this;
         }
 
-        public Criteria andUpdatedEqualTo(Integer value) {
-            addCriterion("updated =", value, "updated");
+        public Criteria andUpdateEqualTo(Integer value) {
+            addCriterion("update =", value, "update");
             return (Criteria) this;
         }
 
-        public Criteria andUpdatedNotEqualTo(Integer value) {
-            addCriterion("updated <>", value, "updated");
+        public Criteria andUpdateNotEqualTo(Integer value) {
+            addCriterion("update <>", value, "update");
             return (Criteria) this;
         }
 
-        public Criteria andUpdatedGreaterThan(Integer value) {
-            addCriterion("updated >", value, "updated");
+        public Criteria andUpdateGreaterThan(Integer value) {
+            addCriterion("update >", value, "update");
             return (Criteria) this;
         }
 
-        public Criteria andUpdatedGreaterThanOrEqualTo(Integer value) {
-            addCriterion("updated >=", value, "updated");
+        public Criteria andUpdateGreaterThanOrEqualTo(Integer value) {
+            addCriterion("update >=", value, "update");
             return (Criteria) this;
         }
 
-        public Criteria andUpdatedLessThan(Integer value) {
-            addCriterion("updated <", value, "updated");
+        public Criteria andUpdateLessThan(Integer value) {
+            addCriterion("update <", value, "update");
             return (Criteria) this;
         }
 
-        public Criteria andUpdatedLessThanOrEqualTo(Integer value) {
-            addCriterion("updated <=", value, "updated");
+        public Criteria andUpdateLessThanOrEqualTo(Integer value) {
+            addCriterion("update <=", value, "update");
             return (Criteria) this;
         }
 
-        public Criteria andUpdatedIn(List<Integer> values) {
-            addCriterion("updated in", values, "updated");
+        public Criteria andUpdateIn(List<Integer> values) {
+            addCriterion("update in", values, "update");
             return (Criteria) this;
         }
 
-        public Criteria andUpdatedNotIn(List<Integer> values) {
-            addCriterion("updated not in", values, "updated");
+        public Criteria andUpdateNotIn(List<Integer> values) {
+            addCriterion("update not in", values, "update");
             return (Criteria) this;
         }
 
-        public Criteria andUpdatedBetween(Integer value1, Integer value2) {
-            addCriterion("updated between", value1, value2, "updated");
+        public Criteria andUpdateBetween(Integer value1, Integer value2) {
+            addCriterion("update between", value1, value2, "update");
             return (Criteria) this;
         }
 
-        public Criteria andUpdatedNotBetween(Integer value1, Integer value2) {
-            addCriterion("updated not between", value1, value2, "updated");
+        public Criteria andUpdateNotBetween(Integer value1, Integer value2) {
+            addCriterion("update not between", value1, value2, "update");
             return (Criteria) this;
         }
     }

@@ -1,11 +1,11 @@
 import request from '@/api/request'
 
-// Adjust path based on your setup. Usually just '/...' if proxy is set up.
-// Memory says: Vite proxies  to backend.
+// Adjust path based on your setup. Usually just '/api/...' if proxy is set up.
+// Memory says: Vite proxies /api to backend.
 
 export function getModuleTree(funId: number) {
   return request({
-    url: '/designer/module/treeByFunId',
+    url: '/api/designer/module/treeByFunId',
     method: 'get',
     params: { funId }
   })
@@ -14,7 +14,7 @@ export function getModuleTree(funId: number) {
 // Case APIs
 export function addCase(data: any) {
   return request({
-    url: '/designer/case/add',
+    url: '/api/designer/case/add',
     method: 'post',
     data
   })
@@ -22,7 +22,7 @@ export function addCase(data: any) {
 
 export function updateCase(data: any) {
   return request({
-    url: '/designer/case/update',
+    url: '/api/designer/case/update',
     method: 'post',
     data
   })
@@ -30,7 +30,7 @@ export function updateCase(data: any) {
 
 export function deleteCase(caseId: number) {
   return request({
-    url: '/designer/case/delete',
+    url: '/api/designer/case/delete',
     method: 'post',
     params: { caseId }
   })
@@ -39,7 +39,7 @@ export function deleteCase(caseId: number) {
 // Step APIs
 export function addStep(data: any) {
   return request({
-    url: '/designer/step/add',
+    url: '/api/designer/step/add',
     method: 'post',
     data
   })
@@ -47,7 +47,7 @@ export function addStep(data: any) {
 
 export function updateStep(data: any) {
   return request({
-    url: '/designer/step/update',
+    url: '/api/designer/step/update',
     method: 'post',
     data
   })
@@ -55,8 +55,16 @@ export function updateStep(data: any) {
 
 export function deleteStep(stepId: number) {
   return request({
-    url: '/designer/step/delete',
+    url: '/api/designer/step/delete',
     method: 'post',
     params: { StepId: stepId } // Note: Param name matches Controller (capital S)
   })
+}
+
+export function deleteModule(moduleId: number) {
+    return request({
+        url: '/api/designer/module/delete',
+        method: 'post',
+        params: { ModuleId: moduleId }
+    })
 }
