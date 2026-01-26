@@ -37,7 +37,7 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
-        <table tableName="test_function_step" domainObjectName="TestFunctionStep" enableCountByExample="true" enableUpdateByExample="true"
+        <table tableName="base_struct" domainObjectName="BaseStruct" enableCountByExample="true" enableUpdateByExample="true"
                enableDeleteByExample="true" enableSelectByExample="true" selectByExampleQueryId="true"></table>
     </context>
 </generatorConfiguration>

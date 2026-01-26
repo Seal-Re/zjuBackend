@@ -25,11 +25,16 @@
       :default-expand-all="isExpanded"
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
     >
-      <el-table-column label="层级" width="150">
-        <template #default="{ row }">
-           <span v-if="row.type === 'MODULE'" style="font-weight: bold; color: #F56C6C">1. 用例</span>
-           <span v-else-if="row.type === 'CASE'" style="color: #409EFF">1.1. 子用例</span>
-           <span v-else-if="row.type === 'STEP'" style="color: #67C23A">1. 步骤</span>
+      <el-table-column label="层级" width="180"> <template #default="{ row }">
+          <span v-if="row.type === 'MODULE'" style="font-weight: bold; color: #F56C6C">
+            {{ row.indexLabel }} 用例
+          </span>
+          <span v-else-if="row.type === 'CASE'" style="color: #409EFF">
+            {{ row.indexLabel }} 子用例
+          </span>
+          <span v-else-if="row.type === 'STEP'" style="color: #67C23A">
+            {{ row.indexLabel }} 步骤
+          </span>
         </template>
       </el-table-column>
       <el-table-column prop="name" label="用例步骤名称" min-width="200" />
@@ -125,18 +130,36 @@ const isExpanded = ref(true)
 
 const tableData = ref<any[]>([])
 
+const generateHierarchyIndices = (data: any[], parentIndex = '') => {
+  if (!data) return []
+  data.forEach((item, index) => {
+    // 生成逻辑：顶层直接用 index+1，子层拼接 parentIndex
+    const currentIndex = parentIndex ? `${parentIndex}.${index + 1}` : `${index + 1}`
+    item.indexLabel = currentIndex // 赋值给临时属性
+    
+    if (item.children && item.children.length) {
+      generateHierarchyIndices(item.children, currentIndex)
+    }
+  })
+  return data
+}
+
+
 const fetchData = async () => {
   if (!funId.value) return
   try {
     const res: any = await getModuleTree(funId.value)
-    tableData.value = res || []
+    
+    const rawData = res || []
+    tableData.value = generateHierarchyIndices(rawData) 
+    
   } catch (e) {
     console.error(e)
   }
 }
 
 // --- Toolbar Actions ---
-const handleBack = () => router.push('/design/module-library')
+const handleBack = () => router.push('/design/module')
 const handleSave = () => ElMessage.success('Saved successfully (Mock)')
 const handleImport = () => ElMessage.info('Import feature coming soon')
 const handleExport = () => ElMessage.info('Export feature coming soon')

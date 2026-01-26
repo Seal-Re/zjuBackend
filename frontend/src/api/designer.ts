@@ -18,9 +18,25 @@ export const getTestFunctions = (params: any) => {
   })
 }
 
+export const getTestSuites = (params: any) => {
+  return request({
+    url: '/designer/testSuite/listByBaseId', 
+    method: 'get',
+    params
+  })
+}
+
 export const getCheckTestFunction = (params: any) => {
   return request({
     url: '/designer/testFunction/getCheckTestFunction', 
+    method: 'get',
+    params
+  })
+}
+
+export const getCheckTestSuite = (params: any) => {
+  return request({
+    url: '/designer/testSuite/getCheckTestSuite', 
     method: 'get',
     params
   })
@@ -37,7 +53,7 @@ export const createTestFunction = (data: any) => {
 // Function Hierarchy
 export const addModule = (data: any) => {
   return request({
-    url: '/designer/testFunctionModule/add',
+    url: '/designer/module/add',
     method: 'post',
     data
   })
@@ -122,3 +138,52 @@ export const getTestSuiteDetail = (suiteId: string | number) => {
 // FunctionSuite relation - need to fetch functions for a suite
 // If backend doesn't have direct "get functions by suiteId", we assume details might come from getTestSuiteDetail or similar
 // Or use FunctionSuiteController
+
+export const updateTestFunction = (data: any) => {
+    return request({
+        url: `/designer/testFunction/update`,
+        method: 'post',
+        data: data
+    })
+}
+
+export const updateTestSuite = (data: any) => {
+    return request({
+        url: `/designer/testSuite/update`,
+        method: 'post',
+        data: data
+    })
+}
+
+export const submitTestFunction = (funId: number) => {
+    return request({
+        url: `/designer/testFunction/submit`,
+        method: 'post',
+        data: funId, 
+        headers: {
+          'Content-Type': 'application/json'
+        }
+    })
+}
+
+export const submitTestSuite = (suiteId: number) => {
+    return request({
+        url: `/designer/testSuite/submit`,
+        method: 'post',
+        data: suiteId, 
+        headers: {
+          'Content-Type': 'application/json'
+        }
+    })
+}
+
+export const getRely = (suiteId: number) => {
+    return request({
+        url: `/functionSuite/rely`,
+        method: 'get',
+        params: { suiteId }
+
+    })
+
+}
+

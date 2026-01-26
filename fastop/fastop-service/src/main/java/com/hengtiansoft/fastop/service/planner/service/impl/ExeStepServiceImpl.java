@@ -54,20 +54,19 @@ public class ExeStepServiceImpl implements ExeStepService {
     @Override
     @Transactional(readOnly = false)
     public int deleteExeStep(String exeFunctionId) {
-        int res = 0;
-        // 查出对应的数据
-        ExeStepExample exeStepExample = new ExeStepExample();
-        ExeStepExample.Criteria criteria = exeStepExample.createCriteria();
-        criteria.andExeFunctionIdEqualTo(exeFunctionId);
-        List<ExeStep> list = exeStepMapper.selectByExample(exeStepExample);
-        // delete设置为true
-        for (ExeStep exeStep : list) {
-            exeStep.setDeleted(true);
-            // 更新
-            exeStepMapper.updateByPrimaryKeySelective((ExeStepWithBLOBs) exeStep);
-            res++;
+        // 1. 创建查询条件
+        ExeStepExample example = new ExeStepExample();
+        example.createCriteria().andExeFunctionIdEqualTo(exeFunctionId);
+
+        List<ExeStepWithBLOBs> list = exeStepMapper.selectByExampleWithBLOBs(example);
+
+        int count = 0;
+        for (ExeStepWithBLOBs step : list) {
+            step.setDeleted(true);
+            exeStepMapper.updateByPrimaryKeySelective(step); // 此时不需要强转，本身就是 WithBLOBs
+            count++;
         }
-        return res;
+        return count;
     }
 
     @Override

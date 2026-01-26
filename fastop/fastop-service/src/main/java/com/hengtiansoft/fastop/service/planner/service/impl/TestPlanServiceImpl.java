@@ -91,7 +91,7 @@ public class TestPlanServiceImpl implements TestPlanService {
             }
 
         } catch (RuntimeException e) {
-            LOG.warn("业务创建失败: {}", e.getMessage());
+            LOG.warn("业务创建失败: {}", e);
             // 事务回滚
             return ResponseFactory.failure(e.getMessage());
         } catch (Exception e) {
@@ -124,10 +124,6 @@ public class TestPlanServiceImpl implements TestPlanService {
         TestPlan plan = new TestPlan();
         BeanUtils.copyProperties(testPlanRequestDto, plan);
 
-        if (testBase.getBaseType().equals(2)) {
-            plan.setBaseType(2); // 临时清单
-        }
-
         plan.setPlanId(planId);
 
         TestPlan existingPlan = getPlanRound(testPlanRequestDto.getEntityId(), testPlanRequestDto.getSuiteId());
@@ -142,16 +138,6 @@ public class TestPlanServiceImpl implements TestPlanService {
 
         if (result) {
             exeFunctionService.conveyTestFunction2ExeFunction(testPlanRequestDto.getSuiteId(), planId);
-            if (testBase.getBaseType().equals(2)) {
-                // 设置逻辑删除标志
-                testSuite.setDeleted(true);
-                // 调用Service 更新
-                boolean updateSuccess = testSuiteService.updateTestSuite(testSuite);
-
-                if (!updateSuccess) {
-                    throw new RuntimeException("更新临时测试集状态失败");
-                }
-            }
         }
 
         return result;
@@ -175,6 +161,7 @@ public class TestPlanServiceImpl implements TestPlanService {
             testPlan.setPlanStartTime(testPlanRequestDto.getPlanStartTime());
             testPlan.setPlanEndTime(testPlanRequestDto.getPlanEndTime());
             testPlan.setDispatcherId(testPlanRequestDto.getDispatcherId());
+            testPlan.setSuiteId(testPlanRequestDto.getSuiteId());
 
             LOG.info("Remark message{}",testPlanRequestDto.getRemark());
 
@@ -211,7 +198,7 @@ public class TestPlanServiceImpl implements TestPlanService {
             return ResponseFactory.failure("查找不到planId对应的测试计划");
         }
 
-        if (!TestPlanStatusContants.PLAN_STATUS_UNEXE.equals(testPlanDel.getStatus())) {
+        if (TestPlanStatusContants.PLAN_STATUS_EXEING.equals(testPlanDel.getStatus())) {
             return ResponseFactory.failure("当前测试计划状态不能删除");
         }
 
@@ -333,6 +320,13 @@ public class TestPlanServiceImpl implements TestPlanService {
             }
         }
         dispatchData.put("steps", allSteps);
+
+        testPlan.setStatus(TestPlanStatusContants.PLAN_STATUS_UNEXE);
+
+        int updateCount = testPlanMapper.updateByPrimaryKeySelective(testPlan);
+        if (updateCount <= 0) {
+            return ResponseFactory.failure("Failed to update plan status");
+        }
 
         return ResponseFactory.success(dispatchData);
     }

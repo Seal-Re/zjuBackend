@@ -26,7 +26,7 @@ public class TestFunctionStepServiceImpl implements TestFunctionStepService {
 
         testFunctionStep.setStepStatus(StatusContants.step_status_unuse);
         testFunctionStep.setStepDate(String.valueOf(new Date()));
-        testFunctionStep.setUpdate(StatusContants.step_update_change);
+        testFunctionStep.setUpdated(StatusContants.step_update_change);
         // TODO
         testFunctionStep.setChangeUser(null);
 
@@ -44,7 +44,7 @@ public class TestFunctionStepServiceImpl implements TestFunctionStepService {
         if (tFStep == null) {
             return ResponseFactory.failure("用例不存在");
         }
-        tFStep.setUpdate(StatusContants.step_update_change);
+        tFStep.setUpdated(StatusContants.step_update_change);
         int result = testFunctionStepMapper.updateByPrimaryKeySelective(testFunctionStep);
 
         if (result > CommonConstants.NUM_0) {
@@ -59,7 +59,7 @@ public class TestFunctionStepServiceImpl implements TestFunctionStepService {
         if (tFStep == null) {
             return ResponseFactory.failure("用例不存在");
         }
-        tFStep.setUpdate(StatusContants.step_update_change);
+        tFStep.setUpdated(StatusContants.step_update_change);
         tFStep.setStepStatus(StatusContants.step_status_del);
         int result = testFunctionStepMapper.updateByPrimaryKeySelective(tFStep);
         if (result > CommonConstants.NUM_0) {
@@ -138,7 +138,7 @@ public class TestFunctionStepServiceImpl implements TestFunctionStepService {
         }
 
         TestFunctionStep record = new TestFunctionStep();
-        record.setUpdate(StatusContants.step_update_change);
+        record.setUpdated(StatusContants.step_update_change);
 
         TestFunctionStepExample example = new TestFunctionStepExample();
         example.createCriteria().andCaseIdIn(testFunctionCaseIds);

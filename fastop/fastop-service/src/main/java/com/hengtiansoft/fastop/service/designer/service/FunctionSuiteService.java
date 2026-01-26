@@ -20,7 +20,9 @@ public interface FunctionSuiteService {
 
     Integer countKeyProcessBySuite(Integer suiteId);
 
-    List<FunctionSuite> listFunctionSuiteBySuite(int suiteId);
+    List<FunctionSuite> listFunctionSuiteBySuite(Integer suiteId);
 
     List<FunctionSuiteDto> listDtoBySuiteWithExample(Integer suiteId);
+
+    Response getRely(Integer suiteId);
 }

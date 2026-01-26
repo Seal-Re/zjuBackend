@@ -6,12 +6,11 @@ import com.hengtiansoft.fastop.model.designer.entity.TestSuite;
 
 public interface TestSuiteService {
 
-    Response add(TestSuite testSuite);
-
-    // Added createTestSuite to Interface to match Impl
-    boolean createTestSuite(TestSuiteRequestDto nTestSuite);
+    Response add(TestSuiteRequestDto testSuiteRequestDto);
 
     Response update(TestSuiteRequestDto testSuiteRequestDto);
+
+    Response submit(Integer suiteId);
 
     Response delete(Integer suiteId);
 
@@ -34,4 +33,5 @@ public interface TestSuiteService {
 
     boolean updateSuiteListAppStatusToUnApp(TestSuite tSuite);
 
+    Response getCheckTestSuite();
 }

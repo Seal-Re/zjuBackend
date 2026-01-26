@@ -34,8 +34,15 @@ public class TestFunctionController {
     @ApiOperation("修改模块信息")
     @PostMapping("/update")
     public Response updateTestFunction(@RequestBody TestFunctionInfoRequestDto tFunctionInfo) {
-        LOG.info("开始修改模块，ID: {}", tFunctionInfo.getFunId());
+        LOG.info("开始修改模块，ID: {}", tFunctionInfo);
         return testFunctionService.update(tFunctionInfo);
+    }
+
+    @ApiOperation("修改模块信息")
+    @PostMapping("/submit")
+    public Response submitTestFunction(@RequestBody Integer funId) {
+        LOG.info("开始修改模块，ID: {}", funId);
+        return testFunctionService.submit(funId);
     }
 
     @ApiOperation("删除模块")
@@ -76,6 +83,7 @@ public class TestFunctionController {
     @ApiOperation("审批")
     @PostMapping("/check")
     public Response checkTestFunction(@RequestParam Integer funId, @RequestParam String checkWorker, @RequestParam Integer level) {
+        LOG.info("funId= {}, checkWorker= {}, level= {}", funId, checkWorker, level);
         return testFunctionService.check(funId, checkWorker, level);
     }
 

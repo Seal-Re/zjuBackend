@@ -5,6 +5,7 @@ import com.hengtiansoft.fastop.model.designer.dto.TestFunctionInfoRequestDto;
 import com.hengtiansoft.fastop.model.designer.entity.TestFunction;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public interface TestFunctionService {
@@ -12,6 +13,7 @@ public interface TestFunctionService {
     Response add(TestFunctionInfoRequestDto tFunctionInfo);
 
     Response update(TestFunctionInfoRequestDto tFunctionInfo);
+    Response submit(Integer funId);
     Response delete(Integer funId);
     Response listAll();
     Response getById(Integer funId);
@@ -24,7 +26,7 @@ public interface TestFunctionService {
     Integer countKeyProcessByFunId(Integer funId);
 
     Map<Integer, TestFunction> getFunctionsByIds(Collection<Integer> funIds);
-
+    List<TestFunction> getTestFunctionListById(List<Integer> funIds);
     // Added for TestSuite sync creation logic
     void copyTestFunctionForSuite(Integer funId, Integer targetSuiteId, Integer funOrder);
 }

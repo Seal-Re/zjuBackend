@@ -19,8 +19,18 @@ public class TestBaseServiceImpl implements TestBaseService {
 
     @Override
     public Response getTestBaseWithLimit(String model, String profession, String subsystem){
+        Integer result = getTestBaseWithLimitUtil(model,profession,subsystem);
+        if(result==-1){
+            return ResponseFactory.failure("出现系统错误");
+        }
+        else {
+            return ResponseFactory.success(result);
+        }
 
+    }
 
+    @Override
+    public Integer getTestBaseWithLimitUtil(String model, String profession, String subsystem){
 
         TestBaseExample example = new TestBaseExample();
         TestBaseExample.Criteria criteria = example.createCriteria();
@@ -32,7 +42,7 @@ public class TestBaseServiceImpl implements TestBaseService {
         List<TestBase> testBases = testBaseMapper.selectByExample(example);
 
         if(testBases.size()>0){
-            return ResponseFactory.success(testBases.get(0).getId());
+            return testBases.get(0).getId();
         }
 
         TestBase testBase = new TestBase();
@@ -51,10 +61,10 @@ public class TestBaseServiceImpl implements TestBaseService {
         List<TestBase> testBases1 = testBaseMapper.selectByExample(example);
 
         if(testBases1.size()>0){
-            return ResponseFactory.success(testBases1.get(0).getId());
+            return testBases1.get(0).getId();
         }
         else
-            return ResponseFactory.failure("出现系统错误");
+            return -1;
 
     }
 
@@ -97,5 +107,9 @@ public class TestBaseServiceImpl implements TestBaseService {
         return ResponseFactory.success(testBase);
     }
 
+    @Override
+    public List<TestBase> listAllTestBase() {
+        return testBaseMapper.selectByExample(null);
+    }
 
 }
