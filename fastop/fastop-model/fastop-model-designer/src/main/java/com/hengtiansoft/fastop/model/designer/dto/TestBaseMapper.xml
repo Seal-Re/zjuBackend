@@ -12,6 +12,9 @@
     <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
     <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
     <result column="updated_by" jdbcType="VARCHAR" property="updatedBy" />
+    <result column="model" jdbcType="VARCHAR" property="model" />
+    <result column="profession" jdbcType="VARCHAR" property="profession" />
+    <result column="subsystem" jdbcType="VARCHAR" property="subsystem" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -73,7 +76,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, name, entity_struct_id, fun_group_id, base_type, deleted, created_at, updated_at, 
-    created_by, updated_by
+    created_by, updated_by, model, profession, subsystem
   </sql>
   <select id="selectByExample" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestBaseExample" resultMap="BaseResultMap">
     select
@@ -110,11 +113,13 @@
     insert into test_base (id, name, entity_struct_id, 
       fun_group_id, base_type, deleted, 
       created_at, updated_at, created_by, 
-      updated_by)
+      updated_by, model, profession, 
+      subsystem)
     values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{entityStructId,jdbcType=INTEGER}, 
       #{funGroupId,jdbcType=INTEGER}, #{baseType,jdbcType=INTEGER}, #{deleted,jdbcType=BIT}, 
       #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, 
-      #{updatedBy,jdbcType=VARCHAR})
+      #{updatedBy,jdbcType=VARCHAR}, #{model,jdbcType=VARCHAR}, #{profession,jdbcType=VARCHAR}, 
+      #{subsystem,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestBase">
     insert into test_base
@@ -149,6 +154,15 @@
       <if test="updatedBy != null">
         updated_by,
       </if>
+      <if test="model != null">
+        model,
+      </if>
+      <if test="profession != null">
+        profession,
+      </if>
+      <if test="subsystem != null">
+        subsystem,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -180,6 +194,15 @@
       </if>
       <if test="updatedBy != null">
         #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="model != null">
+        #{model,jdbcType=VARCHAR},
+      </if>
+      <if test="profession != null">
+        #{profession,jdbcType=VARCHAR},
+      </if>
+      <if test="subsystem != null">
+        #{subsystem,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -222,6 +245,15 @@
       <if test="record.updatedBy != null">
         updated_by = #{record.updatedBy,jdbcType=VARCHAR},
       </if>
+      <if test="record.model != null">
+        model = #{record.model,jdbcType=VARCHAR},
+      </if>
+      <if test="record.profession != null">
+        profession = #{record.profession,jdbcType=VARCHAR},
+      </if>
+      <if test="record.subsystem != null">
+        subsystem = #{record.subsystem,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -238,7 +270,10 @@
       created_at = #{record.createdAt,jdbcType=TIMESTAMP},
       updated_at = #{record.updatedAt,jdbcType=TIMESTAMP},
       created_by = #{record.createdBy,jdbcType=VARCHAR},
-      updated_by = #{record.updatedBy,jdbcType=VARCHAR}
+      updated_by = #{record.updatedBy,jdbcType=VARCHAR},
+      model = #{record.model,jdbcType=VARCHAR},
+      profession = #{record.profession,jdbcType=VARCHAR},
+      subsystem = #{record.subsystem,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -273,6 +308,15 @@
       <if test="updatedBy != null">
         updated_by = #{updatedBy,jdbcType=VARCHAR},
       </if>
+      <if test="model != null">
+        model = #{model,jdbcType=VARCHAR},
+      </if>
+      <if test="profession != null">
+        profession = #{profession,jdbcType=VARCHAR},
+      </if>
+      <if test="subsystem != null">
+        subsystem = #{subsystem,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -286,7 +330,10 @@
       created_at = #{createdAt,jdbcType=TIMESTAMP},
       updated_at = #{updatedAt,jdbcType=TIMESTAMP},
       created_by = #{createdBy,jdbcType=VARCHAR},
-      updated_by = #{updatedBy,jdbcType=VARCHAR}
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      model = #{model,jdbcType=VARCHAR},
+      profession = #{profession,jdbcType=VARCHAR},
+      subsystem = #{subsystem,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

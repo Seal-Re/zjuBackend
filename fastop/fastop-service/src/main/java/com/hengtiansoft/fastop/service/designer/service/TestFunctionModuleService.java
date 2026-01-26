@@ -22,4 +22,6 @@ public interface TestFunctionModuleService {
     List<TestFunctionModule> getUpdateAll();
 
     Response deletePhy(Integer moduleId);
+
+    Response getTreeByFunId(Integer funId);
 }

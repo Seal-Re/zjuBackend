@@ -45,9 +45,15 @@ public class FunctionSuiteController {
 
     }
 
-    /*
+
     @ApiOperation("获取指定测试集和指定测试类型下的所有功能")
-    @GetMapping("/rely")*/
+    @GetMapping("/rely")
+    public Response getRely(@RequestParam Integer suiteId) {
+
+        return functionSuiteService.getRely(suiteId);
+    }
+
+
 
 
 }

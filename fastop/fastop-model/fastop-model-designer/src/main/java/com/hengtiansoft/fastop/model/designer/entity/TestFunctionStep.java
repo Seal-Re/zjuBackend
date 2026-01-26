@@ -27,7 +27,7 @@ public class TestFunctionStep {
 
     private Integer stepStatus;
 
-    private Integer update;
+    private Integer updated;
 
     public Integer getStepId() {
         return stepId;
@@ -133,11 +133,11 @@ public class TestFunctionStep {
         this.stepStatus = stepStatus;
     }
 
-    public Integer getUpdate() {
-        return update;
+    public Integer getUpdated() {
+        return updated;
     }
 
-    public void setUpdate(Integer update) {
-        this.update = update;
+    public void setUpdated(Integer updated) {
+        this.updated = updated;
     }
 }

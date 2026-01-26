@@ -17,7 +17,7 @@ public class TestFunctionCase {
 
     private Integer caseStatus;
 
-    private Integer update;
+    private Integer updated;
 
     public Integer getCaseId() {
         return caseId;
@@ -83,11 +83,11 @@ public class TestFunctionCase {
         this.caseStatus = caseStatus;
     }
 
-    public Integer getUpdate() {
-        return update;
+    public Integer getUpdated() {
+        return updated;
     }
 
-    public void setUpdate(Integer update) {
-        this.update = update;
+    public void setUpdated(Integer updated) {
+        this.updated = updated;
     }
 }

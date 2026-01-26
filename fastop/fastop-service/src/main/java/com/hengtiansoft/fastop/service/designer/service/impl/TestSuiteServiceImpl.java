@@ -5,26 +5,26 @@ import com.hengtiansoft.fastop.base.common.constants.Status.StatusContants;
 import com.hengtiansoft.fastop.base.common.entity.Response.Response;
 import com.hengtiansoft.fastop.base.common.factory.ResponseFactory;
 // import com.hengtiansoft.fastop.base.common.exception.AppRTException; // Missing in Target
-import com.hengtiansoft.fastop.model.designer.dto.TestSuiteMapper;
-import com.hengtiansoft.fastop.model.designer.dto.TestSuiteRequestDto;
-import com.hengtiansoft.fastop.model.designer.entity.TestSuite;
-import com.hengtiansoft.fastop.model.designer.entity.TestSuiteExample;
+import com.hengtiansoft.fastop.model.designer.dto.*;
+import com.hengtiansoft.fastop.model.designer.entity.*;
 import com.hengtiansoft.fastop.service.designer.service.FunctionSuiteService;
 import com.hengtiansoft.fastop.service.designer.service.TestFunctionService;
 import com.hengtiansoft.fastop.service.designer.service.TestSuiteService;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class TestSuiteServiceImpl implements TestSuiteService {
+
+    @Autowired
+    private TestFunctionService testFunctionService;
 
     @Autowired
     private TestSuiteMapper testSuiteMapper;
@@ -32,34 +32,27 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     @Autowired
     private FunctionSuiteService functionSuiteService;
 
-    @Autowired
-    private TestFunctionService testFunctionService;
-
     @Override
-    public Response add(TestSuite testSuite) {
+    @Transactional(rollbackFor = Exception.class)
+    public Response add(TestSuiteRequestDto testSuiteRequestDto) {
+
         TestSuiteExample checkExample = new TestSuiteExample();
         TestSuiteExample.Criteria checkCriteria = checkExample.createCriteria();
-
-        checkCriteria.andTestBaseIdEqualTo(testSuite.getTestBaseId());
-
+        checkCriteria.andTestBaseIdEqualTo(testSuiteRequestDto.getTestBaseId());
         checkCriteria.andListApprStatusEqualTo(StatusContants.suite_list_app_unapp);
-
         List<TestSuite> suites = testSuiteMapper.selectByExample(checkExample);
 
         if (suites.size() >= CommonConstants.NUM_1) {
             StringBuilder sb = new StringBuilder();
             sb.append("新增失败，已经存在审前通过的清单:");
             suites.forEach((i -> sb.append("【").append(i.getSuiteName()).append("】").append(",")));
-
             return ResponseFactory.failure(sb.substring(0, sb.length() - 1));
         }
 
         TestSuiteExample maxVersionExample = new TestSuiteExample();
         maxVersionExample.createCriteria()
-                .andTestBaseIdEqualTo(testSuite.getTestBaseId());
-
+                .andTestBaseIdEqualTo(testSuiteRequestDto.getTestBaseId());
         maxVersionExample.setOrderByClause("version DESC");
-
         List<TestSuite> maxVersionSuites = testSuiteMapper.selectByExample(maxVersionExample);
 
         TestSuite maxSuite = null;
@@ -68,58 +61,68 @@ public class TestSuiteServiceImpl implements TestSuiteService {
         }
 
         if (maxSuite == null) {
-            testSuite.setVersion(CommonConstants.NUM_0);
+            testSuiteRequestDto.setVersion(CommonConstants.NUM_0);
         } else {
-            testSuite.setVersion(maxSuite.getVersion() + CommonConstants.NUM_1);
+            testSuiteRequestDto.setVersion(maxSuite.getVersion() + CommonConstants.NUM_1);
         }
 
-        testSuite.setListApprStatus(StatusContants.suite_list_app_unapp);
+        testSuiteRequestDto.setListApprStatus(StatusContants.suite_list_app_unapp);
+
+
+        TestSuite testSuite = new TestSuite();
+        BeanUtils.copyProperties(testSuiteRequestDto, testSuite);
+
+        testSuite.setDeleted(false);
+        testSuite.setCreatedAt(new Date());
 
         int rows = testSuiteMapper.insertSelective(testSuite);
 
-        if (rows > 0) {
-            return ResponseFactory.success("新增成功");
-        } else {
-            return ResponseFactory.failure("新增失败，数据库操作未成功。");
-        }
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public boolean createTestSuite(TestSuiteRequestDto nTestSuite) {
-        if (nTestSuite.getSubjectId() == null || nTestSuite.getEntityStructId() == null
-                || StringUtils.isAllBlank(nTestSuite.getSuiteName())) {
-            return false;
+        if (rows <= 0) {
+            return ResponseFactory.failure("新增清单失败，数据库操作未成功。");
         }
 
-        TestSuite tSuite = new TestSuite();
+        List<Integer> funIds = testSuiteRequestDto.getFunIds();
 
-        BeanUtils.copyProperties(nTestSuite, tSuite);
-        tSuite.setListApprStatus(StatusContants.suite_list_app_unapp);
+        if (funIds != null && !funIds.isEmpty()) {
+            List<TestFunction> functionList = testFunctionService.getTestFunctionListById(funIds);
 
-        testSuiteMapper.insertSelective(tSuite);
+            if (functionList.size() != funIds.size()) {
+                throw new RuntimeException("部分功能模块ID无效");
+            }
 
-        if (tSuite.getSuiteId() == null) {
-            return false;
-        }
+            TestSuiteExample findIdExample = new TestSuiteExample();
+            findIdExample.createCriteria()
+                    .andTestBaseIdEqualTo(testSuite.getTestBaseId())
+                    .andVersionEqualTo(testSuite.getVersion()); // 使用刚才计算出的版本号
 
-        if (nTestSuite.getFunIds() != null && nTestSuite.getFunIds().size() > CommonConstants.NUM_0) {
-            List<Integer> funIds = nTestSuite.getFunIds();
-            int targetSuiteId = tSuite.getSuiteId();
-            int funOrder = CommonConstants.NUM_0;
+            List<TestSuite> insertedSuites = testSuiteMapper.selectByExample(findIdExample);
 
-            for (Integer funId : funIds) {
-                // Call TestFunctionService to handle the copy logic, avoiding direct Mapper injection here
-                testFunctionService.copyTestFunctionForSuite(funId, targetSuiteId, funOrder);
-                funOrder++;
+            if (insertedSuites == null || insertedSuites.isEmpty()) {
+                throw new RuntimeException("系统异常：无法获取新创建的清单ID");
+            }
+
+            Integer suiteId = insertedSuites.get(0).getSuiteId();
+
+            FunSuiteIdConnectDto connectDto = new FunSuiteIdConnectDto();
+            connectDto.setSuiteId(suiteId);
+            connectDto.setTestFunctions(functionList);
+
+            Response connectResponse = functionSuiteService.createFunctionSuite(connectDto);
+
+            if (!connectResponse.isSuccess()) {
+                throw new RuntimeException("关联功能模块失败: " + connectResponse.getMsg());
             }
         }
 
-        return true;
+        return ResponseFactory.success(testSuite);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Response update(TestSuiteRequestDto testSuiteRequestDto) {
-        TestSuite tSuite = testSuiteMapper.selectByPrimaryKey(testSuiteRequestDto.getTargetSuiteId());
+        Integer suiteId = testSuiteRequestDto.getSuiteId();
+
+        TestSuite tSuite = testSuiteMapper.selectByPrimaryKey(suiteId);
         if (tSuite == null) {
             return ResponseFactory.failure("测试集不存在");
         }
@@ -128,18 +131,99 @@ public class TestSuiteServiceImpl implements TestSuiteService {
         }
 
         TestSuite record = new TestSuite();
-        record.setSuiteId(testSuiteRequestDto.getTargetSuiteId());
+        record.setSuiteId(suiteId);
         record.setSuiteName(testSuiteRequestDto.getSuiteName());
         record.setSuiteDesc(testSuiteRequestDto.getSuiteDesc());
-
         record.setListApprStatus(StatusContants.suite_list_app_unapp);
+        // 更新时间等
+        record.setUpdatedAt(new Date());
 
         int result = testSuiteMapper.updateByPrimaryKeySelective(record);
-
-        if (result > CommonConstants.NUM_0) {
-            return ResponseFactory.success("更新成功");
+        if (result <= 0) {
+            return ResponseFactory.failure("基础信息更新失败");
         }
-        return ResponseFactory.failure("更新失败");
+
+        List<Integer> newFunIds = testSuiteRequestDto.getFunIds();
+
+        if (newFunIds != null) {
+            List<FunctionSuite> existingRelations = functionSuiteService.listFunctionSuiteBySuite(suiteId);
+
+            Set<Integer> existingFunIdsSet = existingRelations.stream()
+                    .map(FunctionSuite::getTestFunId)
+                    .collect(Collectors.toSet());
+
+            FunctionSuiteDeleteDto deleteDto = new FunctionSuiteDeleteDto();
+            deleteDto.setSuiteId(suiteId);
+            List<FunctionSuiteDto> changeList = new ArrayList<>();
+
+            for (FunctionSuite existing : existingRelations) {
+                if (!newFunIds.contains(existing.getTestFunId())) {
+                    FunctionSuiteDto item = new FunctionSuiteDto();
+                    item.setFunId(existing.getTestFunId());
+                    item.setDeleted(true); // 标记为删除
+                    changeList.add(item);
+                }
+            }
+
+            for (int i = 0; i < newFunIds.size(); i++) {
+                Integer funId = newFunIds.get(i);
+                if (existingFunIdsSet.contains(funId)) {
+                    FunctionSuiteDto item = new FunctionSuiteDto();
+                    item.setFunId(funId);
+                    item.setFunOrder(i + 1);
+                    item.setDeleted(false);
+                    changeList.add(item);
+                }
+            }
+
+            if (!changeList.isEmpty()) {
+                deleteDto.setFunctionSuiteDtos(changeList);
+                Response deleteResp = functionSuiteService.deleteFunctionSuite(deleteDto);
+                if (!deleteResp.isSuccess()) {
+                    throw new RuntimeException("同步关联关系失败: " + deleteResp.getMsg());
+                }
+            }
+
+            List<Integer> idsToAdd = newFunIds.stream()
+                    .filter(id -> !existingFunIdsSet.contains(id))
+                    .collect(Collectors.toList());
+
+            if (!idsToAdd.isEmpty()) {
+                // 批量查询新增模块的基础信息
+                List<TestFunction> metaList = testFunctionService.getTestFunctionListById(idsToAdd);
+                Map<Integer, TestFunction> metaMap = metaList.stream()
+                        .collect(Collectors.toMap(TestFunction::getFunId, m -> m));
+
+                for (int i = 0; i < newFunIds.size(); i++) {
+                    Integer funId = newFunIds.get(i);
+                    // 只有是新增的才执行插入
+                    if (idsToAdd.contains(funId)) {
+                        TestFunction meta = metaMap.get(funId);
+                        if (meta != null) {
+                            FunSuiteIdConnectDto connectDto = new FunSuiteIdConnectDto();
+                            connectDto.setSuiteId(suiteId);
+                            connectDto.setTestFunctions(Collections.singletonList(meta));
+
+                            functionSuiteService.createFunctionSuite(connectDto);
+                        }
+                    }
+                }
+            }
+        }
+
+        return ResponseFactory.success("更新成功");
+    }
+
+    @Override
+    public Response submit(Integer suiteId) {
+        TestSuite tS = new TestSuite();
+
+        tS.setListApprStatus(1);
+        tS.setSuiteId(suiteId);
+
+        testSuiteMapper.updateByPrimaryKeySelective(tS);
+
+        return ResponseFactory.success(true);
     }
 
     @Override
@@ -230,11 +314,11 @@ public class TestSuiteServiceImpl implements TestSuiteService {
         if (level != suite.getListApprStatus()) {
             return ResponseFactory.failure("审签步骤不匹配，实际步骤为 " + StatusContants.SUITE_APP_LEVEL[suite.getListApprStatus()]);
         }
-
+        /*
         if (expectedWorker == null || !expectedWorker.equals(checkWorker)) {
             return ResponseFactory.failure("工作人员 [" + checkWorker + "] 无权在级别 " + level + " 进行 ["+StatusContants.SUITE_APP_LEVEL[level]+"]操作 期望工作人员: [" + expectedWorker + "]");
         }
-
+        TODO*/
         suite.setListApprStatus(targetListApprStatus);
         Integer updateCount = testSuiteMapper.updateByPrimaryKeySelective(suite);
 
@@ -282,6 +366,19 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     public boolean updateSuiteListAppStatusToUnApp(TestSuite tSuite) {
         tSuite.setListApprStatus(StatusContants.suite_list_app_unapp);
         return testSuiteMapper.updateByPrimaryKeySelective(tSuite) > CommonConstants.NUM_0;
+    }
+
+    @Override
+    public Response getCheckTestSuite() {
+        TestSuiteExample example = new TestSuiteExample();
+        TestSuiteExample.Criteria criteria = example.createCriteria();
+
+        criteria.andDeletedEqualTo(false);
+        criteria.andListApprStatusBetween(1, 2);
+
+        List<TestSuite> testSuites = testSuiteMapper.selectByExample(example);
+
+        return ResponseFactory.success(testSuites);
     }
 
 }

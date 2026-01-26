@@ -17,7 +17,7 @@ public class TestFunctionModule {
 
     private Integer moduleStatus;
 
-    private Integer update;
+    private Integer updated;
 
     public Integer getModuleId() {
         return moduleId;
@@ -83,11 +83,11 @@ public class TestFunctionModule {
         this.moduleStatus = moduleStatus;
     }
 
-    public Integer getUpdate() {
-        return update;
+    public Integer getUpdated() {
+        return updated;
     }
 
-    public void setUpdate(Integer update) {
-        this.update = update;
+    public void setUpdated(Integer updated) {
+        this.updated = updated;
     }
 }

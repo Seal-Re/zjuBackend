@@ -265,7 +265,7 @@ public class FunctionSuiteServiceImpl implements FunctionSuiteService {
     }
 
     @Override
-    public List<FunctionSuite> listFunctionSuiteBySuite(int suiteId) {
+    public List<FunctionSuite> listFunctionSuiteBySuite(Integer suiteId) {
         FunctionSuiteExample functionSuiteExample = new FunctionSuiteExample();
         functionSuiteExample.createCriteria().andSuiteIdEqualTo(suiteId);
 
@@ -344,4 +344,21 @@ public class FunctionSuiteServiceImpl implements FunctionSuiteService {
         }).collect(Collectors.toList());
     }
 
+    @Override
+    public Response getRely(Integer suiteId) {
+        List<FunctionSuite> functionSuites = listFunctionSuiteBySuite(suiteId);
+                                            
+        List<Integer> funIds = functionSuites.stream()
+                .map(FunctionSuite::getTestFunId)
+                .collect(Collectors.toList());
+
+        List<TestFunction> testFunctions = testFunctionService.getTestFunctionListById(funIds);
+
+        RelyDto result = new RelyDto();
+
+        result.setSuiteId(suiteId);
+        result.setTestFunctions(testFunctions);
+
+        return ResponseFactory.success(result);
+    }
 }

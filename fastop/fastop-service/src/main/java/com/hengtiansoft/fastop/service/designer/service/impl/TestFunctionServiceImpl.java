@@ -84,13 +84,6 @@ public class TestFunctionServiceImpl implements TestFunctionService {
         testFunction.setChangeFlag(0);
         testFunction.setApproveStatus(0);
 
-        testFunction.setDesigner(null);
-        testFunction.setProofer(null);
-        testFunction.setVerifier(null);
-        testFunction.setChecker(null);
-        testFunction.setQualityer(null);
-        testFunction.setApprover(null);
-
         // 插入数据库
         int count = testFunctionMapper.insertSelective(testFunction);
 
@@ -159,6 +152,18 @@ public class TestFunctionServiceImpl implements TestFunctionService {
         } else {
             return ResponseFactory.failure("更新失败，功能ID不存在或数据未修改");
         }
+    }
+
+    @Override
+    public Response submit(Integer funId) {
+        TestFunction tF = new TestFunction();
+
+        tF.setApproveStatus(1);
+        tF.setFunId((funId));
+
+        testFunctionMapper.updateByPrimaryKeySelective(tF);
+
+        return ResponseFactory.success(true);
     }
 
     @Override
@@ -277,10 +282,11 @@ public class TestFunctionServiceImpl implements TestFunctionService {
         if (level != function.getApproveStatus()) {
             return ResponseFactory.failure("审签步骤不匹配，实际步骤为 " + StatusContants.FUNS_APP_LEVEL[function.getApproveStatus()]);
         }
-
+        /*
         if (expectedWorker == null || !expectedWorker.equals(checkWorker)) {
             return ResponseFactory.failure("工作人员 [" + checkWorker + "] 无权在级别 " + level + " 进行 ["+StatusContants.FUNS_APP_LEVEL[level]+"]操作 期望工作人员: [" + expectedWorker + "]");
-        }
+        }*/
+        //TODO
 
         function.setApproveStatus(targetApproveStatus);
         Integer updateCount = testFunctionMapper.updateByPrimaryKeySelective(function);
@@ -290,6 +296,19 @@ public class TestFunctionServiceImpl implements TestFunctionService {
         } else {
             return ResponseFactory.failure("数据库更新失败");
         }
+    }
+
+    @Override
+    public Response getCheckTestFunction() {
+        TestFunctionExample example = new TestFunctionExample();
+        TestFunctionExample.Criteria criteria = example.createCriteria();
+
+        criteria.andDeletedEqualTo(false);
+        criteria.andApproveStatusBetween(1, 5);
+
+        List<TestFunction> testFunctions = testFunctionMapper.selectByExample(example);
+
+        return ResponseFactory.success(testFunctions);
     }
 
     @Override
@@ -366,6 +385,14 @@ public class TestFunctionServiceImpl implements TestFunctionService {
 
             // For now, focusing on the TestFunction copy part requested.
         }
+    }
+
+    @Override
+    public List<TestFunction> getTestFunctionListById(List<Integer> funIds){
+        TestFunctionExample funExample = new TestFunctionExample();
+        funExample.createCriteria().andFunIdIn(funIds);
+        List<TestFunction> functionList = testFunctionMapper.selectByExample(funExample);
+        return functionList;
     }
 
 }

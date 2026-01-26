@@ -26,9 +26,9 @@ public class TestSuiteController {
 
     @ApiOperation("新增清单")
     @PostMapping("/add")
-    public Response addTestSuite(@RequestBody TestSuite testSuite) {
-        LOG.info("开始新增清单: {}", testSuite);
-        return testSuiteService.add(testSuite);
+    public Response addTestSuite(@RequestBody TestSuiteRequestDto testSuiteRequestDto) {
+        LOG.info("开始新增清单: {}", testSuiteRequestDto);
+        return testSuiteService.add(testSuiteRequestDto);
     }
 
     @ApiOperation("修改清单")
@@ -36,6 +36,13 @@ public class TestSuiteController {
     public Response updateTestSuite(@RequestBody TestSuiteRequestDto testSuiteRequestDto) {
         LOG.info("开始修改清单: {}", testSuiteRequestDto);
         return testSuiteService.update(testSuiteRequestDto);
+    }
+
+    @ApiOperation("提交清单")
+    @PostMapping("/submit")
+    public Response submitTestSuite(@RequestBody Integer suiteId){
+        LOG.info("开始修改模块，ID: {}", suiteId);
+        return testSuiteService.submit(suiteId);
     }
 
     @ApiOperation("删除清单")
@@ -71,6 +78,13 @@ public class TestSuiteController {
     public Response checkTestFunction(@RequestParam Integer suiteId, @RequestParam String checkWorker, @RequestParam Integer level) {
         return testSuiteService.check(suiteId, checkWorker, level);
     }
+
+    @ApiOperation("获取审批列表")
+    @GetMapping("/getCheckTestSuite")
+    public Response getCheckTestSuite() {
+        return testSuiteService.getCheckTestSuite();
+    }
+
 
 
 }

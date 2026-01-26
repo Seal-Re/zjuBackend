@@ -22,10 +22,10 @@ public class TestBaseController {
     private TestBaseService testBaseService;
 
     @ApiOperation("用构型和子系统查询所有测试库")
-    @GetMapping("/getTestBaseListWithStructAndGroup")
-    public Response getListByStructAndGroup(@RequestParam("structId") int structId, @RequestParam("groupId") int groupId) {
-        LOG.info("Start getting testBase by structId and groupId :structId={}, groupId={}", structId, groupId);
-        return testBaseService.getListByStructAndGroup(structId, groupId);
+    @GetMapping("/getTestBaseWithLimit")
+    public Response getTestBaseWithLimit(@RequestParam("model") String model, @RequestParam("profession") String profession, @RequestParam("subsystem") String subsystem) {
+        LOG.info("Start getting testBase :model={}, profession={}, subsystem={}", model, profession, subsystem);
+        return testBaseService.getTestBaseWithLimit(model, profession, subsystem);
     }
 
     @ApiOperation("获取指定测试库信息")
