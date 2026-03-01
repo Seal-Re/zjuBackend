@@ -1,6 +1,7 @@
 <template>
   <div class="suite-library">
-    <div class="global-filter">
+    <h2 class="page-title">清单库</h2>
+    <div class="global-filter filter-bar">
       <el-cascader
         v-model="filterStore.model"
         :options="modelOptions"
@@ -43,10 +44,12 @@
       </div>
     </div>
 
+    <div class="table-wrap">
     <el-table 
         :data="tableData" 
-        style="width: 100%; margin-top: 20px" 
+        class="data-table"
         border 
+        stripe
         v-loading="loading"
         empty-text="请选择机型、专业和子系统以加载数据"
     >
@@ -103,6 +106,7 @@
             </template>
         </el-table-column>
     </el-table>
+    </div>
 
     <el-dialog 
         v-model="dialogVisible" 
@@ -516,14 +520,13 @@ onMounted(() => { initBaseStructs() })
 </script>
 
 <style scoped lang="scss">
+.suite-library .page-title { margin-top: 0; }
 .global-filter {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
   flex-wrap: wrap;
-  background: white;
-  padding: 10px;
-  border-radius: 4px;
+  padding: 12px 0;
 
   .filter-actions {
       margin-left: auto;
@@ -531,6 +534,8 @@ onMounted(() => { initBaseStructs() })
       gap: 10px;
   }
 }
+.table-wrap { margin-top: 16px; border-radius: var(--app-radius); overflow: hidden; box-shadow: var(--app-shadow-card); }
+.data-table { width: 100%; }
 
 .step-content {
     padding: 20px;

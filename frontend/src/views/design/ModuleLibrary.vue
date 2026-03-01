@@ -1,6 +1,7 @@
 <template>
   <div class="module-library">
-    <div class="global-filter">
+    <h2 class="page-title">模块库</h2>
+    <div class="global-filter filter-bar">
       <el-cascader
         v-model="filterStore.model"
         :options="modelOptions"
@@ -36,7 +37,8 @@
       </div>
     </div>
 
-    <el-table :data="tableData" style="width: 100%; margin-top: 20px" border>
+    <div class="table-wrap">
+    <el-table :data="tableData" class="data-table" border stripe>
       <el-table-column prop="num" label="模块编号" />
       <el-table-column label="模块名称">
         <template #default="{ row }">
@@ -87,6 +89,7 @@
         </template>
       </el-table-column>
     </el-table>
+    </div>
 
     <el-dialog
       v-model="dialogVisible"
@@ -453,14 +456,13 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+.module-library .page-title { margin-top: 0; }
 .global-filter {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
   flex-wrap: wrap;
-  background: white;
-  padding: 10px;
-  border-radius: 4px;
+  padding: 12px 0;
 
   .filter-actions {
       margin-left: auto;
@@ -468,6 +470,8 @@ onMounted(() => {
       gap: 10px;
   }
 }
+.table-wrap { margin-top: 16px; border-radius: var(--app-radius); overflow: hidden; box-shadow: var(--app-shadow-card); }
+.data-table { width: 100%; }
 
 .dynamic-row {
     display: flex;

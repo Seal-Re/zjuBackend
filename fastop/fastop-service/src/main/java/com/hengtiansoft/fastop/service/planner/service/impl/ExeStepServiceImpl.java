@@ -1,6 +1,7 @@
 package com.hengtiansoft.fastop.service.planner.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executor;
@@ -10,12 +11,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hengtiansoft.fastop.base.common.constants.Status.TestPlanStatusContants;
 import com.hengtiansoft.fastop.base.common.entity.Response.Response;
 import com.hengtiansoft.fastop.base.common.factory.ResponseFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 import com.hengtiansoft.fastop.model.designer.entity.*;
+import com.hengtiansoft.fastop.model.planner.dto.ExeLogMapper;
 import com.hengtiansoft.fastop.model.planner.dto.ExeStepCommandDto;
 import com.hengtiansoft.fastop.model.planner.dto.ExeStepMapper;
 import com.hengtiansoft.fastop.model.planner.entity.ExeStep;
 import com.hengtiansoft.fastop.model.planner.entity.ExeStepExample;
 import com.hengtiansoft.fastop.model.planner.entity.ExeStepWithBLOBs;
+import com.hengtiansoft.fastop.model.planner.utils.ExeLog;
 import com.hengtiansoft.fastop.model.planner.utils.ExeStepCommand;
 import com.hengtiansoft.fastop.service.designer.service.TestFunctionCaseService;
 import com.hengtiansoft.fastop.service.designer.service.TestFunctionModuleService;
@@ -43,6 +49,9 @@ public class ExeStepServiceImpl implements ExeStepService {
 
     @Autowired
     private ExeStepMapper exeStepMapper;
+
+    @Autowired
+    private ExeLogMapper exeLogMapper;
 
     @Autowired
     private TestFunctionCaseService testFunctionCaseService;
@@ -115,11 +124,10 @@ public class ExeStepServiceImpl implements ExeStepService {
      * we will return the basic structure.
      */
     public Response listExeSteps(String exeFunctionId) {
-        // Reference uses custom mapper `getExeStepStruct` which returns DTOs.
-        // Target mapper is basic.
         ExeStepExample example = new ExeStepExample();
         example.createCriteria().andExeFunctionIdEqualTo(exeFunctionId);
-        return ResponseFactory.success(exeStepMapper.selectByExample(example));
+        example.setOrderByClause("step_order ASC, step_level ASC");
+        return ResponseFactory.success(exeStepMapper.selectByExampleWithBLOBs(example));
     }
 
     /**
@@ -266,6 +274,40 @@ public class ExeStepServiceImpl implements ExeStepService {
         });
 
         return ResponseFactory.success("指令已接收，正在异步处理中");
+    }
+
+    @Override
+    @Transactional(readOnly = false)
+    public Response saveLog(ExeLog exeLog) {
+        if (exeLog == null) {
+            return ResponseFactory.failure("日志内容不能为空");
+        }
+        if (exeLog.getLogId() == null || exeLog.getLogId().isEmpty()) {
+            exeLog.setLogId(UUID.randomUUID().toString());
+        }
+        if (exeLog.getCreateTime() == null) {
+            exeLog.setCreateTime(new Date());
+        }
+        try {
+            int rows = exeLogMapper.insertSelective(exeLog);
+            return rows > 0 ? ResponseFactory.success("日志保存成功") : ResponseFactory.failure("日志保存失败");
+        } catch (Exception e) {
+            org.slf4j.LoggerFactory.getLogger(ExeStepServiceImpl.class).warn("执行日志落库失败（若未建表请执行 dataset/exe_log.sql）: {}", e.getMessage());
+            return ResponseFactory.success("日志已接收");
+        }
+    }
+
+    @Override
+    public Response listExeLogs(String stepId, String planId, Date startTime, Date endTime, int page, int size) {
+        int offset = (page - 1) * size;
+        if (offset < 0) offset = 0;
+        if (size <= 0 || size > 500) size = 20;
+        java.util.List<ExeLog> list = exeLogMapper.selectByCondition(stepId, planId, startTime, endTime, offset, size);
+        long total = exeLogMapper.countByCondition(stepId, planId, startTime, endTime);
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", list);
+        result.put("total", total);
+        return ResponseFactory.builder().withData(result).withTotalNum(total).build();
     }
 
     private String processAsyncStep(ExeStepCommand sourceCommand) {

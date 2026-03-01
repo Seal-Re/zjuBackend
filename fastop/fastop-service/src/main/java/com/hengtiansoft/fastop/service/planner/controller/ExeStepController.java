@@ -1,8 +1,6 @@
 package com.hengtiansoft.fastop.service.planner.controller;
 
 import com.hengtiansoft.fastop.base.common.entity.Response.Response;
-import com.hengtiansoft.fastop.base.common.entity.Response.ResponseBody;
-import com.hengtiansoft.fastop.model.planner.entity.ExeStep;
 import com.hengtiansoft.fastop.model.planner.utils.ExeStepCommand;
 import com.hengtiansoft.fastop.model.planner.utils.ExeLog;
 import com.hengtiansoft.fastop.service.planner.service.ExeStepService;
@@ -14,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 @Slf4j
@@ -57,17 +57,37 @@ public class ExeStepController {
         return exeStepService.doV1(exeStepCommand);
     }
 
-    @ApiOperation("保存步骤执行日志")
+    @ApiOperation("保存步骤执行日志（军检审计落库）")
     @PostMapping("/log/save")
     public Response saveLog(@RequestBody ExeLog exeLog) {
         LOG.info("接收到日志保存请求: {}", exeLog);
-        // In a real implementation, this would save to DB.
-        // For now, we just acknowledge it as per instructions to 'modify backend'.
-        // Assuming persistence is handled or this is a stub for the frontend verification.
-        // If strict persistence is needed, we would need Mapper/XML but user said "add to utils" which is odd.
-        // Given the constraints and the ambiguity of "add to utils", and no DB access,
-        // I will return success to satisfy the frontend call.
-        ResponseBody<String> responseBody = new ResponseBody<>(200, "Log saved successfully");
-        return new Response<>(responseBody, org.springframework.http.HttpStatus.OK);
+        return exeStepService.saveLog(exeLog);
+    }
+
+    @ApiOperation("分页查询执行日志")
+    @GetMapping("/log/list")
+    public Response listExeLogs(
+            @RequestParam(required = false) String stepId,
+            @RequestParam(required = false) String planId,
+            @RequestParam(required = false) String startTime,
+            @RequestParam(required = false) String endTime,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Date start = parseDate(startTime);
+        Date end = parseDate(endTime);
+        return exeStepService.listExeLogs(stepId, planId, start, end, page, size);
+    }
+
+    private static Date parseDate(String str) {
+        if (str == null || str.isEmpty()) return null;
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(str);
+        } catch (Exception e) {
+            try {
+                return new SimpleDateFormat("yyyy-MM-dd").parse(str);
+            } catch (Exception e2) {
+                return null;
+            }
+        }
     }
 }

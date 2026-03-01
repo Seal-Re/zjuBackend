@@ -15,10 +15,12 @@ import com.hengtiansoft.fastop.model.planner.dto.TestPlanRequestDto;
 import com.hengtiansoft.fastop.model.planner.dto.ExeFunctionMapper;
 import com.hengtiansoft.fastop.model.planner.dto.ExeStepMapper;
 import com.hengtiansoft.fastop.model.planner.entity.*;
+import com.hengtiansoft.fastop.model.planner.utils.OperationLog;
 import com.hengtiansoft.fastop.model.planner.utils.TestPlanEnum;
 import com.hengtiansoft.fastop.service.designer.service.TestBaseService;
 import com.hengtiansoft.fastop.service.designer.service.TestSuiteService;
 import com.hengtiansoft.fastop.service.planner.service.ExeFunctionService;
+import com.hengtiansoft.fastop.service.planner.service.OperationLogService;
 import com.hengtiansoft.fastop.service.planner.service.TestPlanService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -55,6 +57,9 @@ public class TestPlanServiceImpl implements TestPlanService {
     @Autowired
     private ExeStepMapper exeStepMapper;
 
+    @Autowired
+    private OperationLogService operationLogService;
+
     @Override
     @Transactional(rollbackFor = {Exception.class})
     public Response createTestPlan(TestPlanRequestDto testPlanRequestDto) {
@@ -85,6 +90,7 @@ public class TestPlanServiceImpl implements TestPlanService {
             }
 
             if (result) {
+                recordOperationLog("测试计划", "创建", "计划", testPlanRequestDto.getPlanName(), "计划名称: " + testPlanRequestDto.getPlanName());
                 return ResponseFactory.success(testPlanRequestDto);
             } else {
                 throw new Exception("创建计划逻辑内部失败");
@@ -173,8 +179,7 @@ public class TestPlanServiceImpl implements TestPlanService {
                 // 没更新到任何数据（ID不存在），直接返回失败
                 return ResponseFactory.failure("更新失败：未找到对应计划或无变更");
             }
-
-
+            recordOperationLog("测试计划", "修改", "计划", testPlanRequestDto.getPlanId(), testPlanRequestDto.getPlanName());
             return ResponseFactory.success("更新计划成功");
 
         } catch (Exception e) {
@@ -213,7 +218,7 @@ public class TestPlanServiceImpl implements TestPlanService {
         }
 
         exeFunctionService.deleteExeFunction(planId);
-
+        recordOperationLog("测试计划", "删除", "计划", planId, testPlanDel.getPlanName());
         return ResponseFactory.success("删除测试计划成功" + result);
     }
 
@@ -327,7 +332,7 @@ public class TestPlanServiceImpl implements TestPlanService {
         if (updateCount <= 0) {
             return ResponseFactory.failure("Failed to update plan status");
         }
-
+        recordOperationLog("测试计划", "派发", "计划", planId, testPlan.getPlanName());
         return ResponseFactory.success(dispatchData);
     }
 
@@ -355,7 +360,7 @@ public class TestPlanServiceImpl implements TestPlanService {
             exeFunc.setExeStatus(TestPlanStatusContants.PLAN_STATUS_EXEING); // Assuming ExeStatus follows same constants
             exeFunctionMapper.updateByPrimaryKeySelective(exeFunc);
         }
-
+        recordOperationLog("测试计划", "开始", "计划", planId, testPlan.getPlanName());
         return ResponseFactory.success("Plan started");
     }
 
@@ -382,8 +387,24 @@ public class TestPlanServiceImpl implements TestPlanService {
             exeFunc.setExeStatus(TestPlanStatusContants.PLAN_STATUS_PAUSE);
             exeFunctionMapper.updateByPrimaryKeySelective(exeFunc);
         }
-
+        recordOperationLog("测试计划", "暂停", "计划", planId, testPlan.getPlanName());
         return ResponseFactory.success("Plan paused");
     }
 
+    private void recordOperationLog(String module, String action, String targetType, String targetId, String detail) {
+        try {
+            OperationLog log = new OperationLog();
+            log.setOperatorId("system");
+            log.setOperatorName("系统");
+            log.setModule(module);
+            log.setAction(action);
+            log.setTargetType(targetType);
+            log.setTargetId(targetId);
+            log.setDetail(detail != null ? (detail.length() > 500 ? detail.substring(0, 500) : detail) : null);
+            log.setCreateTime(new Date());
+            operationLogService.record(log);
+        } catch (Exception e) {
+            LOG.debug("操作日志记录忽略: {}", e.getMessage());
+        }
+    }
 }

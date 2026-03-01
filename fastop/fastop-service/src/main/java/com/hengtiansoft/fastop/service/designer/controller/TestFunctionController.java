@@ -46,7 +46,7 @@ public class TestFunctionController {
     }
 
     @ApiOperation("删除模块")
-    @PostMapping("/delete")
+    @PostMapping("/delete/{funId}")
     public Response deleteTestFunction(@ApiParam("功能ID") @PathVariable Integer funId) {
         LOG.warn("开始删除模块，ID: {}", funId);
         return testFunctionService.delete(funId);
@@ -73,8 +73,17 @@ public class TestFunctionController {
         return testFunctionService.listAll();
     }
 
-    @ApiOperation("通用/条件查询模块")
-    @GetMapping("/query")
+    @ApiOperation("模块列表（兼容前端 getFunctionList，支持可选 testBaseId 筛选）")
+    @GetMapping("/list")
+    public Response listTestFunction(@RequestParam(required = false) Integer testBaseId) {
+        if (testBaseId != null) {
+            return testFunctionService.listByTestBaseId(testBaseId);
+        }
+        return testFunctionService.listAll();
+    }
+
+    @ApiOperation("通用/条件查询模块（POST 避免 GET 带 body 的兼容问题）")
+    @PostMapping("/query")
     public Response queryTestFunction(@RequestBody TestFunctionInfoRequestDto tFunctionInfo) {
         LOG.debug("执行通用查询: {}", tFunctionInfo);
         return testFunctionService.query(tFunctionInfo);

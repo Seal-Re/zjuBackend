@@ -1,5 +1,23 @@
 import request from './request'
 
+// ========== ExeFunction（执行功能）==========
+// 获取指定计划下正在执行的功能列表 (对应后端 GET /exeFunction/testFunctions/inexe/{planId})
+export const getExeFunctionsByPlanId = (planId: string) => {
+  return request({
+    url: `/exeFunction/testFunctions/inexe/${planId}`,
+    method: 'get'
+  })
+}
+
+// 根据功能ID获取执行功能详情 (对应后端 GET /exeFunction/testFunctions/id/{functionId})
+export const getExeFunctionById = (functionId: string) => {
+  return request({
+    url: `/exeFunction/testFunctions/id/${functionId}`,
+    method: 'get'
+  })
+}
+
+// ========== ExeStep（执行步骤）==========
 // 1. 获取指定测试作业计划下的步骤 (对应后端 /getinexe/{functionId})
 export const getExeStepsByFunction = (functionId: string) => {
   return request({

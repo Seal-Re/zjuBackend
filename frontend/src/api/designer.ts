@@ -117,14 +117,20 @@ export const checkTestSuite = (data: any) => {
     })
 }
 
-// Aux API
-// Need API to get list of modules/functions for the Transfer component
-export const getFunctionList = (params: any) => {
-    // Reuse list endpoint or specific search
+// Aux API：获取工艺模块列表（支持可选 testBaseId 筛选，与后端 GET /list 一致）
+export const getFunctionList = (params?: { testBaseId?: number }) => {
     return request({
-        url: '/designer/testFunction/list', // Placeholder
+        url: '/designer/testFunction/list',
         method: 'get',
         params
+    })
+}
+
+// 删除工艺模块（对应后端 POST /designer/testFunction/delete/{funId}）
+export const deleteTestFunction = (funId: number) => {
+    return request({
+        url: `/designer/testFunction/delete/${funId}`,
+        method: 'post'
     })
 }
 
@@ -155,6 +161,16 @@ export const updateTestSuite = (data: any) => {
     })
 }
 
+// 删除测试清单（对应后端 POST /designer/testSuite/delete，body 为 suiteId）
+export const deleteTestSuite = (suiteId: number) => {
+    return request({
+        url: '/designer/testSuite/delete',
+        method: 'post',
+        data: suiteId,
+        headers: { 'Content-Type': 'application/json' }
+    })
+}
+
 export const submitTestFunction = (funId: number) => {
     return request({
         url: `/designer/testFunction/submit`,
@@ -182,8 +198,23 @@ export const getRely = (suiteId: number) => {
         url: `/functionSuite/rely`,
         method: 'get',
         params: { suiteId }
-
     })
+}
 
+// 获取全部功能-清单关联 (对应后端 GET /functionSuite/listAll)
+export const listAllFunctionSuite = () => {
+    return request({
+        url: '/functionSuite/listAll',
+        method: 'get'
+    })
+}
+
+// 删除功能-清单关联 (对应后端 POST /functionSuite/deleteFunctionSuite)
+export const deleteFunctionSuite = (data: { suiteId?: number; funId?: number; [key: string]: any }) => {
+    return request({
+        url: '/functionSuite/deleteFunctionSuite',
+        method: 'post',
+        data
+    })
 }
 

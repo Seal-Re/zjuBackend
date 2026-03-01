@@ -1,7 +1,8 @@
 <template>
   <div class="test-plan-container">
-    <el-card shadow="never">
-      <div class="header-actions">
+    <h2 class="page-title">测试计划</h2>
+    <el-card shadow="never" class="main-card">
+      <div class="header-actions filter-bar">
         <div class="left-panel">
           <el-input
             v-model="queryParams.keyword"
@@ -31,12 +32,13 @@
         </div>
       </div>
 
+      <div class="table-wrap">
       <el-table
         v-loading="loading"
         :data="tableData"
         border
         stripe
-        style="width: 100%; margin-top: 20px"
+        class="data-table"
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" align="center" />
@@ -71,6 +73,7 @@
           </template>
         </el-table-column>
       </el-table>
+      </div>
     </el-card>
 
     <el-drawer
@@ -546,7 +549,11 @@ const handlePause = async (row: TestPlan) => { await pausePlan(row.planId); ElMe
 </script>
 
 <style scoped>
-.test-plan-container { padding: 20px; }
-.header-actions { display: flex; justify-content: space-between; align-items: center; }
+.test-plan-container { padding: 0; }
+.header-actions { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
 .left-panel, .right-panel { display: flex; gap: 10px; align-items: center; }
+.main-card { border-radius: var(--app-radius); }
+.main-card :deep(.el-card__body) { padding: 20px; }
+.table-wrap { margin-top: 16px; border-radius: var(--app-radius); overflow: hidden; }
+.data-table { width: 100%; }
 </style>
