@@ -35,6 +35,12 @@
             <span>测试计划</span>
           </template>
         </el-menu-item>
+        <el-menu-item v-if="canManageDevice" index="/device/list">
+          <template #title>
+            <el-icon><Monitor /></el-icon>
+            <span>设备管理</span>
+          </template>
+        </el-menu-item>
         <el-menu-item index="/command/dashboard">
           <template #title>
             <el-icon><Monitor /></el-icon>
@@ -62,9 +68,23 @@
         </div>
         <div class="header-right">
           <span class="current-time">{{ currentTime }}</span>
-          <div class="user-info">
-            <el-avatar :size="28" class="user-avatar">管</el-avatar>
-            <span class="username">管理员</span>
+          <el-dropdown v-if="isAuthenticated" trigger="click">
+            <div class="user-info">
+              <el-avatar :size="28" class="user-avatar">
+                {{ userInitial }}
+              </el-avatar>
+              <span class="username">{{ displayName }}</span>
+            </div>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item disabled>当前用户：{{ displayName }}</el-dropdown-item>
+                <el-dropdown-item divided @click="handleLogout">退出登录</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <div v-else class="user-info">
+            <el-avatar :size="28" class="user-avatar">未</el-avatar>
+            <span class="username">未登录</span>
           </div>
         </div>
       </header>
@@ -80,7 +100,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import {
   Edit,
   Check,
@@ -88,12 +108,21 @@ import {
   Monitor,
   VideoPlay
 } from '@element-plus/icons-vue'
+import { useAuthStore } from '@/store/auth'
 
 const route = useRoute()
+const router = useRouter()
 const activeMenu = computed(() => route.path)
 
 const currentTime = ref('')
 let timer: any = null
+
+const authStore = useAuthStore()
+
+const displayName = computed(() => authStore.user?.name || authStore.user?.username || '管理员')
+const userInitial = computed(() => (displayName.value || '管').slice(0, 1))
+const isAuthenticated = computed(() => authStore.isAuthenticated)
+const canManageDevice = computed(() => authStore.hasRole('ADMIN'))
 
 const updateTime = () => {
   const now = new Date()
@@ -103,11 +132,17 @@ const updateTime = () => {
 onMounted(() => {
   updateTime()
   timer = setInterval(updateTime, 1000)
+  authStore.fetchUser()
 })
 
 onUnmounted(() => {
   if (timer) clearInterval(timer)
 })
+
+const handleLogout = async () => {
+  await authStore.logout()
+  router.push({ path: '/login' })
+}
 </script>
 
 <style scoped lang="scss">

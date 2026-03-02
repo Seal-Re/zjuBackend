@@ -320,11 +320,9 @@ const cascadeFilter = reactive({
 // 1. 初始化构型数据
 const initBaseStructs = async () => {
     try {
-        const res: any = await listAllBaseStructAndId()
-        const data = res.data || res.result || res || []
+        const data: any = await listAllBaseStructAndId()
         if (Array.isArray(data)) {
             allStructs.value = data
-            // 提取机型
             const models = new Set(data.map((item: any) => item.baseStruct?.model).filter(Boolean))
             modelOptions.value = Array.from(models).map(m => ({ value: m, label: m }))
         }
@@ -428,10 +426,9 @@ onMounted(() => {
 const loadData = async () => {
   loading.value = true
   try {
-    const res: any = await getTestPlans(queryParams)
-    const rawData = res.data || res.result || res
-    const list = Array.isArray(rawData) ? rawData : []
-    let filteredList = list.filter((item: TestPlan) => item.deleted !== true && item.deleted !== 1)
+    const list: any = await getTestPlans(queryParams)
+    const arr = Array.isArray(list) ? list : []
+    let filteredList = arr.filter((item: TestPlan) => item.deleted !== true && item.deleted !== 1)
     if (queryParams.keyword) {
       const k = queryParams.keyword.toLowerCase()
       filteredList = filteredList.filter((item: TestPlan) => 
@@ -543,7 +540,7 @@ const submitForm = async () => {
 const handleDelete = (row: TestPlan) => { ElMessageBox.confirm('确认删除?', '警告', { type: 'warning' }).then(async () => { await deleteSingleTestPlan(row.planId); ElMessage.success('删除成功'); loadData(); }).catch(()=>{}) }
 const handleBatchDelete = () => { if (!selectedIds.value.length) return; ElMessageBox.confirm('确认批量删除?', '警告', { type: 'warning' }).then(async () => { await deleteTestPlanWithBatch({ planIdLists: selectedIds.value }); ElMessage.success('删除成功'); loadData(); selectedIds.value = [] }).catch(()=>{}) }
 const handleSelectionChange = (s: TestPlan[]) => selectedIds.value = s.map(i => i.planId)
-const handleDispatch = async (row: TestPlan) => { try { const res: any = await dispatchPlan(row.planId); dispatchResult.value = res.data || res.result || res; dispatchVisible.value = true; loadData(); } catch(e){} }
+const handleDispatch = async (row: TestPlan) => { try { const res: any = await dispatchPlan(row.planId); dispatchResult.value = res; dispatchVisible.value = true; loadData(); } catch(e){} }
 const handleStart = async (row: TestPlan) => { await startPlan(row.planId); ElMessage.success('开始'); loadData() }
 const handlePause = async (row: TestPlan) => { await pausePlan(row.planId); ElMessage.warning('暂停'); loadData() }
 </script>

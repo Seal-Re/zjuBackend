@@ -259,8 +259,7 @@ const subsystemOptions = ref<any[]>([])
 
 const initBaseStructs = async () => {
     try {
-        const res: any = await listAllBaseStructAndId()
-        const data = res.data || res.result || res || []
+        const data: any = await listAllBaseStructAndId()
         if (Array.isArray(data)) {
             allStructs.value = data
             const models = new Set(data.map((item: any) => item.baseStruct?.model).filter(Boolean))
@@ -436,23 +435,14 @@ const handleEdit = async (row: any) => {
     await loadFunctions()
 
     // 3. 【核心修改】调用 getRely 获取已关联模块
-    try {
-        loadingFunctions.value = true
-        const res: any = await getRely(row.suiteId)
-        
-        // 解析 RelyDto
-        // 假设 request 拦截器直接返回了 response body，或者是 { data: ... }
-        // RelyDto 结构: { suiteId: Integer, testFunctions: List<TestFunction> }
-        
-        const data = res.data || res.result || res || {}
-        const functions = data.testFunctions || []
+        try {
+            loadingFunctions.value = true
+            const data: any = await getRely(row.suiteId)
+            const functions = (data && Array.isArray(data.testFunctions)) ? data.testFunctions : []
 
-        // 提取 funId 并赋值给穿梭框绑定值
-        // 使用 map 提取 ID，并用 Number 转换防止类型不匹配
-        selectedFunctionIds.value = functions.map((f: any) => Number(f.funId))
+            selectedFunctionIds.value = functions.map((f: any) => Number(f.funId))
 
-        console.log("已回显关联模块 ID:", selectedFunctionIds.value)
-
+            console.log("已回显关联模块 ID:", selectedFunctionIds.value)
     } catch (e) {
         console.error("获取关联模块失败", e)
         selectedFunctionIds.value = []

@@ -13,9 +13,14 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:10001/fastop', // Assuming backend runs on 8080
+        target: 'http://localhost:10001/fastop',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
+      },
+      '/auth-api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/auth-api/, '')
       }
     }
   }

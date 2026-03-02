@@ -187,20 +187,18 @@ const defaultProps = { children: 'children', label: 'label' }
 // 1. 获取测试计划列表
 const fetchPlans = async () => {
   try {
-    const res: any = await getTestPlans({}) // 你的原有API
-    // 适配后端返回
-    const list = Array.isArray(res) ? res : (res.data || [])
-    planOptions.value = list.map((p: any) => ({ 
+    const list: any = await getTestPlans({})
+    const arr = Array.isArray(list) ? list : []
+    planOptions.value = arr.map((p: any) => ({ 
         label: p.planName, 
-        value: p.planId, 
-        suiteId: p.suiteId 
+        value: p.planId
     }))
   } catch (e) {
     console.error("Fetch plans failed", e)
   }
 }
 
-// 2. 加载执行树 (Plan -> Function -> Steps)
+// 2. 加载执行树 (Plan -> ExeFunction -> ExeSteps)
 const loadExecutionTree = async () => {
   if (!selectedPlanId.value) return
   
@@ -220,39 +218,39 @@ const loadExecutionTree = async () => {
       children: []
     }
 
-    // 获取清单详情以拿到 Function 列表
-    // 注意：这里假设清单详情里包含 functions 列表
-    const suiteRes: any = await getTestSuiteDetail(selectedPlan.suiteId)
-    const functions = suiteRes.testFunctions || suiteRes.data?.testFunctions || []
-
-    for (const func of functions) {
-      const funcNode: TreeNode = {
-        id: `func-${func.funId}`,
-        exeFunctionId: func.funId, // 关键：保存ID供批量操作使用
-        label: func.funName,
-        type: 'function',
-        children: []
-      }
-
-      // 核心对接：调用后端 /exeStep/getinexe/{functionId}
-      // 注意：这里可能会有 N+1 问题，如果功能很多，建议后端提供一次性获取所有步骤的接口
-      const stepsRes: any = await getExeStepsByFunction(func.funId)
-      const steps = Array.isArray(stepsRes) ? stepsRes : (stepsRes.data || [])
-
-      funcNode.children = steps.map((step: any) => ({
-        id: `step-${step.exeStepId}`,
-        exeStepId: step.exeStepId, // 关键：保存真实 ExeStepId
-        label: step.stepName || '未命名步骤',
-        type: 'step',
-        status: step.exeStatus || 'UNEXE', // 假设后端字段名为 exeStatus
-        description: step.stepDesc,
-        expected: step.stepExpect,
-        logs: [], // 初始日志为空，点击需不需要单独加载视后端而定
-        actualResult: ''
-      }))
-
-      planNode.children?.push(funcNode)
+    // 根据 planId 获取执行功能（ExeFunction）
+    const exeFunc: any = await getExeFunctionsByPlanId(selectedPlan.value)
+    if (!exeFunc || !exeFunc.exeFunctionId) {
+      ElMessage.warning('当前计划下暂无可执行功能')
+      treeData.value = [planNode]
+      return
     }
+
+    const funcNode: TreeNode = {
+      id: `func-${exeFunc.exeFunctionId}`,
+      exeFunctionId: exeFunc.exeFunctionId,
+      label: exeFunc.functionName || '执行功能',
+      type: 'function',
+      children: []
+    }
+
+    // 核心对接：调用后端 /exeStep/getinexe/{exeFunctionId}
+    const stepsRes: any = await getExeStepsByFunction(exeFunc.exeFunctionId)
+    const steps = Array.isArray(stepsRes) ? stepsRes : []
+
+    funcNode.children = steps.map((step: any) => ({
+      id: `step-${step.exeStepId}`,
+      exeStepId: step.exeStepId,
+      label: step.stepDescription || `步骤 ${step.stepSeq || ''}` || '未命名步骤',
+      type: 'step',
+      status: step.exeStatus, // 数字状态，后续映射
+      description: step.stepDescription,
+      expected: step.criterionDesc,
+      logs: [],
+      actualResult: step.stepResult || ''
+    }))
+
+    planNode.children?.push(funcNode)
 
     treeData.value = [planNode]
   } catch (e) {
@@ -277,11 +275,12 @@ const handleExecuteCommand = async () => {
     
     detailLoading.value = true
     try {
-        // 构造 ExeStepCommand 对象
+        // 构造 ExeStepCommand 对象，对应后端 ExeStepCommand
         const commandPayload = {
-            stepId: currentNode.value.exeStepId,
-            commandContent: "AUTO_EXEC_V1", // 示例指令内容
-            params: { "mode": "default" }
+            exeStepId: currentNode.value.exeStepId,
+            deviceId: '',          // 设备管理尚未完备，这里先留空或传占位
+            command: 'AUTO_EXEC',  // 示例指令内容
+            url: ''                // 如需对接设备网关，可在此填入地址
         }
         
         await executeStepCommand(commandPayload)
@@ -295,19 +294,21 @@ const handleExecuteCommand = async () => {
 }
 
 // 5. 步骤操作 (对应后端 /stepOperate)
-const handleOperate = async (option: string) => {
+// result 表示前端语义：PASS/FAIL/SKIP，后端统一使用 doFinish 更新为完成状态
+const handleOperate = async (result: 'PASS' | 'FAIL' | 'SKIP') => {
     if (!currentNode.value?.exeStepId) return
 
     try {
         await operateStep({
             exeStepId: currentNode.value.exeStepId,
-            option: option // "PASS", "FAIL", "SKIP"
+            option: 'doFinish'
         })
         
-        // 更新本地状态
-        currentNode.value.status = option
-        ElMessage.success(`操作成功: ${getStatusText(option)}`)
-        addLocalLog(`人工标记为: ${getStatusText(option)}`, option === 'FAIL' ? 'danger' : 'success')
+        // 更新本地状态为「已完成」
+        currentNode.value.status = 6
+        const text = result === 'PASS' ? '通过' : result === 'FAIL' ? '失败' : '跳过'
+        ElMessage.success(`操作成功: ${text}`)
+        addLocalLog(`人工标记为: ${text}`, result === 'FAIL' ? 'danger' : 'success')
     } catch (e) {
         ElMessage.error('操作提交失败')
     }
@@ -335,12 +336,12 @@ const addManualLog = async () => {
     try {
         const { value } = await ElMessageBox.prompt('请输入备注内容', '添加备注')
         if (value) {
-            // 调用后端保存
+            // 调用后端保存，对应 ExeLog
             await saveExecutionLog({
-                exeStepId: currentNode.value.exeStepId,
+                stepId: currentNode.value.exeStepId,
+                planId: selectedPlanId.value || '',
                 content: value,
-                logType: 'MANUAL',
-                logTime: new Date()
+                createTime: new Date()
             })
             addLocalLog(`备注: ${value}`, 'info')
             ElMessage.success('日志保存成功')
@@ -364,17 +365,22 @@ const addLocalLog = (content: string, type: string = 'primary') => {
 const expandAll = () => { /* 展开逻辑 */ }
 
 const getStatusText = (status: any) => {
+    // 后端 exeStatus 使用 TestPlanStatusContants：0 未执行、2 执行中、3 暂停、6 已完成
     const map: any = { 
-        'PASS': '通过', 'FAIL': '失败', 'SKIP': '跳过', 
-        'UNEXE': '未执行', 'PAUSE': '暂停' 
+        0: '未执行',
+        2: '执行中',
+        3: '已暂停',
+        6: '已完成'
     }
     return map[status] || status || '未执行'
 }
 
 const getStatusType = (status: any) => {
     const map: any = { 
-        'PASS': 'success', 'FAIL': 'danger', 'SKIP': 'info', 
-        'UNEXE': '', 'PAUSE': 'warning' 
+        0: '',
+        2: 'success',
+        3: 'warning',
+        6: 'success'
     }
     return map[status] || 'info'
 }

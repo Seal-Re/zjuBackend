@@ -157,24 +157,28 @@ suiteId=1&checkWorker=worker1&level=0
 ### Task 7: Dispatch
 **URL**: `GET /planner/plan/dispatch/{planId}`
 
-### Task 8: Get Task
-**URL**: `POST /exeFunction/getinexe/{functionId}`
+### Task 8: Get Executable Function & Steps
+**URL**: `GET /exeFunction/testFunctions/inexe/{planId}`
+**Description**: 获取指定计划下的执行功能（ExeFunction）。
+
+**URL**: `GET /exeStep/getinexe/{exeFunctionId}`
+**Description**: 获取指定执行功能下的执行步骤列表（ExeStep）。
 
 ### Task 9: Pause Task
-**URL**: `POST /exeFunction/pause/{exeFunctionId}`
-**Verification**: `test_plan.status` = 3, `exe_function.exe_status` = 3.
+**URL**: `POST /exeStep/pause/{exeFunctionId}`
+**Verification**: `test_plan.status` = 3, `exe_function.exe_status` = 3，且关联的 `exe_step.exe_status` 由执行中更新为暂停。
 
 #### other Operate
-**URL**: `POST /exeFunction/stepOperate`
-input:@RequestBody Map<String, String> params
+**URL**: `POST /exeStep/stepOperate`
+**Input**: `{"exeStepId": "...", "option": "doFinish"}` 等参数，用于更新单个步骤的执行状态。
 
-### Task 10: Start Task
-**URL**: `POST /exeFunction/do`
+### Task 10: Execute Step Command
+**URL**: `POST /exeStep/do`
 **Input**:
 ```json
 {
-  "exeStepId": "sadsfsdf",
-  "deviceId": "sdfsdf",
-  "command": "sdfsdf",
-  "url": "http:fffff" 
+  "exeStepId": "uuid-of-exe-step",
+  "deviceId": "device-identifier",
+  "command": "AUTO_EXEC",
+  "url": "http://device-gateway/..." 
 }

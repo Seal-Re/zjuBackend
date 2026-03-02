@@ -4,6 +4,11 @@ import Layout from '@/layout/Layout.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/views/auth/Login.vue')
+  },
+  {
     path: '/',
     redirect: '/design/module'
   },
@@ -59,6 +64,18 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
   {
+    path: '/device',
+    component: Layout,
+    redirect: '/device/list',
+    children: [
+      {
+        path: 'list',
+        name: 'DeviceManage',
+        component: () => import('@/views/device/DeviceManage.vue')
+      }
+    ]
+  },
+  {
     path: '/command',
     component: Layout,
     redirect: '/command/dashboard',
@@ -89,4 +106,21 @@ const router = createRouter({
   routes
 })
 
+const whiteList = ['/login']
+
+router.beforeEach((to, from) => {
+  if (whiteList.includes(to.path)) {
+    return true
+  }
+  const token = localStorage.getItem('access_token')
+  if (!token) {
+    return {
+      path: '/login',
+      query: { redirect: to.fullPath }
+    }
+  }
+  return true
+})
+
 export default router
+

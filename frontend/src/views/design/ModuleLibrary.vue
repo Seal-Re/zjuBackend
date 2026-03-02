@@ -218,18 +218,11 @@ const subsystemOptions = ref<any[]>([])
 // 1. 初始化：获取所有构型数据
 const initBaseStructs = async () => {
     try {
-        const res: any = await listAllBaseStructAndId()
-        // 兼容处理：API 返回 data 数组
-        const data = res.data || res.result || res || []
-        
+        const data: any = await listAllBaseStructAndId()
         if (Array.isArray(data)) {
             allStructs.value = data
-            
-            // 提取所有机型 (item.baseStruct.model)
             const models = new Set(data.map((item: any) => item.baseStruct?.model).filter(Boolean))
             modelOptions.value = Array.from(models).map(m => ({ value: m, label: m }))
-            
-            // 如果 Store 里有缓存，尝试回显
             if (filterStore.model) {
                 handleModelChange(filterStore.model, false)
             }
