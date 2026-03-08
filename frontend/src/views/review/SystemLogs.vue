@@ -149,6 +149,7 @@ async function loadOperationLogs() {
   opLoading.value = true
   try {
     const [startTime, endTime] = opTimeRange.value || [undefined, undefined]
+    // 请求层拦截器已返回 res.data，故 res 即为 { list, total } 或兼容结构
     const res: any = await getOperationLogList({
       operatorName: opFilters.operatorName || undefined,
       module: opFilters.module || undefined,
@@ -158,12 +159,13 @@ async function loadOperationLogs() {
       page: opPage.value,
       size: opSize.value
     })
-    const data = res?.data ?? res ?? {}
-    operationList.value = Array.isArray(data?.list) ? data.list : []
-    opTotal.value = typeof data?.total === 'number' ? data.total : 0
+    const data = res && typeof res === 'object' ? res : {}
+    operationList.value = Array.isArray(data.list) ? data.list : (Array.isArray(data) ? data : [])
+    opTotal.value = typeof data.total === 'number' ? data.total : (Array.isArray(data) ? data.length : 0)
   } catch (e) {
     operationList.value = []
     opTotal.value = 0
+    console.warn('操作日志加载失败（可能未建 operation_log 表）:', e)
   } finally {
     opLoading.value = false
   }
@@ -181,12 +183,13 @@ async function loadExeLogs() {
       page: exePage.value,
       size: exeSize.value
     })
-    const data = res?.data ?? res ?? {}
-    exeLogList.value = Array.isArray(data?.list) ? data.list : []
-    exeTotal.value = typeof data?.total === 'number' ? data.total : 0
+    const data = res && typeof res === 'object' ? res : {}
+    exeLogList.value = Array.isArray(data.list) ? data.list : (Array.isArray(data) ? data : [])
+    exeTotal.value = typeof data.total === 'number' ? data.total : (Array.isArray(data) ? data.length : 0)
   } catch (e) {
     exeLogList.value = []
     exeTotal.value = 0
+    console.warn('执行日志加载失败:', e)
   } finally {
     exeLoading.value = false
   }

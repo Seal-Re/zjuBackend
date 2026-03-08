@@ -47,12 +47,6 @@
             <span>测试指挥</span>
           </template>
         </el-menu-item>
-        <el-menu-item index="/execution/run">
-          <template #title>
-            <el-icon><VideoPlay /></el-icon>
-            <span>测试执行</span>
-          </template>
-        </el-menu-item>
       </el-menu>
     </aside>
 
@@ -105,8 +99,7 @@ import {
   Edit,
   Check,
   Calendar,
-  Monitor,
-  VideoPlay
+  Monitor
 } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/store/auth'
 

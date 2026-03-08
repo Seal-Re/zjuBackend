@@ -37,11 +37,19 @@ public class OperationLogServiceImpl implements OperationLogService {
         int offset = (page - 1) * size;
         if (offset < 0) offset = 0;
         if (size <= 0 || size > 500) size = 20;
-        List<OperationLog> list = operationLogMapper.selectByCondition(operatorName, module, action, startTime, endTime, offset, size);
-        long total = operationLogMapper.countByCondition(operatorName, module, action, startTime, endTime);
-        Map<String, Object> result = new HashMap<>();
-        result.put("list", list);
-        result.put("total", total);
-        return ResponseFactory.builder().withData(result).withTotalNum(total).build();
+        try {
+            List<OperationLog> list = operationLogMapper.selectByCondition(operatorName, module, action, startTime, endTime, offset, size);
+            long total = operationLogMapper.countByCondition(operatorName, module, action, startTime, endTime);
+            Map<String, Object> result = new HashMap<>();
+            result.put("list", list != null ? list : new java.util.ArrayList<>());
+            result.put("total", total);
+            return ResponseFactory.builder().withData(result).withTotalNum(total).build();
+        } catch (Exception e) {
+            org.slf4j.LoggerFactory.getLogger(OperationLogServiceImpl.class).warn("操作日志查询失败（若未建表请执行 dataset/operation_log.sql）: {}", e.getMessage());
+            Map<String, Object> result = new HashMap<>();
+            result.put("list", new java.util.ArrayList<>());
+            result.put("total", 0L);
+            return ResponseFactory.builder().withData(result).withTotalNum(0L).build();
+        }
     }
 }

@@ -86,18 +86,6 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/command/CommandDashboard.vue')
       }
     ]
-  },
-  {
-    path: '/execution',
-    component: Layout,
-    redirect: '/execution/run',
-    children: [
-      {
-        path: 'run',
-        name: 'TestExecution',
-        component: () => import('@/views/execution/TestExecution.vue')
-      }
-    ]
   }
 ]
 

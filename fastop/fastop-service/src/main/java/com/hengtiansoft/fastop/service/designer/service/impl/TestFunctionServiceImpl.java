@@ -389,10 +389,13 @@ public class TestFunctionServiceImpl implements TestFunctionService {
 
     @Override
     public List<TestFunction> getTestFunctionListById(List<Integer> funIds){
+        if (funIds == null || funIds.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
         TestFunctionExample funExample = new TestFunctionExample();
         funExample.createCriteria().andFunIdIn(funIds);
         List<TestFunction> functionList = testFunctionMapper.selectByExample(funExample);
-        return functionList;
+        return functionList != null ? functionList : java.util.Collections.emptyList();
     }
 
 }

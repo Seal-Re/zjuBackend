@@ -1,6 +1,7 @@
 package com.hengtiansoft.fastop.service.planner.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -83,21 +84,28 @@ public class ExeStepServiceImpl implements ExeStepService {
     public void conveyTestStep2ExeStep(Integer funId, String exeFunctionId) {
         if (funId == null || exeFunctionId == null) return;
 
+        Object modulesData = testFunctionModuleService.getByFunId(funId).getData();
+        if (modulesData == null) return;
         List<TestFunctionModule> modules = objectMapper.convertValue(
-                testFunctionModuleService.getByFunId(funId).getData(),
+                modulesData,
                 new TypeReference<List<TestFunctionModule>>() {});
+        if (modules == null) modules = Collections.emptyList();
 
         for (TestFunctionModule module : modules) {
-            // 2. Get Cases
-            List<TestFunctionCase> cases = objectMapper.convertValue(
-                    testFunctionCaseService.getByModuleId(module.getModuleId()).getData(),
-                    new TypeReference<List<TestFunctionCase>>() {});
+            // 2. Get Cases（无子用例时返回 failure，getData() 为 null，需空指针防护）
+            Object casesData = testFunctionCaseService.getByModuleId(module.getModuleId()).getData();
+            List<TestFunctionCase> cases = casesData != null
+                    ? objectMapper.convertValue(casesData, new TypeReference<List<TestFunctionCase>>() {})
+                    : null;
+            if (cases == null) cases = Collections.emptyList();
 
             for (TestFunctionCase testCase : cases) {
-                // 3. Get Steps
-                List<TestFunctionStep> steps = objectMapper.convertValue(
-                        testFunctionStepService.getByCaseId(testCase.getCaseId()).getData(),
-                        new TypeReference<List<TestFunctionStep>>() {});
+                // 3. Get Steps（无步骤时同上）
+                Object stepsData = testFunctionStepService.getByCaseId(testCase.getCaseId()).getData();
+                List<TestFunctionStep> steps = stepsData != null
+                        ? objectMapper.convertValue(stepsData, new TypeReference<List<TestFunctionStep>>() {})
+                        : null;
+                if (steps == null) steps = Collections.emptyList();
 
                 for (TestFunctionStep step : steps) {
                     ExeStepWithBLOBs exeStep = new ExeStepWithBLOBs();
