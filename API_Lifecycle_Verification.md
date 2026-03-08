@@ -19,7 +19,9 @@
 **Verification**: Check `changeFlag` is 4 and `approveStatus` is 0 in DB.
 
 ### Task 2: Build Function Hierarchy
-**URL**: `POST /designer/testFunctionModule/add`
+（实际后端路径与前端一致，以下为当前实现路径）
+
+**URL**: `POST /designer/module/add`
 **Input**:
 ```json
 {
@@ -28,7 +30,7 @@
 }
 ```
 
-**URL**: `POST /designer/testFunctionCase/add`
+**URL**: `POST /designer/case/add`
 **Input**:
 ```json
 {
@@ -37,7 +39,7 @@
 }
 ```
 
-**URL**: `POST /designer/testFunctionStep/add`
+**URL**: `POST /designer/step/add`
 **Input**:
 ```json
 {

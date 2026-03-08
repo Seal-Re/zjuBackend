@@ -295,16 +295,8 @@ const submitForm = async () => {
             // Create
             if (form.type === 'MODULE') {
                 await addModule({
-                    funName: form.name,
-                    funId: funId.value, // It needs parent FunId
-                    // Other required fields might be missing, checking API
-                    // In ModuleLibrary add: num, military, etc.
-                    // Minimal add might fail if backend enforces these.
-                    // For now, pass defaults.
-                    num: 0,
-                    military: false,
-                    planeEffectMin: 1,
-                    planeEffectMax: 100
+                    moduleName: form.name,
+                    funId: funId.value
                 })
             } else if (form.type === 'CASE') {
                 await addCase({
