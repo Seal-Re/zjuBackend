@@ -62,10 +62,10 @@ public class ExeFunctionServiceImpl implements ExeFunctionService {
         List<ExeFunction> exeFunctions = exeFunctionMapper.selectByExample(example);
 
         if (exeFunctions == null || exeFunctions.isEmpty()) {
-            return ResponseFactory.failure("查询不到对应planId的ExeFunction");
+            return ResponseFactory.success(java.util.Collections.emptyList());
         }
 
-        return ResponseFactory.success(exeFunctions.get(0));
+        return ResponseFactory.success(exeFunctions);
     }
 
     @Override

@@ -183,7 +183,9 @@ const fetchPlans = async () => {
         console.log("【Debug】getTestPlans 原始返回:", res)
         
         const list = Array.isArray(res) ? res : []
-        planOptions.value = list.map((p: any) => ({ 
+        // 仅展示已派发/执行中的计划，避免选择未派发计划导致“无执行结构”报错
+        const runnable = list.filter((p: any) => [0, 1, 2, 3, 4, 6].includes(Number(p.status)))
+        planOptions.value = runnable.map((p: any) => ({ 
             label: p.planName, 
             value: p.planId, 
             suiteId: p.suiteId 
@@ -225,7 +227,9 @@ const loadExecutionTree = async () => {
 
         // 执行域正确链路：planId -> exeFunction -> exeStep
         const exeFunctionsRes: any = await getExeFunctionsByPlanId(selectedPlanId.value)
-        const exeFunctions = Array.isArray(exeFunctionsRes) ? exeFunctionsRes : []
+        const exeFunctions = Array.isArray(exeFunctionsRes)
+            ? exeFunctionsRes
+            : (exeFunctionsRes ? [exeFunctionsRes] : [])
 
         if (exeFunctions.length === 0) {
             ElMessage.warning("该计划暂无执行结构，请先派发计划")
@@ -282,8 +286,13 @@ const loadExecutionTree = async () => {
         console.log("【Debug】最终生成的树数据:", [root])
         treeData.value = [root]
         
-    } catch (e) {
+    } catch (e: any) {
         console.error("【Debug】加载执行结构发生异常:", e)
+        const msg = String(e?.message || '')
+        if (msg.includes('查询不到对应planId的ExeFunction')) {
+            ElMessage.warning('当前计划暂无执行结构，请先在测试计划页执行“派发”')
+            return
+        }
         ElMessage.error('加载执行结构失败')
     } finally {
         treeLoading.value = false
