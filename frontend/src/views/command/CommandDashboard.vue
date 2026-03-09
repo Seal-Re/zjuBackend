@@ -140,9 +140,8 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 
 // API 引入
 import { getTestPlans } from '@/api/planner'
-// 【修改】引入 getRely
-import { getRely } from '@/api/designer' 
 import { 
+    getExeFunctionsByPlanId,
     getExeStepsByFunction, 
     executeStepCommand, 
     pauseExeFunction 
@@ -183,7 +182,7 @@ const fetchPlans = async () => {
         const res: any = await getTestPlans({})
         console.log("【Debug】getTestPlans 原始返回:", res)
         
-        const list = Array.isArray(res) ? res : (res.data || [])
+        const list = Array.isArray(res) ? res : []
         planOptions.value = list.map((p: any) => ({ 
             label: p.planName, 
             value: p.planId, 
@@ -224,42 +223,31 @@ const loadExecutionTree = async () => {
             planName: planInfo.label
         }
 
-        // --- 【核心修改开始】使用 getRely 获取关联的功能列表 ---
-        console.log(`【Debug】正在获取 Rely 详情 (已选模块), suiteId: ${planInfo.suiteId}`)
-        
-        // 调用 getRely 接口
-        const relyRes: any = await getRely(planInfo.suiteId)
-        console.log("【Debug】getRely 返回:", relyRes)
+        // 执行域正确链路：planId -> exeFunction -> exeStep
+        const exeFunctionsRes: any = await getExeFunctionsByPlanId(selectedPlanId.value)
+        const exeFunctions = Array.isArray(exeFunctionsRes) ? exeFunctionsRes : []
 
-        // 解析返回数据
-        // RelyDto 结构: { suiteId: ..., testFunctions: [...] }
-        const data = relyRes.data || relyRes.result || relyRes || {}
-        const functions = data.testFunctions || []
-        
-        console.log("【Debug】解析出的功能列表 (Functions):", functions)
-        // --- 【核心修改结束】 ---
-
-        if (functions.length === 0) {
-            ElMessage.warning("该计划关联的清单中没有功能模块")
+        if (exeFunctions.length === 0) {
+            ElMessage.warning("该计划暂无执行结构，请先派发计划")
         }
 
-        for (const func of functions) {
+        for (const func of exeFunctions) {
+            const exeFunctionId = func.exeFunctionId || func.id
             const funcNode: TaskNode = {
-                id: `func-${func.funId}`,
-                exeFunctionId: func.funId,
-                label: func.funName,
+                id: `func-${exeFunctionId}`,
+                exeFunctionId,
+                label: func.functionName || func.funName || '未命名功能',
                 type: 'function',
                 status: 0, 
                 children: [],
                 planName: planInfo.label,
-                description: `包含 ${func.num || ''} 号功能组的所有执行步骤`
+                description: `执行功能ID: ${exeFunctionId}`
             }
 
-            // 获取步骤列表
-            // console.log(`【Debug】正在获取步骤, funId: ${func.funId}`)
-            const stepsRes: any = await getExeStepsByFunction(func.funId)
+            // 后端接口 /exeStep/getinexe/{exeFunctionId}
+            const stepsRes: any = await getExeStepsByFunction(exeFunctionId)
 
-            const steps = Array.isArray(stepsRes) ? stepsRes : (stepsRes.data || [])
+            const steps = Array.isArray(stepsRes) ? stepsRes : []
             // console.log(`【Debug】解析出的步骤数 (${func.funName}):`, steps.length)
 
             // 计算进度
@@ -272,12 +260,12 @@ const loadExecutionTree = async () => {
                 return {
                     id: `step-${step.exeStepId}`,
                     exeStepId: step.exeStepId,
-                    exeFunctionId: func.funId,
+                    exeFunctionId,
                     label: step.stepName || '未命名步骤',
                     type: 'step',
                     status: sStatus,
                     planName: planInfo.label,
-                    description: step.stepDesc || '暂无步骤描述'
+                    description: step.stepDescription || step.stepDesc || '暂无步骤描述'
                 }
             })
 
@@ -337,9 +325,10 @@ const handleStart = async () => {
 
     try {
         const payload = {
-            stepId: currentTask.value.exeStepId,
-            commandContent: "AUTO_EXEC", // 示例指令
-            params: {}
+            exeStepId: currentTask.value.exeStepId,
+            deviceId: '',
+            command: "AUTO_EXEC",
+            url: ''
         }
         await executeStepCommand(payload)
         
