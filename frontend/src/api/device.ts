@@ -1,8 +1,6 @@
-/**
- * 设备管理 API
- * 规范见 docs/DEVICE_API_SPEC.md，待后端实现后对接同一 baseURL 或单独配置
- */
 import request from './request'
+
+/** 设备主数据 CRUD：后端实现前仅占位，路径约定见 docs/DEVICE_API_SPEC.md */
 
 export interface DeviceDto {
   id?: string
@@ -20,8 +18,13 @@ export interface DeviceListResult {
   total: number
 }
 
-/** 设备列表（分页与筛选），路径与后端规范一致 */
-export function getDeviceList(params?: { page?: number; size?: number; name?: string; type?: string; status?: number }) {
+export function getDeviceList(params?: {
+  page?: number
+  size?: number
+  name?: string
+  type?: string
+  status?: number
+}) {
   return request({
     url: '/devices/list',
     method: 'get',
@@ -29,7 +32,6 @@ export function getDeviceList(params?: { page?: number; size?: number; name?: st
   })
 }
 
-/** 获取单个设备 */
 export function getDevice(id: string) {
   return request({
     url: `/devices/${id}`,
@@ -37,7 +39,6 @@ export function getDevice(id: string) {
   })
 }
 
-/** 新增设备 */
 export function createDevice(data: Partial<DeviceDto>) {
   return request({
     url: '/devices',
@@ -46,7 +47,6 @@ export function createDevice(data: Partial<DeviceDto>) {
   })
 }
 
-/** 更新设备 */
 export function updateDevice(id: string, data: Partial<DeviceDto>) {
   return request({
     url: `/devices/${id}`,
@@ -55,7 +55,6 @@ export function updateDevice(id: string, data: Partial<DeviceDto>) {
   })
 }
 
-/** 删除设备 */
 export function deleteDevice(id: string) {
   return request({
     url: `/devices/${id}`,

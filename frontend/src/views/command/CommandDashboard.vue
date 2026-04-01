@@ -127,6 +127,15 @@
             <el-empty v-else description="请在左侧选择一个 测试步骤 或 功能组" />
         </div>
     </div>
+
+    <el-dialog v-model="emsPreviewVisible" title="EMS 报文预览" width="680px" destroy-on-close>
+      <p class="preview-hint">以下为按当前执行步骤构造的 MessageEtt，确认后将发往 EMS（fastop.integration.ems-url）。</p>
+      <pre class="json-preview">{{ emsPreviewText }}</pre>
+      <template #footer>
+        <el-button @click="emsPreviewVisible = false">取消</el-button>
+        <el-button type="primary" :loading="emsSendLoading" @click="confirmSendEms">确认发送</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -144,7 +153,8 @@ import {
     getExeFunctionsByPlanId,
     getExeStepsByFunction, 
     executeStepCommand, 
-    pauseExeFunction 
+    pauseExeFunction,
+    previewEmsMessage
 } from '@/api/execution'
 
 // --- 类型定义 ---
@@ -175,6 +185,10 @@ const treeData = ref<TaskNode[]>([])
 const currentTask = ref<any>(null) // 当前选中的节点转换为卡片数据对象
 
 const defaultProps = { children: 'children', label: 'label' }
+
+const emsPreviewVisible = ref(false)
+const emsPreviewText = ref('')
+const emsSendLoading = ref(false)
 
 const fetchPlans = async () => {
     console.log("【Debug】开始获取测试计划列表...")
@@ -231,6 +245,28 @@ const loadExecutionTree = async () => {
             ? exeFunctionsRes
             : (exeFunctionsRes ? [exeFunctionsRes] : [])
 
+        // #region agent log exeFunctions (H1)
+        fetch('http://127.0.0.1:7636/ingest/f6c8c880-ffd9-4ffd-824d-2ebe6355dc47', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Debug-Session-Id': 'ea6e3f'
+            },
+            body: JSON.stringify({
+                sessionId: 'ea6e3f',
+                runId: 'pre-fix',
+                hypothesisId: 'H1',
+                location: 'frontend/src/views/command/CommandDashboard.vue:loadExecutionTree',
+                message: 'exeFunctions loaded',
+                data: {
+                    planId: selectedPlanId.value,
+                    count: exeFunctions.length
+                },
+                timestamp: Date.now()
+            })
+        }).catch(() => {})
+        // #endregion
+
         if (exeFunctions.length === 0) {
             ElMessage.warning("该计划暂无执行结构，请先派发计划")
         }
@@ -252,7 +288,29 @@ const loadExecutionTree = async () => {
             const stepsRes: any = await getExeStepsByFunction(exeFunctionId)
 
             const steps = Array.isArray(stepsRes) ? stepsRes : []
-            // console.log(`【Debug】解析出的步骤数 (${func.funName}):`, steps.length)
+
+            // #region agent log exeSteps (H2)
+            fetch('http://127.0.0.1:7636/ingest/f6c8c880-ffd9-4ffd-824d-2ebe6355dc47', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Debug-Session-Id': 'ea6e3f'
+                },
+                body: JSON.stringify({
+                    sessionId: 'ea6e3f',
+                    runId: 'pre-fix',
+                    hypothesisId: 'H2',
+                    location: 'frontend/src/views/command/CommandDashboard.vue:loadExecutionTree',
+                    message: 'exeSteps loaded',
+                    data: {
+                        planId: selectedPlanId.value,
+                        exeFunctionId,
+                        count: steps.length
+                    },
+                    timestamp: Date.now()
+                })
+            }).catch(() => {})
+            // #endregion
 
             // 计算进度
             let finishedCount = 0
@@ -265,7 +323,7 @@ const loadExecutionTree = async () => {
                     id: `step-${step.exeStepId}`,
                     exeStepId: step.exeStepId,
                     exeFunctionId,
-                    label: step.stepName || '未命名步骤',
+                    label: step.stepName || step.stepDescription || '未命名步骤',
                     type: 'step',
                     status: sStatus,
                     planName: planInfo.label,
@@ -333,19 +391,29 @@ const handleStart = async () => {
     }
 
     try {
-        const payload = {
-            exeStepId: currentTask.value.exeStepId,
-            deviceId: '',
-            command: "AUTO_EXEC",
-            url: ''
-        }
-        await executeStepCommand(payload)
-        
-        currentTask.value.status = 1 // 标记为进行中
-        ElMessage.success('指令已发送')
-        // 这里可以重新刷新树状态，或者手动更新本地状态
+        const preview = await previewEmsMessage(currentTask.value.exeStepId)
+        emsPreviewText.value = JSON.stringify(preview, null, 2)
+        emsPreviewVisible.value = true
     } catch (e) {
-        // demo
+        console.error(e)
+    }
+}
+
+const confirmSendEms = async () => {
+    if (!currentTask.value || currentTask.value.type !== 'step') return
+    emsSendLoading.value = true
+    try {
+        await executeStepCommand({
+            exeStepId: currentTask.value.exeStepId,
+            command: 'AUTO_EXEC'
+        })
+        emsPreviewVisible.value = false
+        currentTask.value.status = 1
+        ElMessage.success('指令已发送')
+    } catch (e) {
+        console.error(e)
+    } finally {
+        emsSendLoading.value = false
     }
 }
 
@@ -389,6 +457,23 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+.preview-hint {
+    color: #606266;
+    font-size: 13px;
+    margin: 0 0 12px;
+}
+.json-preview {
+    max-height: 420px;
+    overflow: auto;
+    margin: 0;
+    padding: 12px;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
 .command-dashboard {
     height: 100%;
     display: flex;

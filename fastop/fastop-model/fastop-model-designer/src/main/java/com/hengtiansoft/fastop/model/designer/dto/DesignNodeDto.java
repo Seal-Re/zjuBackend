@@ -37,8 +37,14 @@ public class DesignNodeDto {
     @ApiModelProperty("操作动作")
     private String operation;
 
-    @ApiModelProperty("操作对象")
+    @ApiModelProperty("操作对象（设备 topic / eventType）")
     private String obj;
+
+    @ApiModelProperty("示例报文 JSON 字符串")
+    private String commandExample;
+
+    @ApiModelProperty("参数填充 JSON 字符串")
+    private String commandParams;
 
     @ApiModelProperty("操作目的")
     private String purpose;

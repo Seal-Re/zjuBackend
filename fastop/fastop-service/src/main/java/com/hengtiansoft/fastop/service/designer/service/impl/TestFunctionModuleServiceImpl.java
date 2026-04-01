@@ -215,6 +215,8 @@ public class TestFunctionModuleServiceImpl implements TestFunctionModuleService 
                         .description(step.getStepDescription())
                         .operation(step.getStepOperation())
                         .obj(step.getStepObj())
+                        .commandExample(step.getStepCommandExample())
+                        .commandParams(step.getStepCommandParams())
                         .purpose(step.getStepPurpose())
                         .build();
 

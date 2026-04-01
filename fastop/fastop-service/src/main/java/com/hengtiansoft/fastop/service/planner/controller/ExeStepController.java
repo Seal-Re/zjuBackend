@@ -7,8 +7,6 @@ import com.hengtiansoft.fastop.service.planner.service.ExeStepService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,22 +20,20 @@ import java.util.Map;
 @RequestMapping("/exeStep")
 public class ExeStepController {
 
-    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
-
     @Autowired
     private ExeStepService exeStepService;
 
     @ApiOperation("获取指定测试作业计划下的步骤")
     @GetMapping("/getinexe/{functionId}")
-    public Response getExeFunctionInExe(@PathVariable("functionId") String functionId){
-        LOG.info("start getting ExeStepInExe by functionId",functionId);
+    public Response getExeFunctionInExe(@PathVariable("functionId") String functionId) {
+        log.info("get ExeStepInExe by functionId={}", functionId);
         return exeStepService.listExeSteps(functionId);
     }
 
     @ApiOperation("批量暂停步骤")
     @PostMapping("/pause/{exeFunctionId}")
     public Response updateStepExeToPause(@PathVariable("exeFunctionId") String exeFunctionId) {
-        LOG.info("暂停指令已收到，开始批量暂停functionId为{} 下的所有步骤",exeFunctionId);
+        log.info("pause steps under exeFunctionId={}", exeFunctionId);
         return exeStepService.updateStepExeToPause(exeFunctionId);
     }
 
@@ -46,21 +42,27 @@ public class ExeStepController {
     public Response stepOperate(@RequestBody Map<String, String> params) {
         String exeStepId = params.get("exeStepId");
         String option = params.get("option");
-        LOG.info("开始对步骤{} 进行指令{}",exeStepId,option);
+        log.info("stepOperate exeStepId={} option={}", exeStepId, option);
         return exeStepService.updateStepStatusByOption(exeStepId, option);
     }
 
     @ApiOperation("步骤执行，发送设备指令v1")
     @PostMapping("/do")
     public Response doV1(@RequestBody ExeStepCommand exeStepCommand) {
-        LOG.info("接收到执行指令，开始操作");
+        log.info("doV1 received");
         return exeStepService.doV1(exeStepCommand);
+    }
+
+    @ApiOperation("预览发往 EMS 的报文（MessageEtt）")
+    @GetMapping("/ems/preview")
+    public Response previewEms(@RequestParam String exeStepId) {
+        return exeStepService.previewEmsMessage(exeStepId);
     }
 
     @ApiOperation("保存步骤执行日志（军检审计落库）")
     @PostMapping("/log/save")
     public Response saveLog(@RequestBody ExeLog exeLog) {
-        LOG.info("接收到日志保存请求: {}", exeLog);
+        log.info("saveLog: {}", exeLog);
         return exeStepService.saveLog(exeLog);
     }
 

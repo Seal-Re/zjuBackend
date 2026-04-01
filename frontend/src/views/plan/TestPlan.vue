@@ -267,8 +267,6 @@ interface TestPlan {
   [key: string]: any
 }
 
-const PlanStatus = { UNEXE: 0, VERIFY: 1, EXEING: 2, PAUSE: 3, MVERIFY: 4, DISPATCH: 5, FINISH: 6 }
-
 // --- 响应式变量 ---
 const loading = ref(false)
 const submitLoading = ref(false)

@@ -10,6 +10,8 @@
     <result column="step_date" jdbcType="VARCHAR" property="stepDate" />
     <result column="step_operation" jdbcType="VARCHAR" property="stepOperation" />
     <result column="step_obj" jdbcType="VARCHAR" property="stepObj" />
+    <result column="step_command_example" jdbcType="LONGVARCHAR" property="stepCommandExample" />
+    <result column="step_command_params" jdbcType="LONGVARCHAR" property="stepCommandParams" />
     <result column="step_purpose" jdbcType="VARCHAR" property="stepPurpose" />
     <result column="total_send" jdbcType="BIT" property="totalSend" />
     <result column="condition_status" jdbcType="VARCHAR" property="conditionStatus" />
@@ -77,7 +79,7 @@
   </sql>
   <sql id="Base_Column_List">
     step_id, step_name, change_user, step_description, step_note, step_date, step_operation, 
-    step_obj, step_purpose, total_send, condition_status, case_id, step_status, updated
+    step_obj, step_command_example, step_command_params, step_purpose, total_send, condition_status, case_id, step_status, updated
   </sql>
   <select id="selectByExample" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionStepExample" resultMap="BaseResultMap">
     select
@@ -113,12 +115,12 @@
   <insert id="insert" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionStep">
     insert into test_function_step (step_id, step_name, change_user, 
       step_description, step_note, step_date, 
-      step_operation, step_obj, step_purpose, 
+      step_operation, step_obj, step_command_example, step_command_params, step_purpose, 
       total_send, condition_status, case_id, 
       step_status, updated)
     values (#{stepId,jdbcType=INTEGER}, #{stepName,jdbcType=VARCHAR}, #{changeUser,jdbcType=VARCHAR}, 
       #{stepDescription,jdbcType=VARCHAR}, #{stepNote,jdbcType=VARCHAR}, #{stepDate,jdbcType=VARCHAR}, 
-      #{stepOperation,jdbcType=VARCHAR}, #{stepObj,jdbcType=VARCHAR}, #{stepPurpose,jdbcType=VARCHAR}, 
+      #{stepOperation,jdbcType=VARCHAR}, #{stepObj,jdbcType=VARCHAR}, #{stepCommandExample,jdbcType=LONGVARCHAR}, #{stepCommandParams,jdbcType=LONGVARCHAR}, #{stepPurpose,jdbcType=VARCHAR}, 
       #{totalSend,jdbcType=BIT}, #{conditionStatus,jdbcType=VARCHAR}, #{caseId,jdbcType=INTEGER}, 
       #{stepStatus,jdbcType=INTEGER}, #{updated,jdbcType=INTEGER})
   </insert>
@@ -148,6 +150,12 @@
       </if>
       <if test="stepObj != null">
         step_obj,
+      </if>
+      <if test="stepCommandExample != null">
+        step_command_example,
+      </if>
+      <if test="stepCommandParams != null">
+        step_command_params,
       </if>
       <if test="stepPurpose != null">
         step_purpose,
@@ -192,6 +200,12 @@
       </if>
       <if test="stepObj != null">
         #{stepObj,jdbcType=VARCHAR},
+      </if>
+      <if test="stepCommandExample != null">
+        #{stepCommandExample,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="stepCommandParams != null">
+        #{stepCommandParams,jdbcType=LONGVARCHAR},
       </if>
       <if test="stepPurpose != null">
         #{stepPurpose,jdbcType=VARCHAR},
@@ -246,6 +260,12 @@
       <if test="record.stepObj != null">
         step_obj = #{record.stepObj,jdbcType=VARCHAR},
       </if>
+      <if test="record.stepCommandExample != null">
+        step_command_example = #{record.stepCommandExample,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.stepCommandParams != null">
+        step_command_params = #{record.stepCommandParams,jdbcType=LONGVARCHAR},
+      </if>
       <if test="record.stepPurpose != null">
         step_purpose = #{record.stepPurpose,jdbcType=VARCHAR},
       </if>
@@ -279,6 +299,8 @@
       step_date = #{record.stepDate,jdbcType=VARCHAR},
       step_operation = #{record.stepOperation,jdbcType=VARCHAR},
       step_obj = #{record.stepObj,jdbcType=VARCHAR},
+      step_command_example = #{record.stepCommandExample,jdbcType=LONGVARCHAR},
+      step_command_params = #{record.stepCommandParams,jdbcType=LONGVARCHAR},
       step_purpose = #{record.stepPurpose,jdbcType=VARCHAR},
       total_send = #{record.totalSend,jdbcType=BIT},
       condition_status = #{record.conditionStatus,jdbcType=VARCHAR},
@@ -313,6 +335,12 @@
       <if test="stepObj != null">
         step_obj = #{stepObj,jdbcType=VARCHAR},
       </if>
+      <if test="stepCommandExample != null">
+        step_command_example = #{stepCommandExample,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="stepCommandParams != null">
+        step_command_params = #{stepCommandParams,jdbcType=LONGVARCHAR},
+      </if>
       <if test="stepPurpose != null">
         step_purpose = #{stepPurpose,jdbcType=VARCHAR},
       </if>
@@ -343,6 +371,8 @@
       step_date = #{stepDate,jdbcType=VARCHAR},
       step_operation = #{stepOperation,jdbcType=VARCHAR},
       step_obj = #{stepObj,jdbcType=VARCHAR},
+      step_command_example = #{stepCommandExample,jdbcType=LONGVARCHAR},
+      step_command_params = #{stepCommandParams,jdbcType=LONGVARCHAR},
       step_purpose = #{stepPurpose,jdbcType=VARCHAR},
       total_send = #{totalSend,jdbcType=BIT},
       condition_status = #{conditionStatus,jdbcType=VARCHAR},

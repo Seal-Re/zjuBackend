@@ -1,7 +1,3 @@
-/**
- * 认证与令牌管理 API（OAuth2）
- * 规范：获取/校验/撤销令牌、用户信息
- */
 import authRequest from './authRequest'
 
 export interface TokenResponse {
@@ -12,7 +8,6 @@ export interface TokenResponse {
   scope?: string
 }
 
-/** 获取令牌（password 模式） */
 export function getToken(params: { username: string; password: string }) {
   const form = new URLSearchParams()
   form.set('grant_type', 'password')
@@ -31,7 +26,6 @@ export function getToken(params: { username: string; password: string }) {
   })
 }
 
-/** 使用 refresh_token 刷新 */
 export function refreshToken(refreshTokenValue: string) {
   const form = new URLSearchParams()
   form.set('grant_type', 'refresh_token')
@@ -46,7 +40,6 @@ export function refreshToken(refreshTokenValue: string) {
   })
 }
 
-/** 检查令牌合法性（POST/GET） */
 export function checkToken(token?: string) {
   const t = token || localStorage.getItem('access_token')
   return authRequest.post<any, { active: boolean; user_name?: string; user_id?: string; exp?: number }>(
@@ -56,7 +49,6 @@ export function checkToken(token?: string) {
   )
 }
 
-/** 撤销令牌（登出） */
 export function revokeToken(token?: string) {
   const t = token || localStorage.getItem('access_token')
   if (t) {
@@ -70,7 +62,6 @@ export function revokeToken(token?: string) {
   return Promise.resolve()
 }
 
-/** 获取当前用户信息（OpenID Connect userinfo） */
 export interface UserInfo {
   id: string
   username: string

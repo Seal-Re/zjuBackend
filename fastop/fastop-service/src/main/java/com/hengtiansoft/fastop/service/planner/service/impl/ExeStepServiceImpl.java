@@ -3,7 +3,9 @@ package com.hengtiansoft.fastop.service.planner.service.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 
@@ -14,7 +16,6 @@ import com.hengtiansoft.fastop.base.common.entity.Response.Response;
 import com.hengtiansoft.fastop.base.common.factory.ResponseFactory;
 
 import java.util.HashMap;
-import java.util.Map;
 import com.hengtiansoft.fastop.model.designer.entity.*;
 import com.hengtiansoft.fastop.model.planner.dto.ExeLogMapper;
 import com.hengtiansoft.fastop.model.planner.dto.ExeStepCommandDto;
@@ -24,11 +25,14 @@ import com.hengtiansoft.fastop.model.planner.entity.ExeStepExample;
 import com.hengtiansoft.fastop.model.planner.entity.ExeStepWithBLOBs;
 import com.hengtiansoft.fastop.model.planner.utils.ExeLog;
 import com.hengtiansoft.fastop.model.planner.utils.ExeStepCommand;
+import com.hengtiansoft.fastop.model.planner.dto.ems.MessageEtt;
+import com.hengtiansoft.fastop.service.config.IntegrationProperties;
 import com.hengtiansoft.fastop.service.designer.service.TestFunctionCaseService;
 import com.hengtiansoft.fastop.service.designer.service.TestFunctionModuleService;
 import com.hengtiansoft.fastop.service.designer.service.TestFunctionStepService;
+import com.hengtiansoft.fastop.service.integration.EmsMessageService;
 import com.hengtiansoft.fastop.service.planner.service.ExeStepService;
-import org.springframework.beans.BeanUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -60,6 +64,12 @@ public class ExeStepServiceImpl implements ExeStepService {
     private TestFunctionModuleService testFunctionModuleService;
     @Autowired
     private TestFunctionStepService testFunctionStepService;
+
+    @Autowired
+    private IntegrationProperties integrationProperties;
+
+    @Autowired
+    private EmsMessageService emsMessageService;
 
     @Override
     @Transactional(readOnly = false)
@@ -109,14 +119,37 @@ public class ExeStepServiceImpl implements ExeStepService {
 
                 for (TestFunctionStep step : steps) {
                     ExeStepWithBLOBs exeStep = new ExeStepWithBLOBs();
-                    BeanUtils.copyProperties(step, exeStep);
                     exeStep.setExeStepId(UUID.randomUUID().toString());
                     exeStep.setExeFunctionId(exeFunctionId);
+                    exeStep.setStepId(step.getStepId());
+                    String desc = step.getStepDescription();
+                    if (desc == null || desc.trim().isEmpty()) {
+                        desc = step.getStepName();
+                    }
+                    exeStep.setStepDescription(desc);
+                    exeStep.setOperation(step.getStepOperation());
+                    exeStep.setOperationObject(step.getStepObj());
+                    exeStep.setOperationContent(step.getStepPurpose());
                     exeStep.setExeStatus(TestPlanStatusContants.PLAN_STATUS_UNEXE);
-
-                    // Set default deleted if null
-                    if (exeStep.getDeleted() == null) exeStep.setDeleted(false);
-
+                    exeStep.setDeleted(false);
+                    try {
+                        Map<String, Object> cmd = new LinkedHashMap<>();
+                        cmd.put("topic", step.getStepObj());
+                        if (step.getStepCommandExample() != null && !step.getStepCommandExample().trim().isEmpty()) {
+                            cmd.put("example", objectMapper.readValue(step.getStepCommandExample(), Object.class));
+                        } else {
+                            cmd.put("example", new LinkedHashMap<String, Object>());
+                        }
+                        if (step.getStepCommandParams() != null && !step.getStepCommandParams().trim().isEmpty()) {
+                            cmd.put("params", objectMapper.readValue(step.getStepCommandParams(),
+                                    new TypeReference<Map<String, Object>>() {}));
+                        } else {
+                            cmd.put("params", new LinkedHashMap<String, Object>());
+                        }
+                        exeStep.setCommandData(objectMapper.writeValueAsString(cmd));
+                    } catch (Exception e) {
+                        exeStep.setCommandData("{\"topic\":\"\",\"example\":{},\"params\":{}}");
+                    }
                     exeStepMapper.insertSelective(exeStep);
                 }
             }
@@ -269,19 +302,65 @@ public class ExeStepServiceImpl implements ExeStepService {
     }
 
     public Response doV1(ExeStepCommand exeStepCommand) {
-        if (exeStepCommand == null || exeStepCommand.getUrl() == null || exeStepCommand.getExeStepId() == null) {
-            return ResponseFactory.failure("参数错误：Command URL ExeStepId不能为空, 接受数据：" + exeStepCommand);
+        if (exeStepCommand == null || exeStepCommand.getExeStepId() == null) {
+            return ResponseFactory.failure("参数错误：exeStepId 不能为空");
         }
-
-        executor.execute(() -> {
-            try {
-                processAsyncStep(exeStepCommand);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+        boolean legacyUrl = exeStepCommand.getUrl() != null && !exeStepCommand.getUrl().trim().isEmpty();
+        if (legacyUrl) {
+            executor.execute(() -> {
+                try {
+                    processAsyncStep(exeStepCommand);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } else {
+            String emsBase = integrationProperties.getEmsUrl();
+            if (emsBase == null || emsBase.trim().isEmpty()) {
+                return ResponseFactory.failure("未配置 fastop.integration.ems-url 且请求未携带 url");
             }
-        });
-
+            String sid = exeStepCommand.getExeStepId();
+            executor.execute(() -> processAsyncEms(sid));
+        }
         return ResponseFactory.success("指令已接收，正在异步处理中");
+    }
+
+    @Override
+    public Response previewEmsMessage(String exeStepId) {
+        if (exeStepId == null || exeStepId.isEmpty()) {
+            return ResponseFactory.failure("exeStepId 不能为空");
+        }
+        ExeStepWithBLOBs step = exeStepMapper.selectByPrimaryKey(exeStepId);
+        if (step == null) {
+            return ResponseFactory.failure("步骤不存在");
+        }
+        MessageEtt msg = emsMessageService.buildFromExeStep(step);
+        return ResponseFactory.success(msg);
+    }
+
+    private void processAsyncEms(String exeStepId) {
+        try {
+            ExeStepWithBLOBs step = exeStepMapper.selectByPrimaryKey(exeStepId);
+            if (step == null) {
+                return;
+            }
+            MessageEtt msg = emsMessageService.buildFromExeStep(step);
+            String base = integrationProperties.getEmsUrl().trim();
+            if (base.endsWith("/")) {
+                base = base.substring(0, base.length() - 1);
+            }
+            String path = integrationProperties.getEmsSendPath();
+            if (path == null || path.isEmpty()) {
+                path = "/addDefault";
+            }
+            if (!path.startsWith("/")) {
+                path = "/" + path;
+            }
+            String url = base + path;
+            restTemplate.postForObject(url, msg, String.class);
+        } catch (Exception e) {
+            LoggerFactory.getLogger(ExeStepServiceImpl.class).error("EMS 调用失败", e);
+        }
     }
 
     @Override

@@ -222,15 +222,14 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useGlobalFilterStore } from '@/store/globalFilter'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Edit, Connection, InfoFilled } from '@element-plus/icons-vue'
+import { InfoFilled } from '@element-plus/icons-vue'
 // API
-import { 
-    getTestSuites, 
-    createTestSuite, 
+import {
+    getTestSuites,
+    createTestSuite,
     updateTestSuite,
     getTestFunctions,
     submitTestSuite,
-    getTestSuiteDetail,
     getRely
 } from '@/api/designer'
 import { listAllBaseStructAndId } from '@/api/base' 

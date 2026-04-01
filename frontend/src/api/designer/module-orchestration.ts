@@ -1,8 +1,5 @@
 import request from '@/api/request'
 
-// Adjust path based on your setup. Usually just '/...' if proxy is set up.
-// Memory says: Vite proxies  to backend.
-
 export function getModuleTree(funId: number) {
   return request({
     url: '/designer/module/treeByFunId',
@@ -11,8 +8,7 @@ export function getModuleTree(funId: number) {
   })
 }
 
-// Case APIs
-export function addCase(data: any) {
+export function addCase(data: Record<string, unknown>) {
   return request({
     url: '/designer/case/add',
     method: 'post',
@@ -20,7 +16,7 @@ export function addCase(data: any) {
   })
 }
 
-export function updateCase(data: any) {
+export function updateCase(data: Record<string, unknown>) {
   return request({
     url: '/designer/case/update',
     method: 'post',
@@ -36,8 +32,7 @@ export function deleteCase(caseId: number) {
   })
 }
 
-// Step APIs
-export function addStep(data: any) {
+export function addStep(data: Record<string, unknown>) {
   return request({
     url: '/designer/step/add',
     method: 'post',
@@ -45,7 +40,7 @@ export function addStep(data: any) {
   })
 }
 
-export function updateStep(data: any) {
+export function updateStep(data: Record<string, unknown>) {
   return request({
     url: '/designer/step/update',
     method: 'post',
@@ -57,14 +52,14 @@ export function deleteStep(stepId: number) {
   return request({
     url: '/designer/step/delete',
     method: 'post',
-    params: { StepId: stepId } // Note: Param name matches Controller (capital S)
+    params: { StepId: stepId }
   })
 }
 
 export function deleteModule(moduleId: number) {
-    return request({
-        url: '/designer/module/delete',
-        method: 'post',
-        params: { ModuleId: moduleId }
-    })
+  return request({
+    url: '/designer/module/delete',
+    method: 'post',
+    params: { ModuleId: moduleId }
+  })
 }

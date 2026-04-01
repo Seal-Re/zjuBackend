@@ -5,8 +5,6 @@ import com.hengtiansoft.fastop.service.designer.service.TestBaseService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,30 +14,27 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class TestBaseController {
 
-    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
-
     @Autowired
     private TestBaseService testBaseService;
 
     @ApiOperation("用构型和子系统查询所有测试库")
     @GetMapping("/getTestBaseWithLimit")
     public Response getTestBaseWithLimit(@RequestParam("model") String model, @RequestParam("profession") String profession, @RequestParam("subsystem") String subsystem) {
-        LOG.info("Start getting testBase :model={}, profession={}, subsystem={}", model, profession, subsystem);
+        log.info("getTestBaseWithLimit model={} profession={} subsystem={}", model, profession, subsystem);
         return testBaseService.getTestBaseWithLimit(model, profession, subsystem);
     }
 
     @ApiOperation("获取指定测试库信息")
     @GetMapping("/getTestBaseInfo")
     public Response getTestBaseInfo(@RequestParam("targetGroupId") int targetGroupId, @RequestParam("baseType") int baseType, @RequestParam("entityStructId") int entityStructId) {
-        LOG.info("Start getting TestBaseInfo by targetGroupId={}, by baseType={}, by entityStructId={}", targetGroupId, baseType, entityStructId);
+        log.info("getTestBaseInfo targetGroupId={} baseType={} entityStructId={}", targetGroupId, baseType, entityStructId);
         return testBaseService.getTestBaseInfo(targetGroupId, baseType, entityStructId);
     }
 
-    @ApiOperation("获取指定测试库信息")
+    @ApiOperation("根据 baseId 获取测试库")
     @GetMapping("/{baseId}")
     public Response getTestBaseById(@PathVariable("baseId") Integer baseId) {
-        LOG.info("Start getting testBase by baseId :baseId={}", baseId);
+        log.info("getTestBaseById baseId={}", baseId);
         return testBaseService.getTestBaseById(baseId);
     }
-
 }

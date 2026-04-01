@@ -96,7 +96,7 @@ const router = createRouter({
 
 const whiteList = ['/login']
 
-router.beforeEach((to, from) => {
+router.beforeEach((to, _from) => {
   if (whiteList.includes(to.path)) {
     return true
   }

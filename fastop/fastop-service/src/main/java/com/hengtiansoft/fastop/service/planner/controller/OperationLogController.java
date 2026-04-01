@@ -5,8 +5,6 @@ import com.hengtiansoft.fastop.model.planner.utils.OperationLog;
 import com.hengtiansoft.fastop.service.planner.service.OperationLogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,15 +16,13 @@ import java.util.Date;
 @RequestMapping("/log/operation")
 public class OperationLogController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OperationLogController.class);
-
     @Autowired
     private OperationLogService operationLogService;
 
     @ApiOperation("记录操作日志")
     @PostMapping("/record")
-    public Response record(@RequestBody OperationLog log) {
-        return operationLogService.record(log);
+    public Response record(@RequestBody OperationLog operationLog) {
+        return operationLogService.record(operationLog);
     }
 
     @ApiOperation("分页查询操作日志")

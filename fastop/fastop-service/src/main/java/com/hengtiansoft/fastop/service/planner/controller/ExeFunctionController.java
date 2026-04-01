@@ -5,8 +5,6 @@ import com.hengtiansoft.fastop.service.planner.service.ExeFunctionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,23 +17,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/exeFunction")
 public class ExeFunctionController {
 
-    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
-
     @Autowired
     private ExeFunctionService exeFunctionService;
 
     @ApiOperation("获取指定测试作业计划下正在执行的功能")
     @GetMapping("/testFunctions/inexe/{planId}")
-    public Response getExeFunctionInExe(@PathVariable("planId") String planId){
-        LOG.info("start getting ExeFunctionInExe by planId",planId);
+    public Response getExeFunctionInExe(@PathVariable("planId") String planId) {
+        log.info("get ExeFunctionInExe by planId={}", planId);
         return exeFunctionService.getExeFunctionInExeListByPlanId(planId);
     }
 
     @ApiOperation("获取指定测试功能ID的功能")
     @GetMapping("/testFunctions/id/{functionId}")
     public Response getExeFunctionById(@PathVariable("functionId") String functionId) {
-        LOG.info("start getting ExeFunctionById by functionId",functionId);
+        log.info("get ExeFunctionById functionId={}", functionId);
         return exeFunctionService.getExeFunctionByFunctionId(functionId);
     }
-
 }

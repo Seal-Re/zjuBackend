@@ -174,7 +174,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useGlobalFilterStore } from '@/store/globalFilter'
 import { 
   createTestFunction, 
@@ -182,7 +182,6 @@ import {
   updateTestFunction, 
   submitTestFunction 
 } from '@/api/designer'
-// 【新增】引入新接口
 import { listAllBaseStructAndId } from '@/api/base' 
 
 import { Delete } from '@element-plus/icons-vue'

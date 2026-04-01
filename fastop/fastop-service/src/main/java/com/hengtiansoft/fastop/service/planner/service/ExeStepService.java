@@ -15,6 +15,9 @@ public interface ExeStepService {
     Response updateStepStatusByOption(String exeStepId, String option);
     Response doV1(ExeStepCommand exeStepCommand);
 
+    /** 按当前执行步骤构造即将发往 EMS 的 MessageEtt（预览） */
+    Response previewEmsMessage(String exeStepId);
+
     /** 保存步骤执行日志（军检审计落库） */
     Response saveLog(ExeLog exeLog);
 

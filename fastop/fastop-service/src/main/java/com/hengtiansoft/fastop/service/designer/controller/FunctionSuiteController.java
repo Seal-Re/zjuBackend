@@ -7,8 +7,6 @@ import com.hengtiansoft.fastop.service.designer.service.FunctionSuiteService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,42 +16,33 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/functionSuite")
 public class FunctionSuiteController {
 
-    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
-
     @Autowired
     private FunctionSuiteService functionSuiteService;
 
     @ApiOperation("获取全部模块清单")
     @GetMapping("/listAll")
     public Response listAllFunctionSuite() {
-        LOG.info("Start list all function suite");
+        log.info("listAllFunctionSuite");
         return functionSuiteService.listAllFunctionSuite();
     }
 
     @ApiOperation("增加模块清单")
     @PostMapping("/createFunctionSuite")
     public Response createFunctionSuite(@RequestBody FunSuiteIdConnectDto funSuiteIdConnectDto) {
-        LOG.info("Start create function suite");
+        log.info("createFunctionSuite");
         return functionSuiteService.createFunctionSuite(funSuiteIdConnectDto);
     }
 
     @ApiOperation("删除模块清单")
     @PostMapping("/deleteFunctionSuite")
     public Response deleteFunctionSuite(@RequestBody FunctionSuiteDeleteDto functionSuiteDeleteDto) {
-        LOG.info("Start delete function suite");
+        log.info("deleteFunctionSuite");
         return functionSuiteService.deleteFunctionSuite(functionSuiteDeleteDto);
-
     }
-
 
     @ApiOperation("获取指定测试集和指定测试类型下的所有功能")
     @GetMapping("/rely")
     public Response getRely(@RequestParam Integer suiteId) {
-
         return functionSuiteService.getRely(suiteId);
     }
-
-
-
-
 }

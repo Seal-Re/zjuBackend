@@ -17,6 +17,12 @@ public class TestFunctionStep {
 
     private String stepObj;
 
+    /** 设备管理服务返回的示例报文 JSON 字符串 */
+    private String stepCommandExample;
+
+    /** 用户对示例报文可填字段的键值 JSON（如 {\"a.b\":\"v\"}） */
+    private String stepCommandParams;
+
     private String stepPurpose;
 
     private Boolean totalSend;
@@ -91,6 +97,22 @@ public class TestFunctionStep {
 
     public void setStepObj(String stepObj) {
         this.stepObj = stepObj == null ? null : stepObj.trim();
+    }
+
+    public String getStepCommandExample() {
+        return stepCommandExample;
+    }
+
+    public void setStepCommandExample(String stepCommandExample) {
+        this.stepCommandExample = stepCommandExample;
+    }
+
+    public String getStepCommandParams() {
+        return stepCommandParams;
+    }
+
+    public void setStepCommandParams(String stepCommandParams) {
+        this.stepCommandParams = stepCommandParams;
     }
 
     public String getStepPurpose() {

@@ -62,7 +62,7 @@
     <el-dialog
       v-model="dialogVisible"
       :title="isEdit ? '编辑节点' : '创建节点'"
-      width="600px"
+      width="720px"
     >
       <el-form :model="form" ref="formRef" label-width="120px" :rules="rules">
         <!-- Area 1: Base Info -->
@@ -93,9 +93,29 @@
           <el-form-item label="操作内容" prop="operation">
             <el-input v-model="form.operation" />
           </el-form-item>
-          <el-form-item label="操作对象" prop="obj">
-            <el-input v-model="form.obj" />
+          <el-form-item label="操作对象 (topic)" prop="obj">
+            <el-select
+              v-model="form.obj"
+              filterable
+              allow-create
+              default-first-option
+              placeholder="从设备服务选择或手动输入 topic"
+              style="width: 100%"
+            >
+              <el-option v-for="t in deviceTopics" :key="t" :label="t" :value="t" />
+            </el-select>
+            <div class="hint">数据来自设备管理服务；派发执行时会写入 EMS 的 eventType。</div>
           </el-form-item>
+          <div v-if="paramFields.length" class="param-block">
+            <h4>报文可填字段</h4>
+            <el-form-item
+              v-for="f in paramFields"
+              :key="f.path"
+              :label="f.path"
+            >
+              <el-input v-model="paramValues[f.path]" placeholder="填充值" />
+            </el-form-item>
+          </div>
           <el-form-item label="操作目的">
              <el-input v-model="form.purpose" type="textarea" />
           </el-form-item>
@@ -113,10 +133,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getModuleTree, addCase, updateCase, deleteCase, addStep, updateStep, deleteStep, deleteModule } from '@/api/designer/module-orchestration'
+import { getDeviceTopics } from '@/api/integration'
 // Assuming addModule exists or reusing similar for "Create Use Case" (Module) if needed.
 // Since I don't have addModule imported, I'll assume "Create Use Case" creates a Case on the first module for now,
 // or I should verify if I can import addModule from designer.
@@ -200,6 +221,90 @@ const form = reactive({
   parentType: ''
 })
 
+const deviceTopics = ref<string[]>([])
+const deviceExample = ref<Record<string, unknown> | null>(null)
+const paramFields = ref<{ path: string; sample: unknown }[]>([])
+const paramValues = reactive<Record<string, string>>({})
+const stepEditContext = ref<any>(null)
+
+function collectLeafFields(obj: unknown, prefix = ''): { path: string; sample: unknown }[] {
+  const out: { path: string; sample: unknown }[] = []
+  if (obj === null || typeof obj !== 'object') {
+    if (prefix) out.push({ path: prefix, sample: obj })
+    return out
+  }
+  if (Array.isArray(obj)) {
+    if (prefix) out.push({ path: prefix, sample: JSON.stringify(obj) })
+    return out
+  }
+  const keys = Object.keys(obj as object)
+  for (const k of keys) {
+    const p = prefix ? `${prefix}.${k}` : k
+    const v = (obj as Record<string, unknown>)[k]
+    if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
+      out.push(...collectLeafFields(v, p))
+    } else {
+      out.push({ path: p, sample: v })
+    }
+  }
+  return out
+}
+
+async function loadDeviceTopics() {
+  const res: any = await getDeviceTopics()
+  deviceTopics.value = Array.isArray(res?.topics) ? res.topics : []
+  const skipExample =
+    isEdit.value && stepEditContext.value && stepEditContext.value.commandExample
+  if (!skipExample) {
+    deviceExample.value = (res?.example && typeof res.example === 'object')
+      ? (res.example as Record<string, unknown>)
+      : {}
+  }
+}
+
+function rebuildParamUiFromExample() {
+  const ex = deviceExample.value
+  paramFields.value = ex ? collectLeafFields(ex) : []
+  const srcParams =
+    isEdit.value && stepEditContext.value?.commandParams
+      ? (() => {
+          try {
+            return JSON.parse(stepEditContext.value.commandParams) as Record<string, unknown>
+          } catch {
+            return {}
+          }
+        })()
+      : null
+  Object.keys(paramValues).forEach((k) => delete paramValues[k])
+  for (const f of paramFields.value) {
+    const fromSaved = srcParams && srcParams[f.path] != null
+    if (fromSaved) {
+      paramValues[f.path] = String(srcParams![f.path])
+    } else {
+      paramValues[f.path] =
+        f.sample === undefined || f.sample === null ? '' : String(f.sample)
+    }
+  }
+}
+
+watch(dialogVisible, async (v) => {
+  if (!v || form.type !== 'STEP') return
+  try {
+    await loadDeviceTopics()
+    if (isEdit.value && stepEditContext.value?.commandExample) {
+      try {
+        deviceExample.value = JSON.parse(stepEditContext.value.commandExample)
+      } catch {
+        deviceExample.value = {}
+      }
+    }
+    rebuildParamUiFromExample()
+  } catch (e) {
+    console.error(e)
+    ElMessage.error('获取设备 topic 失败，请检查 device-controller-mock 与 application.yml')
+  }
+})
+
 const rules = {
   type: [{ required: true, message: '请选择类型', trigger: 'change' }],
   name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
@@ -214,6 +319,7 @@ const allowStepCreation = computed(() => !isEdit.value && form.parentType === 'C
 
 // Open Dialog for "Create Use Case" (Module) - Top Level
 const openCreateModule = () => {
+    stepEditContext.value = null
     isEdit.value = false
     form.id = undefined
     form.name = ''
@@ -230,6 +336,7 @@ const openCreateModule = () => {
 }
 
 const openCreateDialog = (row: any) => {
+  stepEditContext.value = null
   isEdit.value = false
   form.id = undefined
   form.name = ''
@@ -253,6 +360,7 @@ const openCreateDialog = (row: any) => {
 }
 
 const openEditDialog = (row: any) => {
+  stepEditContext.value = row.type === 'STEP' ? row : null
   isEdit.value = true
   form.id = row.id
   form.name = row.name
@@ -285,6 +393,8 @@ const submitForm = async () => {
                     stepDescription: form.description,
                     stepOperation: form.operation,
                     stepObj: form.obj,
+                    stepCommandExample: JSON.stringify(deviceExample.value ?? {}),
+                    stepCommandParams: JSON.stringify(paramValues),
                     stepPurpose: form.purpose
                 })
             } else if (form.type === 'MODULE') {
@@ -310,6 +420,8 @@ const submitForm = async () => {
                     stepDescription: form.description,
                     stepOperation: form.operation,
                     stepObj: form.obj,
+                    stepCommandExample: JSON.stringify(deviceExample.value ?? {}),
+                    stepCommandParams: JSON.stringify(paramValues),
                     stepPurpose: form.purpose,
                     caseId: form.parentId // Parent is Case
                 })
@@ -377,5 +489,20 @@ h3 {
     font-size: 16px;
     font-weight: bold;
     color: #333;
+}
+.param-block {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #e4e7ed;
+}
+.param-block h4 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #606266;
+}
+.hint {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 4px;
 }
 </style>

@@ -2,14 +2,11 @@ package com.hengtiansoft.fastop.service.designer.controller;
 
 import com.hengtiansoft.fastop.base.common.entity.Response.Response;
 import com.hengtiansoft.fastop.model.designer.dto.TestSuiteRequestDto;
-import com.hengtiansoft.fastop.model.designer.entity.TestSuite;
 import com.hengtiansoft.fastop.service.designer.service.TestSuiteService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,57 +16,55 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class TestSuiteController {
 
-    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
-
     @Autowired
     private TestSuiteService testSuiteService;
 
     @ApiOperation("新增清单")
     @PostMapping("/add")
     public Response addTestSuite(@RequestBody TestSuiteRequestDto testSuiteRequestDto) {
-        LOG.info("开始新增清单: {}", testSuiteRequestDto);
+        log.info("addTestSuite: {}", testSuiteRequestDto);
         return testSuiteService.add(testSuiteRequestDto);
     }
 
     @ApiOperation("修改清单")
     @PostMapping("/update")
     public Response updateTestSuite(@RequestBody TestSuiteRequestDto testSuiteRequestDto) {
-        LOG.info("开始修改清单: {}", testSuiteRequestDto);
+        log.info("updateTestSuite: {}", testSuiteRequestDto);
         return testSuiteService.update(testSuiteRequestDto);
     }
 
     @ApiOperation("提交清单")
     @PostMapping("/submit")
-    public Response submitTestSuite(@RequestBody Integer suiteId){
-        LOG.info("开始修改模块，ID: {}", suiteId);
+    public Response submitTestSuite(@RequestBody Integer suiteId) {
+        log.info("submitTestSuite suiteId={}", suiteId);
         return testSuiteService.submit(suiteId);
     }
 
     @ApiOperation("删除清单")
     @PostMapping("/delete")
     public Response deleteTestSuite(@RequestBody Integer suiteId) {
-        LOG.info("开始删除清单: {}", suiteId);
+        log.info("deleteTestSuite suiteId={}", suiteId);
         return testSuiteService.delete(suiteId);
     }
 
     @ApiOperation("根据ID查询单个清单详情")
     @GetMapping("/get/{suiteId}")
-    public Response getTestSuiteById(@ApiParam("清单Id")@PathVariable Integer suiteId) {
-        LOG.info("查询清单详情, Id: {}", suiteId);
+    public Response getTestSuiteById(@ApiParam("清单Id") @PathVariable Integer suiteId) {
+        log.info("getTestSuiteById suiteId={}", suiteId);
         return testSuiteService.getById(suiteId);
     }
 
     @ApiOperation("根据BaseId查询清单列表")
     @GetMapping("/listByBaseId")
     public Response listTestSuiteByBaseId(@RequestParam Integer testBaseId) {
-        LOG.info("开始查询列表, BaseId: {}", testBaseId);
+        log.info("listTestSuiteByBaseId testBaseId={}", testBaseId);
         return testSuiteService.listByBaseId(testBaseId);
     }
 
     @ApiOperation("查询全部清单")
     @GetMapping("/listAll")
     public Response listAll() {
-        LOG.info("开始查询");
+        log.info("listAll test suites");
         return testSuiteService.listAll();
     }
 
@@ -84,7 +79,4 @@ public class TestSuiteController {
     public Response getCheckTestSuite() {
         return testSuiteService.getCheckTestSuite();
     }
-
-
-
 }

@@ -11,10 +11,6 @@ public class ResponseFactory {
     private ResponseFactory() {
     }
 
-    /**
-     * 静态内部类，用于构建 Response 对象
-     * @param <T>
-     */
     public static class ResponseBuilder<T> {
         private int code;
         private String msg;
@@ -59,11 +55,6 @@ public class ResponseFactory {
         }
     }
 
-    /**
-     * 公共构建方法
-     * @return
-     * @param <T>
-     */
     public static <T> ResponseBuilder<T> builder() {
             return new ResponseBuilder<>();
         }
@@ -81,9 +72,6 @@ public class ResponseFactory {
         }
 
 
-        /**
-         * feign 返回值时获取真实数据
-         */
         public static <T> T getFeignData(Response<T> respData) {
             if (respData == null || respData.getCode() != ResponseCode.SUCC_CODE || respData.getData() == null) {
                 return null;
