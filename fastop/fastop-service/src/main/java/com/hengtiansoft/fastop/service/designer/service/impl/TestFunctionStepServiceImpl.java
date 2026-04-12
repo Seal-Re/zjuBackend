@@ -12,6 +12,8 @@ import com.hengtiansoft.fastop.service.designer.service.TestFunctionStepService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.hengtiansoft.fastop.base.common.context.UserContextHolder;
+
 import java.util.Date;
 import java.util.List;
 
@@ -27,8 +29,7 @@ public class TestFunctionStepServiceImpl implements TestFunctionStepService {
         testFunctionStep.setStepStatus(StatusContants.step_status_unuse);
         testFunctionStep.setStepDate(String.valueOf(new Date()));
         testFunctionStep.setUpdated(StatusContants.step_update_change);
-        // TODO
-        testFunctionStep.setChangeUser(null);
+        testFunctionStep.setChangeUser(UserContextHolder.getCurrentUser());
 
         int count = testFunctionStepMapper.insertSelective(testFunctionStep);
 

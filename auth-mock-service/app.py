@@ -49,6 +49,8 @@ ROLE_PERMISSIONS = {'r1': ['p1', 'p2', 'p3', 'p4', 'p5'], 'r2': ['p4'], 'r3': ['
 @app.route('/oauth/token', methods=['POST'])
 def token():
     """获取令牌。grant_type=password 时传 username, password"""
+    # Flask 3 中 get_json() 在非 application/json 请求下会抛 415，
+    # 这里使用 silent=True 兼容 x-www-form-urlencoded。
     body = request.get_json(silent=True) or request.form.to_dict() or dict(request.args) or {}
     grant_type = body.get('grant_type', 'password')
     if grant_type == 'password':
@@ -134,7 +136,7 @@ def _bearer_token():
 @app.route('/api/v1/users', methods=['POST'])
 def create_user():
     """注册/创建用户"""
-    body = request.get_json(silent=True) or {}
+    body = request.get_json() or {}
     uid = str(len(MOCK_USERS) + 1)
     MOCK_USERS.append({
         'id': uid,
@@ -160,7 +162,7 @@ def update_user(uid):
     u = next((x for x in MOCK_USERS if x['id'] == uid), None)
     if not u:
         return std_response(None, 'user not found', 404)
-    body = request.get_json(silent=True) or {}
+    body = request.get_json() or {}
     for k in ('name', 'email', 'enabled'):
         if k in body:
             u[k] = body[k]
@@ -169,7 +171,7 @@ def update_user(uid):
 
 @app.route('/api/v1/users/<uid>/password/reset', methods=['POST'])
 def reset_password(uid):
-    body = request.get_json(silent=True) or {}
+    body = request.get_json() or {}
     new_password = body.get('newPassword') or body.get('password')
     if not new_password:
         return std_response(None, 'newPassword required', 400)
@@ -184,7 +186,7 @@ def list_roles():
 
 @app.route('/api/v1/roles', methods=['POST'])
 def create_role():
-    body = request.get_json(silent=True) or {}
+    body = request.get_json() or {}
     rid = 'r' + str(len(MOCK_ROLES) + 1)
     MOCK_ROLES.append({
         'id': rid,
@@ -197,7 +199,7 @@ def create_role():
 
 @app.route('/api/v1/roles/<rid>/permissions', methods=['POST'])
 def bind_role_permissions(rid):
-    body = request.get_json(silent=True) or {}
+    body = request.get_json() or {}
     perm_codes = body.get('permissions') or body.get('permissionCodes') or []
     ROLE_PERMISSIONS[rid] = perm_codes if isinstance(perm_codes[0], str) else [p.get('code') for p in perm_codes]
     return std_response({'roleId': rid, 'permissions': ROLE_PERMISSIONS.get(rid, [])})

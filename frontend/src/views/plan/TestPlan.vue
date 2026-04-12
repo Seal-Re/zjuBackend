@@ -103,6 +103,7 @@
               <el-select 
                 v-model="cascadeFilter.model" 
                 placeholder="选择机型" 
+                :disabled="isEdit"
                 @change="handleModelChange"
                 filterable
               >
@@ -115,7 +116,7 @@
               <el-select 
                 v-model="cascadeFilter.profession" 
                 placeholder="选择专业" 
-                :disabled="!cascadeFilter.model"
+                :disabled="!cascadeFilter.model || isEdit"
                 @change="handleProfessionChange"
                 filterable
               >
@@ -128,7 +129,7 @@
               <el-select 
                 v-model="cascadeFilter.subsystem" 
                 placeholder="选择子系统" 
-                :disabled="!cascadeFilter.profession"
+                :disabled="!cascadeFilter.profession || isEdit"
                 @change="handleSubsystemChange"
                 filterable
               >
@@ -144,7 +145,7 @@
             placeholder="请先选择子系统以加载可用清单" 
             style="width: 100%"
             :loading="loadingSuites"
-            :disabled="!form.entityId"
+            :disabled="!form.entityId || isEdit"
             no-data-text="该构型下暂无已发布的测试清单"
           >
              <el-option 
@@ -216,7 +217,9 @@
           <el-table :data="dispatchResult.functions || []" border height="400">
              <el-table-column type="index" label="序号" width="60" />
              <el-table-column property="exeFunctionId" label="功能ID" width="100" />
-             <el-table-column property="exeFunctionName" label="功能名称" />
+             <el-table-column label="功能名称">
+               <template #default="{ row }">{{ row.functionName || row.exeFunctionName || row.funName || '-' }}</template>
+             </el-table-column>
           </el-table>
         </el-tab-pane>
         <el-tab-pane label="步骤列表">
@@ -224,7 +227,9 @@
              <el-table-column type="index" label="序号" width="60" />
              <el-table-column property="exeStepId" label="步骤ID" width="100" />
              <el-table-column property="stepName" label="步骤名称" />
-             <el-table-column property="stepDesc" label="步骤描述" show-overflow-tooltip />
+             <el-table-column label="步骤描述" show-overflow-tooltip>
+               <template #default="{ row }">{{ row.stepDescription || row.stepDesc || '-' }}</template>
+             </el-table-column>
           </el-table>
         </el-tab-pane>
       </el-tabs>

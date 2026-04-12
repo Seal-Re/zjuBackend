@@ -8,6 +8,7 @@ import com.hengtiansoft.fastop.base.common.constants.Status.TestPlanStatusContan
 import com.hengtiansoft.fastop.base.common.entity.Response.Response;
 import com.hengtiansoft.fastop.base.common.factory.ResponseFactory;
 import com.hengtiansoft.fastop.model.designer.dto.FunctionSuiteDto;
+import com.hengtiansoft.fastop.model.designer.dto.TestFunctionRelyMapper;
 import com.hengtiansoft.fastop.model.designer.entity.*;
 import com.hengtiansoft.fastop.model.planner.dto.ExeFunctionMapper;
 import com.hengtiansoft.fastop.model.planner.dto.ExeStepMapper;
@@ -46,6 +47,9 @@ public class ExeFunctionServiceImpl implements ExeFunctionService {
 
     @Autowired
     private ExeFunctionMapper exeFunctionMapper;
+
+    @Autowired
+    private TestFunctionRelyMapper testFunctionRelyMapper;
 
 
     @Override
@@ -171,46 +175,32 @@ public class ExeFunctionServiceImpl implements ExeFunctionService {
         eFunction.setMilitary(function.getMilitary());
         eFunction.setKeyProCount(function.getKeyProCount());
 
-        // TODO: Feature pending due to missing entity [TestFunctionRely] or mapper method getRely in Target
-        // Reference uses: List<Integer> lists = exeFunctionMapper.getRely(function.getFunId(), functionSuite.getSuiteId());
-        // Target's ExeFunctionMapper does not have getRely. We need to implement it via TestFunctionRelyMapper if available locally?
-        // Checked file list: fastop/fastop-service/src/main/java/com/hengtiansoft/fastop/service/designer/service/impl/ExeFunctionServiceImpl.java
-        // Wait, I am modifying ExeFunctionServiceImpl in Planner.
-        // I need to check if I can access TestFunctionRelyMapper.
-        // It seems TestFunctionRelyMapper is in designer package?
-        // Let's assume for now we skip relying logic or use empty list to proceed, as per instructions to comment out missing parts?
-        // Actually, TestFunctionRely is a standard entity in Designer, so I might be able to inject it if I had the mapper.
-        // But the instruction says "don't create target repository models or mappers if missing".
-        // I'll check if TestFunctionRelyMapper is available in Target.
-        // (From previous file list: fastop-model-designer contains TestFunctionRely.java)
-        // So I can use it if I inject the mapper. But the Mapper might be in fastop-dal-designer.
-        // Since I can't verify fastop-dal-designer content easily without listing it again (and I recall seeing it),
-        // I will assume for now I cannot use custom mapper methods not in the Interface.
-        // So I will comment out the dependsOn logic or leave it empty.
+        // 查询该功能在当前套件中的依赖关系
+        TestFunctionRelyExample relyExample = new TestFunctionRelyExample();
+        relyExample.createCriteria()
+                .andTestFunctionIdEqualTo(function.getFunId())
+                .andSuiteIdEqualTo(functionSuite.getSuiteId())
+                .andDeletedEqualTo(false);
+        List<TestFunctionRely> relies = testFunctionRelyMapper.selectByExample(relyExample);
 
-        // List<Integer> lists = getRelyByExample(function.getFunId(), functionSuite.getSuiteId());
-        // if (lists != null && !lists.isEmpty()) {
-        //     eFunction.setDependsOn(StringUtils.join(lists, ','));
-        // } else {
-             eFunction.setDependsOn("");
-        // }
+        List<Integer> relyIds = relies.stream()
+                .map(TestFunctionRely::getRelyFunctionId)
+                .collect(Collectors.toList());
+
+        if (!relyIds.isEmpty()) {
+            eFunction.setDependsOn(StringUtils.join(relyIds, ','));
+            eFunction.setIsReady(false);
+        } else {
+            eFunction.setDependsOn("");
+            eFunction.setIsReady(true);
+        }
 
         eFunction.setCaution(function.getCaution());
         eFunction.setDetectId(function.getDetectId());
 
-        // 设置是否准备就绪
-        // if (lists.isEmpty()) {
-            eFunction.setIsReady(true);
-        // }
-
         exeFunctionMapper.insertSelective(eFunction);
         return exeFunId;
     }
-
-    // public List<Integer> getRelyByExample(Integer testFunctionId, Integer suiteId) {
-    //      // Implementation would go here if Mapper was available
-    //      return Collections.emptyList();
-    // }
 
     @Override
     @Transactional(readOnly = false)
@@ -260,39 +250,61 @@ public class ExeFunctionServiceImpl implements ExeFunctionService {
     // public Map<String, List<ExeFunctionResponseDto>> listSortExeFunction(String planId) { ... }
 
     /**
-     * 状态更新逻辑 (Replaced StateContext with direct updates or simplified logic)
+     * 根据操作指令推进执行功能的状态，带合法性校验。
+     * 状态流转：
+     *   runFunction  : UNEXE(0) / PAUSE(3)  → EXEING(2)
+     *   runPause     : EXEING(2)             → PAUSE(3)
+     *   doFinish     : EXEING(2)             → FINISH(6)
+     *   doInvalid    : 任意未完成状态        → UNEXE(0)（重置）
+     *   restartRun   : PAUSE(3)              → EXEING(2)
      */
     @Transactional(readOnly = false)
     public boolean updateFunctionStatusByOption(String exeFunctionId, String option) {
-        boolean done_result = false;
-
         ExeFunction exeFunction = exeFunctionMapper.selectByPrimaryKey(exeFunctionId);
         if (exeFunction == null) return false;
 
-        // TODO: Feature pending due to missing entity [FunctionStateContext]
-        // Implementing basic status transition based on option directly without StateMachine context
-
+        int current = exeFunction.getExeStatus();
         int targetStatus = -1;
 
-        if ("runFunction".equals(option)) {
-            // Start running
-             targetStatus = TestPlanStatusContants.PLAN_STATUS_EXEING; // Using PLAN constants as placeholders or map to Function constants
-        } else if ("runPause".equals(option)) {
-             targetStatus = TestPlanStatusContants.PLAN_STATUS_PAUSE;
-        } else if ("doFinish".equals(option)) {
-             targetStatus = TestPlanStatusContants.PLAN_STATUS_FINISH;
-        } else if ("doInvalid".equals(option)) {
-             // targetStatus = INVALID?
-        } else if ("restartRun".equals(option)) {
-             targetStatus = TestPlanStatusContants.PLAN_STATUS_EXEING;
+        switch (option) {
+            case "runFunction":
+                if (current == TestPlanStatusContants.PLAN_STATUS_UNEXE
+                        || current == TestPlanStatusContants.PLAN_STATUS_PAUSE) {
+                    targetStatus = TestPlanStatusContants.PLAN_STATUS_EXEING;
+                }
+                break;
+            case "runPause":
+                if (current == TestPlanStatusContants.PLAN_STATUS_EXEING) {
+                    targetStatus = TestPlanStatusContants.PLAN_STATUS_PAUSE;
+                }
+                break;
+            case "doFinish":
+                if (current == TestPlanStatusContants.PLAN_STATUS_EXEING) {
+                    targetStatus = TestPlanStatusContants.PLAN_STATUS_FINISH;
+                }
+                break;
+            case "doInvalid":
+                if (current != TestPlanStatusContants.PLAN_STATUS_FINISH) {
+                    targetStatus = TestPlanStatusContants.PLAN_STATUS_UNEXE;
+                }
+                break;
+            case "restartRun":
+                if (current == TestPlanStatusContants.PLAN_STATUS_PAUSE) {
+                    targetStatus = TestPlanStatusContants.PLAN_STATUS_EXEING;
+                }
+                break;
+            default:
+                LOG.warn("updateFunctionStatusByOption: 未知操作指令 [{}]", option);
+                return false;
         }
 
-        if (targetStatus != -1) {
-            exeFunction.setExeStatus(targetStatus);
-            done_result = exeFunctionMapper.updateByPrimaryKeySelective(exeFunction) > 0;
+        if (targetStatus == -1) {
+            LOG.warn("updateFunctionStatusByOption: 当前状态 [{}] 不允许执行操作 [{}]", current, option);
+            return false;
         }
 
-        return done_result;
+        exeFunction.setExeStatus(targetStatus);
+        return exeFunctionMapper.updateByPrimaryKeySelective(exeFunction) > 0;
     }
 
     /**

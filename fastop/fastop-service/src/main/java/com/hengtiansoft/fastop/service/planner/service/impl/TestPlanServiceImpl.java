@@ -22,6 +22,7 @@ import com.hengtiansoft.fastop.service.designer.service.TestSuiteService;
 import com.hengtiansoft.fastop.service.planner.service.ExeFunctionService;
 import com.hengtiansoft.fastop.service.planner.service.OperationLogService;
 import com.hengtiansoft.fastop.service.planner.service.TestPlanService;
+import com.hengtiansoft.fastop.base.common.context.UserContextHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -191,7 +192,22 @@ public class TestPlanServiceImpl implements TestPlanService {
     }
 
     @Override
-    @Transactional(readOnly = false) // 添加事务管理
+    public Response remarkTestPlan(String planId, String remark) {
+        if (StringUtils.isBlank(planId)) {
+            return ResponseFactory.failure("planId 不能为空");
+        }
+        TestPlan testPlan = testPlanMapper.selectByPrimaryKey(planId);
+        if (testPlan == null) {
+            return ResponseFactory.failure("未找到对应计划");
+        }
+        // TestPlan 实体暂无 remark 列，此处预留更新点；当前仅记录操作日志
+        recordOperationLog("测试计划", "备注", "计划", planId,
+                remark != null ? remark : "");
+        return ResponseFactory.success("备注已记录");
+    }
+
+    @Override
+    @Transactional(readOnly = false)
     public Response deleteSingleTestPlan(String planId) {
 
         if (StringUtils.isBlank(planId)) {
@@ -394,8 +410,9 @@ public class TestPlanServiceImpl implements TestPlanService {
     private void recordOperationLog(String module, String action, String targetType, String targetId, String detail) {
         try {
             OperationLog log = new OperationLog();
-            log.setOperatorId("system");
-            log.setOperatorName("系统");
+            String currentUser = UserContextHolder.getCurrentUser();
+            log.setOperatorId(currentUser);
+            log.setOperatorName(currentUser);
             log.setModule(module);
             log.setAction(action);
             log.setTargetType(targetType);

@@ -1,9 +1,13 @@
+/**
+ * 认证/用户服务专用请求实例
+ * 基地址为独立认证服务（可通过 .env 配置 VITE_AUTH_API），
+ * 请求头自动携带 Authorization: Bearer {token}
+ */
 import axios, { type AxiosInstance } from 'axios'
 import { ElMessage } from 'element-plus'
 
-const baseURL =
-  import.meta.env.VITE_AUTH_API ||
-  (import.meta.env.DEV ? '/auth-api' : 'http://localhost:5000')
+// 默认直连本地认证 mock，避免非 Vite 代理环境下出现 /auth-api 404
+const baseURL = import.meta.env.VITE_AUTH_API || 'http://localhost:5000'
 
 const authService: AxiosInstance = axios.create({
   baseURL,
@@ -23,13 +27,13 @@ authService.interceptors.response.use(
   response => {
     const res = response.data
     if (res.code !== 200 && res.code !== 201) {
-      ElMessage.error(res.message || res.msg || '请求失败')
-      return Promise.reject(new Error(res.message || res.msg || 'Error'))
+      ElMessage.error(res.message || '请求失败')
+      return Promise.reject(new Error(res.message || 'Error'))
     }
     return res.data
   },
   error => {
-    ElMessage.error(error.response?.data?.message || error.response?.data?.msg || error.message)
+    ElMessage.error(error.response?.data?.message || error.message)
     return Promise.reject(error)
   }
 )

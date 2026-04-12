@@ -10,6 +10,8 @@ import com.hengtiansoft.fastop.service.designer.service.TestFunctionModuleServic
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.hengtiansoft.fastop.base.common.context.UserContextHolder;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -35,8 +37,7 @@ public class TestFunctionModuleServiceImpl implements TestFunctionModuleService 
         testFunctionModule.setModuleStatus(StatusContants.step_status_unuse);
         testFunctionModule.setModuleDate(String.valueOf(new Date()));
         testFunctionModule.setUpdated(StatusContants.step_update_change);
-        //TODO
-        testFunctionModule.setChangeUser(null);
+        testFunctionModule.setChangeUser(UserContextHolder.getCurrentUser());
         int count = testFunctionModuleMapper.insertSelective(testFunctionModule);
 
         if (count > 0) {

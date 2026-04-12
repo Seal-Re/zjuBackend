@@ -13,6 +13,8 @@ import com.hengtiansoft.fastop.service.designer.service.TestFunctionStepService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.hengtiansoft.fastop.base.common.context.UserContextHolder;
+
 import java.util.Date;
 import java.util.List;
 
@@ -31,8 +33,7 @@ public class TestFunctionCaseServiceImpl implements TestFunctionCaseService {
         testFunctionCase.setCaseStatus(StatusContants.step_status_unuse);
         testFunctionCase.setCaseDate(String.valueOf(new Date()));
         testFunctionCase.setUpdated(StatusContants.step_update_change);
-        // TODO
-        testFunctionCase.setChangeUser(null);
+        testFunctionCase.setChangeUser(UserContextHolder.getCurrentUser());
 
         int count = testFunctionCaseMapper.insertSelective(testFunctionCase);
 

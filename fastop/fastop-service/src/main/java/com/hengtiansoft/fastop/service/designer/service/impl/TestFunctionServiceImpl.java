@@ -17,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
+import com.hengtiansoft.fastop.base.common.context.UserContextHolder;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -77,7 +78,7 @@ public class TestFunctionServiceImpl implements TestFunctionService {
         testFunction.setCreatedAt(new Date());
         testFunction.setUpdatedAt(new Date());
 
-        testFunction.setCreatedBy("TODO");
+        testFunction.setCreatedBy(UserContextHolder.getCurrentUser());
 
         testFunction.setDeleted(Boolean.FALSE);
 
@@ -282,11 +283,14 @@ public class TestFunctionServiceImpl implements TestFunctionService {
         if (level != function.getApproveStatus()) {
             return ResponseFactory.failure("审签步骤不匹配，实际步骤为 " + StatusContants.FUNS_APP_LEVEL[function.getApproveStatus()]);
         }
-        /*
-        if (expectedWorker == null || !expectedWorker.equals(checkWorker)) {
-            return ResponseFactory.failure("工作人员 [" + checkWorker + "] 无权在级别 " + level + " 进行 ["+StatusContants.FUNS_APP_LEVEL[level]+"]操作 期望工作人员: [" + expectedWorker + "]");
-        }*/
-        //TODO
+
+        // 提交阶段（level=0）由任意操作人发起，后续各级需校验指定责任人
+        if (level != StatusContants.funs_app_submit) {
+            if (expectedWorker == null || !expectedWorker.equals(checkWorker)) {
+                return ResponseFactory.failure("工作人员 [" + checkWorker + "] 无权在级别 " + level
+                        + " 进行 [" + StatusContants.FUNS_APP_LEVEL[level] + "] 操作，期望工作人员: [" + expectedWorker + "]");
+            }
+        }
 
         function.setApproveStatus(targetApproveStatus);
         Integer updateCount = testFunctionMapper.updateByPrimaryKeySelective(function);

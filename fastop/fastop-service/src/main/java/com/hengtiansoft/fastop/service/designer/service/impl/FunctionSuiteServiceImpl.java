@@ -7,6 +7,7 @@ import com.hengtiansoft.fastop.base.common.entity.Response.Response;
 import com.hengtiansoft.fastop.base.common.factory.ResponseFactory;
 import com.hengtiansoft.fastop.model.designer.dto.*;
 import com.hengtiansoft.fastop.model.designer.entity.*;
+import com.hengtiansoft.fastop.model.designer.dto.TestFunctionRelyMapper;
 import com.hengtiansoft.fastop.service.designer.service.FunctionSuiteService;
 import com.hengtiansoft.fastop.service.designer.service.TestFunctionService;
 import com.hengtiansoft.fastop.service.designer.service.TestSuiteService;
@@ -38,6 +39,9 @@ public class FunctionSuiteServiceImpl implements FunctionSuiteService {
 
     @Autowired
     private TestFunctionMapper testFunctionMapper;
+
+    @Autowired
+    private TestFunctionRelyMapper testFunctionRelyMapper;
 
     @Override
     public Response listAllFunctionSuite() {
@@ -138,7 +142,7 @@ public class FunctionSuiteServiceImpl implements FunctionSuiteService {
             FunctionSuite originFunction = originMap.get(funId);
 
             if (originFunction == null) {
-                // TODO: 记录日志或抛出异常：数据不一致
+                LOG.warn("deleteFunctionSuite: suiteId={} 中找不到 funId={} 对应的 FunctionSuite 记录，已跳过", suiteId, funId);
                 continue;
             }
 
@@ -157,12 +161,20 @@ public class FunctionSuiteServiceImpl implements FunctionSuiteService {
 
         }
 
-        // TODO批量删除依赖关系
-        /*
+        // 批量删除依赖关系：该功能作为主体或被依赖方的所有记录
         if (!funIdsForRelyDeletion.isEmpty()) {
-            testFunctionRelyMapper.deleteByFunctionAndSuite(funIdsForRelyDeletion, suiteId);
-            testFunctionRelyMapper.deleteByFunctionRelyAndSuite(funIdsForRelyDeletion, suiteId);
-        }*/
+            TestFunctionRelyExample relyAsSubject = new TestFunctionRelyExample();
+            relyAsSubject.createCriteria()
+                    .andTestFunctionIdIn(funIdsForRelyDeletion)
+                    .andSuiteIdEqualTo(suiteId);
+            testFunctionRelyMapper.deleteByExample(relyAsSubject);
+
+            TestFunctionRelyExample relyAsTarget = new TestFunctionRelyExample();
+            relyAsTarget.createCriteria()
+                    .andRelyFunctionIdIn(funIdsForRelyDeletion)
+                    .andSuiteIdEqualTo(suiteId);
+            testFunctionRelyMapper.deleteByExample(relyAsTarget);
+        }
 
         // 批量物理删除 FunctionSuite 记录
         if (!funSuiteIdsToDelete.isEmpty()) {

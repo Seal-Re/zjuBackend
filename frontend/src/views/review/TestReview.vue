@@ -108,14 +108,13 @@ const FUNS_APP_LEVEL = [
   "审签失败"  // 7
 ];
 
-// 清单：0-5 (5是成功)
-// 注意：这里按照 0-5 连续定义，去除了“待审核”这一级，使 5 变为成功
+// 清单：0-4（3是成功，4是失败）
 const SUITE_APP_LEVEL = [
   "待提交",   // 0
   "待校对",   // 1
-  "待批准",   
-  "审签成功",
-  "审签失败" 
+  "待批准",   // 2
+  "审签成功", // 3
+  "审签失败"  // 4
 ];
 
 // --- 2. 状态管理 ---
@@ -133,10 +132,9 @@ const form = reactive({
 
 // --- 3. 计算属性与工具函数 ---
 
-// 成功状态码界定
-const SUCCESS_CODE = computed(() => activeTab.value === 'function' ? 6 : 5)
-// 失败状态码界定 (统一用 7，或者清单用 6，根据实际后端约定，这里为了安全，显示时只要大于成功码都算失败/结束)
-const FAIL_CODE = 7; 
+// 成功/失败状态码界定
+const SUCCESS_CODE = computed(() => activeTab.value === 'function' ? 6 : 3)
+const FAIL_CODE = computed(() => activeTab.value === 'function' ? 7 : 4)
 
 // 获取当前 Tab 的下拉选项 (不包含成功状态，只包含待处理状态)
 const currentApprovalOptions = computed(() => {
@@ -144,8 +142,8 @@ const currentApprovalOptions = computed(() => {
         // 模块: 0-5 是待处理状态
         return FUNS_APP_LEVEL.slice(0, 6).map((label, index) => ({ label, value: index }));
     } else {
-        // 清单: 0-4 是待处理状态 (5是成功)
-        return SUITE_APP_LEVEL.slice(0, 5).map((label, index) => ({ label, value: index }));
+        // 清单: 0-2 是待处理状态
+        return SUITE_APP_LEVEL.slice(0, 3).map((label, index) => ({ label, value: index }));
     }
 });
 
@@ -153,8 +151,6 @@ const getStatusText = (status: number) => {
     if (activeTab.value === 'function') {
         return FUNS_APP_LEVEL[status] || `未知(${status})`;
     } else {
-        // 兼容清单失败状态 (假设驳回也是 7，或者 6)
-        if (status === 7) return "审签失败";
         return SUITE_APP_LEVEL[status] || `未知(${status})`;
     }
 }
@@ -201,11 +197,15 @@ const loadData = async () => {
         } else {
             res = await getCheckTestSuite({}) 
         }
-        const rawList = Array.isArray(res) ? res : (res.data || []);
+        const rawList = Array.isArray(res) ? res : [];
         
         tableData.value = rawList.map((item: any) => ({
             ...item,
-            approveStatus: Number(item.approveStatus !== undefined ? item.approveStatus : (item.Approvestatus || item.listApprStatus)), 
+            approveStatus: Number(
+              activeTab.value === 'function'
+                ? (item.approveStatus ?? item.Approvestatus ?? 0)
+                : (item.listApprStatus ?? item.approveStatus ?? 0)
+            ),
             _rowKey: item.funId || item.suiteId || item.id 
         }))
     } catch (error) {
@@ -253,10 +253,10 @@ const submitCheck = async () => {
         // --- 视图更新逻辑 ---
         const targetIndex = tableData.value.findIndex(item => item._rowKey === currentId.value);
         if (targetIndex !== -1) {
-            let newStatus = FAIL_CODE; // 默认失败 (7)
+            let newStatus = FAIL_CODE.value;
             
             if (form.result === 'pass') {
-                const maxSuccess = SUCCESS_CODE.value; // Function=6, Suite=5
+                const maxSuccess = SUCCESS_CODE.value;
                 // 线性 +1
                 newStatus = currentLevel >= maxSuccess ? maxSuccess : currentLevel + 1;
             } 

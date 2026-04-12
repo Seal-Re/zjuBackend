@@ -9,6 +9,9 @@ public interface TestPlanService {
     Response createTestPlan(TestPlanRequestDto testPlanRequestDto);
     Response updateTestPlan(TestPlanRequestDto testPlanRequestDto);
 
+    /** 仅更新备注字段，不修改计划结构信息（权限要求低于 updateTestPlan）*/
+    Response remarkTestPlan(String planId, String remark);
+
     Response deleteSingleTestPlan(String planId);
     Response deleteBatchTestPlan(TestPlanDelBatchDto testPlanDelBatchDto);
 
