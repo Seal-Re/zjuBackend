@@ -277,7 +277,7 @@ public class TestPlanServiceImpl implements TestPlanService {
         criteria.andSuiteIdEqualTo(SuiteId);
 
         List<TestPlan> listTestPlan = testPlanMapper.selectByExample(testPlanExample);
-        if (!CollectionUtil.isNotEmpty(listTestPlan)) {
+        if (CollectionUtil.isEmpty(listTestPlan)) {
             return null;
         }
         return listTestPlan.get(0);
