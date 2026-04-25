@@ -362,7 +362,7 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     }
 
     @Override
-    @Transactional(readOnly = false)
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateSuiteListAppStatusToUnApp(TestSuite tSuite) {
         tSuite.setListApprStatus(StatusContants.suite_list_app_unapp);
         return testSuiteMapper.updateByPrimaryKeySelective(tSuite) > CommonConstants.NUM_0;

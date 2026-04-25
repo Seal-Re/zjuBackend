@@ -100,7 +100,7 @@ public class FunctionSuiteServiceImpl implements FunctionSuiteService {
     }
 
     @Override
-    @Transactional(readOnly = false)
+    @Transactional(rollbackFor = Exception.class)
     public Response deleteFunctionSuite(FunctionSuiteDeleteDto functionSuiteDeleteDto) {
         Integer suiteId = functionSuiteDeleteDto.getSuiteId();
         if (null == suiteId) {
