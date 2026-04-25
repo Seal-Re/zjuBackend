@@ -191,10 +191,8 @@ const emsPreviewText = ref('')
 const emsSendLoading = ref(false)
 
 const fetchPlans = async () => {
-    console.log("【Debug】开始获取测试计划列表...")
     try {
         const res: any = await getTestPlans({})
-        console.log("【Debug】getTestPlans 原始返回:", res)
         
         const list = Array.isArray(res) ? res : []
         // 仅展示已派发/执行中的计划，避免选择未派发计划导致“无执行结构”报错
@@ -211,7 +209,6 @@ const fetchPlans = async () => {
 
 // 2. 加载左侧树 (核心修改区域)
 const loadExecutionTree = async () => {
-    console.log("【Debug】触发 loadExecutionTree, 当前选中PlanID:", selectedPlanId.value)
     
     if (!selectedPlanId.value) {
         console.warn("【Debug】未选择 PlanID，停止加载")
@@ -341,7 +338,6 @@ const loadExecutionTree = async () => {
             root.children?.push(funcNode)
         }
 
-        console.log("【Debug】最终生成的树数据:", [root])
         treeData.value = [root]
         
     } catch (e: any) {

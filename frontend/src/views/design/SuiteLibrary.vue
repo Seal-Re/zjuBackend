@@ -441,7 +441,6 @@ const handleEdit = async (row: any) => {
 
             selectedFunctionIds.value = functions.map((f: any) => Number(f.funId))
 
-            console.log("已回显关联模块 ID:", selectedFunctionIds.value)
     } catch (e) {
         console.error("获取关联模块失败", e)
         selectedFunctionIds.value = []
@@ -453,7 +452,7 @@ const handleEdit = async (row: any) => {
     dialogVisible.value = true
 }
 
-const handleDetail = (row: any) => { console.log('查看详情', row) }
+const handleDetail = (_row: any) => { /* TODO: implement detail view */ }
 
 const handleSubmitToReview = async (row: any) => {
     try {
