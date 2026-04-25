@@ -203,7 +203,7 @@ const fetchPlans = async () => {
             suiteId: p.suiteId 
         }))
     } catch (e) {
-        console.error("【Debug】获取计划失败:", e)
+        console.error("获取计划失败:", e)
     }
 }
 
@@ -211,7 +211,7 @@ const fetchPlans = async () => {
 const loadExecutionTree = async () => {
     
     if (!selectedPlanId.value) {
-        console.warn("【Debug】未选择 PlanID，停止加载")
+        console.warn("未选择 PlanID，停止加载")
         return
     }
     
@@ -223,7 +223,7 @@ const loadExecutionTree = async () => {
         const planInfo = planOptions.value.find(p => p.value === selectedPlanId.value)
         
         if (!planInfo) {
-             console.error("【Debug】无法在选项中找到当前计划信息")
+             console.error("无法在选项中找到当前计划信息")
              return
         }
 
@@ -341,7 +341,7 @@ const loadExecutionTree = async () => {
         treeData.value = [root]
         
     } catch (e: any) {
-        console.error("【Debug】加载执行结构发生异常:", e)
+        console.error("加载执行结构发生异常:", e)
         const msg = String(e?.message || '')
         if (msg.includes('查询不到对应planId的ExeFunction')) {
             ElMessage.warning('当前计划暂无执行结构，请先在测试计划页执行“派发”')
