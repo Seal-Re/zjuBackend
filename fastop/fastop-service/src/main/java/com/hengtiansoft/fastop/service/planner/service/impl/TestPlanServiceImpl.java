@@ -207,7 +207,7 @@ public class TestPlanServiceImpl implements TestPlanService {
     }
 
     @Override
-    @Transactional(readOnly = false)
+    @Transactional(rollbackFor = Exception.class)
     public Response deleteSingleTestPlan(String planId) {
 
         if (StringUtils.isBlank(planId)) {

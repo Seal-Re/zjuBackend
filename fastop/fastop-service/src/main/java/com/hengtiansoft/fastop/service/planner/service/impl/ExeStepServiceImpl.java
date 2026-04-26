@@ -72,7 +72,7 @@ public class ExeStepServiceImpl implements ExeStepService {
     private EmsMessageService emsMessageService;
 
     @Override
-    @Transactional(readOnly = false)
+    @Transactional(rollbackFor = Exception.class)
     public int deleteExeStep(String exeFunctionId) {
         // 1. 创建查询条件
         ExeStepExample example = new ExeStepExample();
@@ -90,7 +90,7 @@ public class ExeStepServiceImpl implements ExeStepService {
     }
 
     @Override
-    @Transactional(readOnly = false)
+    @Transactional(rollbackFor = Exception.class)
     public void conveyTestStep2ExeStep(Integer funId, String exeFunctionId) {
         if (funId == null || exeFunctionId == null) return;
 
@@ -174,7 +174,7 @@ public class ExeStepServiceImpl implements ExeStepService {
     /**
      * 更新指定测试步骤下正在执行的步骤为暂停状态
      */
-    @Transactional(readOnly = false)
+    @Transactional(rollbackFor = Exception.class)
     public Response updateStepExeToPause(String exeFunctionId) {
         ExeStepWithBLOBs updateRecord = new ExeStepWithBLOBs();
         updateRecord.setExeStatus(TestPlanStatusContants.PLAN_STATUS_PAUSE);
@@ -206,7 +206,7 @@ public class ExeStepServiceImpl implements ExeStepService {
     }
 
     @Override
-    @Transactional(readOnly = false)
+    @Transactional(rollbackFor = Exception.class)
     public Response updateStepStatusByOption(String exeStepId, String option) {
 
         if (exeStepId == null || option == null) {
@@ -241,7 +241,7 @@ public class ExeStepServiceImpl implements ExeStepService {
     /**
      * 更新手动结果
      */
-    @Transactional(readOnly = false)
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateManualResult(String exeStepId, String manualResult) {
         ExeStepWithBLOBs exeStep = (ExeStepWithBLOBs) exeStepMapper.selectByPrimaryKey(exeStepId);
         if (exeStep != null) {
@@ -256,7 +256,7 @@ public class ExeStepServiceImpl implements ExeStepService {
     /**
      * 更新自动获取结果
      */
-    @Transactional(readOnly = false)
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateAutoResult(String exeStepId, String autoResult) {
         ExeStepWithBLOBs exeStep = (ExeStepWithBLOBs) exeStepMapper.selectByPrimaryKey(exeStepId);
         if (exeStep != null) {
@@ -364,7 +364,7 @@ public class ExeStepServiceImpl implements ExeStepService {
     }
 
     @Override
-    @Transactional(readOnly = false)
+    @Transactional(rollbackFor = Exception.class)
     public Response saveLog(ExeLog exeLog) {
         if (exeLog == null) {
             return ResponseFactory.failure("日志内容不能为空");

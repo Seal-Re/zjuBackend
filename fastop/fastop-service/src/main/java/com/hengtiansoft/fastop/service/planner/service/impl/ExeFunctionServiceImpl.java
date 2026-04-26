@@ -94,7 +94,7 @@ public class ExeFunctionServiceImpl implements ExeFunctionService {
     }
 
     @Override
-    @Transactional(readOnly = false)
+    @Transactional(rollbackFor = Exception.class)
     public boolean conveyTestFunction2ExeFunction(Integer suiteId, String planId) {
 
         // Local Call: replaced functionSuiteFeignService.listFunctionSuiteBySuite(suiteId)
@@ -149,7 +149,7 @@ public class ExeFunctionServiceImpl implements ExeFunctionService {
         return true;
     }
 
-    @Transactional(readOnly = false)
+    @Transactional(rollbackFor = Exception.class)
     public String saveExeFunction(FunctionSuite functionSuite, String planId, TestFunction function) {
         if (function == null || planId == null || planId.trim().isEmpty()) {
             return null;
@@ -203,7 +203,7 @@ public class ExeFunctionServiceImpl implements ExeFunctionService {
     }
 
     @Override
-    @Transactional(readOnly = false)
+    @Transactional(rollbackFor = Exception.class)
     public int deleteExeFunction(String planId) {
         // 记录update成功的数量
         int result = 0;
@@ -258,7 +258,7 @@ public class ExeFunctionServiceImpl implements ExeFunctionService {
      *   doInvalid    : 任意未完成状态        → UNEXE(0)（重置）
      *   restartRun   : PAUSE(3)              → EXEING(2)
      */
-    @Transactional(readOnly = false)
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateFunctionStatusByOption(String exeFunctionId, String option) {
         ExeFunction exeFunction = exeFunctionMapper.selectByPrimaryKey(exeFunctionId);
         if (exeFunction == null) return false;
@@ -310,7 +310,7 @@ public class ExeFunctionServiceImpl implements ExeFunctionService {
     /**
      * 更新指定测试计划下正在执行的用例为暂停状态
      */
-    @Transactional(readOnly = false)
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateCaseExeToPause(String planId) {
         boolean result = true;
         // Reference uses custom mapper: getExeCaseIdInExeByPlanId
