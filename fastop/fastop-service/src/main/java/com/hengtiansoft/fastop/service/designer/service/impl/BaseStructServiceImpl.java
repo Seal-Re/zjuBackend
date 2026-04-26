@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.springframework.cache.interceptor.SimpleKeyGenerator.generateKey;
 
 @Service
 public class BaseStructServiceImpl implements BaseStructService {
@@ -37,7 +36,7 @@ public class BaseStructServiceImpl implements BaseStructService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(readOnly = true)
     public Response listAllBaseStructAndId() {
         List<BaseStruct> baseStructs = getBaseStructData();
         if (CollectionUtil.isEmpty(baseStructs)) {
@@ -60,15 +59,10 @@ public class BaseStructServiceImpl implements BaseStructService {
 
             String key = buildCacheKey(struct.getModel(), struct.getProfession(), struct.getSubsystem());
 
-            if (idCache.containsKey(key)) {
-                dto.setBaseId(idCache.get(key));
-            } else {
-                Integer newId = testBaseService.getTestBaseWithLimitUtil(
-                        struct.getModel(), struct.getProfession(), struct.getSubsystem()
-                );
-                dto.setBaseId(newId);
-                idCache.put(key, newId);
-            }
+            Integer id = idCache.computeIfAbsent(key, k -> testBaseService.getTestBaseWithLimitUtil(
+                    struct.getModel(), struct.getProfession(), struct.getSubsystem()
+            ));
+            dto.setBaseId(id);
             return dto;
         }).collect(Collectors.toList());
 

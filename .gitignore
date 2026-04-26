@@ -1,14 +1,48 @@
-﻿/target/
+# ── Secrets / local config ──
+.env
+.env.local
+*.env
+!.env.example
+application-local.yml
+*local*.yml
+
+# ── Java / Maven ──
+/target/
+**/target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
+*.iml
+*.jar
+*.war
+hs_err_pid*.log
+
+# ── Python ──
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+
+# ── Node / frontend ──
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+frontend/tsconfig.tsbuildinfo
+frontend/tsconfig.node.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
+
+# ── IDE / OS ──
+.idea/
+.vscode/
 .classpath
 .project
-.settings
-.idea
-*.iml
+.settings/
 .DS_Store
+Thumbs.db
+
+# ── Logs / temp ──
 /logs/
 /temp/
-frontend/node_modules/
-frontend/node_modules
-frontend/node_modules/
+*.log
