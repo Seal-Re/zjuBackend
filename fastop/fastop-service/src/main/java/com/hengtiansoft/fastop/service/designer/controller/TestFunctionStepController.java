@@ -34,21 +34,21 @@ public class TestFunctionStepController {
 
     @ApiOperation("删除步骤")
     @PostMapping("/delete")
-    public Response deleteTestFunctionStep(@RequestParam Integer StepId) {
-        log.info("deleteTestFunctionStep StepId={}", StepId);
-        return testFunctionStepService.delete(StepId);
+    public Response deleteTestFunctionStep(@RequestParam Integer stepId) {
+        log.info("deleteTestFunctionStep stepId={}", stepId);
+        return testFunctionStepService.delete(stepId);
     }
 
-    @ApiOperation("根据StepId查询步骤")
-    @GetMapping("/get/{StepId}")
-    public Response getByStepId(@PathVariable Integer StepId) {
-        log.info("getByStepId StepId={}", StepId);
-        return testFunctionStepService.getByStepId(StepId);
+    @ApiOperation("根据stepId查询步骤")
+    @GetMapping("/get/{stepId}")
+    public Response getByStepId(@PathVariable Integer stepId) {
+        log.info("getByStepId stepId={}", stepId);
+        return testFunctionStepService.getByStepId(stepId);
     }
 
     @ApiOperation("根据caseId查询步骤列表")
     @GetMapping("/listByCaseId")
-    public Response listByFunId(@RequestParam Integer caseId) {
+    public Response listByCaseId(@RequestParam Integer caseId) {
         log.info("listByCaseId caseId={}", caseId);
         return testFunctionStepService.getByCaseId(caseId);
     }

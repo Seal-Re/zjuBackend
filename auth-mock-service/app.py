@@ -201,7 +201,10 @@ def create_role():
 def bind_role_permissions(rid):
     body = request.get_json() or {}
     perm_codes = body.get('permissions') or body.get('permissionCodes') or []
-    ROLE_PERMISSIONS[rid] = perm_codes if isinstance(perm_codes[0], str) else [p.get('code') for p in perm_codes]
+    if not perm_codes:
+        ROLE_PERMISSIONS[rid] = []
+    else:
+        ROLE_PERMISSIONS[rid] = perm_codes if isinstance(perm_codes[0], str) else [p.get('code') for p in perm_codes]
     return std_response({'roleId': rid, 'permissions': ROLE_PERMISSIONS.get(rid, [])})
 
 
@@ -218,4 +221,6 @@ def get_user_roles(uid):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # debug=False 关闭 werkzeug 交互调试器，避免 RCE 风险
+    # host=127.0.0.1 仅监听回环；如需局域网联调显式改为 0.0.0.0 并保持 debug=False
+    app.run(host='127.0.0.1', port=5000, debug=False)

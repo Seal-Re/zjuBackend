@@ -4,6 +4,6 @@ import com.hengtiansoft.fastop.base.common.entity.Response.Response;
 
 public interface TestExampleService {
 
-    Response UpdateAll();
+    Response updateAll();
 
 }

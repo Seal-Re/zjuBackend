@@ -1,0 +1,562 @@
+{
+  "config": {
+    "load_threads": 16,
+    "rps_per_thread": 5,
+    "duration_sec": 60,
+    "endpoints": [
+      "/planner/plan/listAll",
+      "/designer/testFunction/listAll",
+      "/designer/testSuite/listAll",
+      "/devices/list",
+      "/base/listAllBaseStruct"
+    ]
+  },
+  "aggregate": {
+    "count": 48,
+    "ok": 48,
+    "err": 0,
+    "rps": 0.8,
+    "p50_ms": 21896.61999999953,
+    "p95_ms": 25650.82640000037,
+    "p99_ms": 26268.676499999856,
+    "max_ms": 26268.676499999856,
+    "avg_ms": 22410.09016875
+  },
+  "actuator": {
+    "executor_pool_size_peak": 0,
+    "executor_queued_peak": 0,
+    "jvm_threads_live_peak": 28.0
+  },
+  "raw_samples": [
+    {
+      "ts": "2026-05-03T23:16:11.059000",
+      "executor.active": {
+        "name": "executor.active",
+        "description": "The approximate number of threads that are actively executing tasks",
+        "baseUnit": "threads",
+        "measurements": [
+          {
+            "statistic": "VALUE",
+            "value": 0.0
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "name",
+            "values": [
+              "taskExecutor"
+            ]
+          }
+        ]
+      },
+      "executor.completed": {
+        "name": "executor.completed",
+        "description": "The approximate total number of tasks that have completed execution",
+        "baseUnit": "tasks",
+        "measurements": [
+          {
+            "statistic": "COUNT",
+            "value": 0.0
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "name",
+            "values": [
+              "taskExecutor"
+            ]
+          }
+        ]
+      },
+      "executor.pool.core": {
+        "name": "executor.pool.core",
+        "description": "The core number of threads for the pool",
+        "baseUnit": "threads",
+        "measurements": [
+          {
+            "statistic": "VALUE",
+            "value": 5.0
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "name",
+            "values": [
+              "taskExecutor"
+            ]
+          }
+        ]
+      },
+      "executor.pool.size": {
+        "name": "executor.pool.size",
+        "description": "The current number of threads in the pool",
+        "baseUnit": "threads",
+        "measurements": [
+          {
+            "statistic": "VALUE",
+            "value": 0.0
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "name",
+            "values": [
+              "taskExecutor"
+            ]
+          }
+        ]
+      },
+      "executor.queued": {
+        "name": "executor.queued",
+        "description": "The approximate number of tasks that are queued for execution",
+        "baseUnit": "tasks",
+        "measurements": [
+          {
+            "statistic": "VALUE",
+            "value": 0.0
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "name",
+            "values": [
+              "taskExecutor"
+            ]
+          }
+        ]
+      },
+      "executor.queue.remaining": {
+        "name": "executor.queue.remaining",
+        "description": "The number of additional elements that this queue can ideally accept without blocking",
+        "baseUnit": "tasks",
+        "measurements": [
+          {
+            "statistic": "VALUE",
+            "value": 20.0
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "name",
+            "values": [
+              "taskExecutor"
+            ]
+          }
+        ]
+      },
+      "jvm.threads.live": {
+        "name": "jvm.threads.live",
+        "description": "The current number of live threads including both daemon and non-daemon threads",
+        "baseUnit": "threads",
+        "measurements": [
+          {
+            "statistic": "VALUE",
+            "value": 28.0
+          }
+        ],
+        "availableTags": []
+      },
+      "jvm.threads.daemon": {
+        "name": "jvm.threads.daemon",
+        "description": "The current number of live daemon threads",
+        "baseUnit": "threads",
+        "measurements": [
+          {
+            "statistic": "VALUE",
+            "value": 24.0
+          }
+        ],
+        "availableTags": []
+      },
+      "jvm.memory.used": {
+        "name": "jvm.memory.used",
+        "description": "The amount of used memory",
+        "baseUnit": "bytes",
+        "measurements": [
+          {
+            "statistic": "VALUE",
+            "value": 329137408.0
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "area",
+            "values": [
+              "heap",
+              "nonheap"
+            ]
+          },
+          {
+            "tag": "id",
+            "values": [
+              "Compressed Class Space",
+              "PS Survivor Space",
+              "PS Old Gen",
+              "Metaspace",
+              "PS Eden Space",
+              "Code Cache"
+            ]
+          }
+        ]
+      },
+      "jvm.gc.pause": {
+        "name": "jvm.gc.pause",
+        "description": "Time spent in GC pause",
+        "baseUnit": "seconds",
+        "measurements": [
+          {
+            "statistic": "COUNT",
+            "value": 3.0
+          },
+          {
+            "statistic": "TOTAL_TIME",
+            "value": 0.10900000000000001
+          },
+          {
+            "statistic": "MAX",
+            "value": 0.084
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "cause",
+            "values": [
+              "Metadata GC Threshold",
+              "Allocation Failure"
+            ]
+          },
+          {
+            "tag": "action",
+            "values": [
+              "end of minor GC",
+              "end of major GC"
+            ]
+          }
+        ]
+      },
+      "http.server.requests": {
+        "name": "http.server.requests",
+        "description": "Duration of HTTP server request handling",
+        "baseUnit": "seconds",
+        "measurements": [
+          {
+            "statistic": "COUNT",
+            "value": 44.0
+          },
+          {
+            "statistic": "TOTAL_TIME",
+            "value": 3.745922003
+          },
+          {
+            "statistic": "MAX",
+            "value": 0.305193201
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "exception",
+            "values": [
+              "None"
+            ]
+          },
+          {
+            "tag": "method",
+            "values": [
+              "GET"
+            ]
+          },
+          {
+            "tag": "uri",
+            "values": [
+              "/actuator/metrics/{requiredMetricName}",
+              "/base/listAllBaseStruct",
+              "/devices/list",
+              "/designer/testSuite/listAll",
+              "/actuator/health",
+              "/designer/testFunction/listAll",
+              "/actuator/metrics",
+              "/planner/plan/listAll"
+            ]
+          },
+          {
+            "tag": "outcome",
+            "values": [
+              "SUCCESS"
+            ]
+          },
+          {
+            "tag": "status",
+            "values": [
+              "200"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ts": "2026-05-03T23:17:08.361973",
+      "executor.active": {
+        "name": "executor.active",
+        "description": "The approximate number of threads that are actively executing tasks",
+        "baseUnit": "threads",
+        "measurements": [
+          {
+            "statistic": "VALUE",
+            "value": 0.0
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "name",
+            "values": [
+              "taskExecutor"
+            ]
+          }
+        ]
+      },
+      "executor.completed": {
+        "name": "executor.completed",
+        "description": "The approximate total number of tasks that have completed execution",
+        "baseUnit": "tasks",
+        "measurements": [
+          {
+            "statistic": "COUNT",
+            "value": 0.0
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "name",
+            "values": [
+              "taskExecutor"
+            ]
+          }
+        ]
+      },
+      "executor.pool.core": {
+        "name": "executor.pool.core",
+        "description": "The core number of threads for the pool",
+        "baseUnit": "threads",
+        "measurements": [
+          {
+            "statistic": "VALUE",
+            "value": 5.0
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "name",
+            "values": [
+              "taskExecutor"
+            ]
+          }
+        ]
+      },
+      "executor.pool.size": {
+        "name": "executor.pool.size",
+        "description": "The current number of threads in the pool",
+        "baseUnit": "threads",
+        "measurements": [
+          {
+            "statistic": "VALUE",
+            "value": 0.0
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "name",
+            "values": [
+              "taskExecutor"
+            ]
+          }
+        ]
+      },
+      "executor.queued": {
+        "name": "executor.queued",
+        "description": "The approximate number of tasks that are queued for execution",
+        "baseUnit": "tasks",
+        "measurements": [
+          {
+            "statistic": "VALUE",
+            "value": 0.0
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "name",
+            "values": [
+              "taskExecutor"
+            ]
+          }
+        ]
+      },
+      "executor.queue.remaining": {
+        "name": "executor.queue.remaining",
+        "description": "The number of additional elements that this queue can ideally accept without blocking",
+        "baseUnit": "tasks",
+        "measurements": [
+          {
+            "statistic": "VALUE",
+            "value": 20.0
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "name",
+            "values": [
+              "taskExecutor"
+            ]
+          }
+        ]
+      },
+      "jvm.threads.live": {
+        "name": "jvm.threads.live",
+        "description": "The current number of live threads including both daemon and non-daemon threads",
+        "baseUnit": "threads",
+        "measurements": [
+          {
+            "statistic": "VALUE",
+            "value": 28.0
+          }
+        ],
+        "availableTags": []
+      },
+      "jvm.threads.daemon": {
+        "name": "jvm.threads.daemon",
+        "description": "The current number of live daemon threads",
+        "baseUnit": "threads",
+        "measurements": [
+          {
+            "statistic": "VALUE",
+            "value": 24.0
+          }
+        ],
+        "availableTags": []
+      },
+      "jvm.memory.used": {
+        "name": "jvm.memory.used",
+        "description": "The amount of used memory",
+        "baseUnit": "bytes",
+        "measurements": [
+          {
+            "statistic": "VALUE",
+            "value": 383561744.0
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "area",
+            "values": [
+              "heap",
+              "nonheap"
+            ]
+          },
+          {
+            "tag": "id",
+            "values": [
+              "Compressed Class Space",
+              "PS Survivor Space",
+              "PS Old Gen",
+              "Metaspace",
+              "PS Eden Space",
+              "Code Cache"
+            ]
+          }
+        ]
+      },
+      "jvm.gc.pause": {
+        "name": "jvm.gc.pause",
+        "description": "Time spent in GC pause",
+        "baseUnit": "seconds",
+        "measurements": [
+          {
+            "statistic": "COUNT",
+            "value": 3.0
+          },
+          {
+            "statistic": "TOTAL_TIME",
+            "value": 0.10900000000000001
+          },
+          {
+            "statistic": "MAX",
+            "value": 0.084
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "cause",
+            "values": [
+              "Metadata GC Threshold",
+              "Allocation Failure"
+            ]
+          },
+          {
+            "tag": "action",
+            "values": [
+              "end of minor GC",
+              "end of major GC"
+            ]
+          }
+        ]
+      },
+      "http.server.requests": {
+        "name": "http.server.requests",
+        "description": "Duration of HTTP server request handling",
+        "baseUnit": "seconds",
+        "measurements": [
+          {
+            "statistic": "COUNT",
+            "value": 71.0
+          },
+          {
+            "statistic": "TOTAL_TIME",
+            "value": 3.8519626149999997
+          },
+          {
+            "statistic": "MAX",
+            "value": 0.305193201
+          }
+        ],
+        "availableTags": [
+          {
+            "tag": "exception",
+            "values": [
+              "None"
+            ]
+          },
+          {
+            "tag": "method",
+            "values": [
+              "GET"
+            ]
+          },
+          {
+            "tag": "uri",
+            "values": [
+              "/actuator/metrics/{requiredMetricName}",
+              "/base/listAllBaseStruct",
+              "/devices/list",
+              "/designer/testSuite/listAll",
+              "/actuator/health",
+              "/designer/testFunction/listAll",
+              "/actuator/metrics",
+              "/planner/plan/listAll"
+            ]
+          },
+          {
+            "tag": "outcome",
+            "values": [
+              "SUCCESS"
+            ]
+          },
+          {
+            "tag": "status",
+            "values": [
+              "200"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -57,7 +57,7 @@
             :page-sizes="[10, 20, 50]"
             layout="total, sizes, prev, pager, next"
             class="pagination"
-            @size-change="loadOperationLogs"
+            @size-change="onOpSizeChange"
             @current-change="loadOperationLogs"
           />
         </div>
@@ -108,7 +108,7 @@
             :page-sizes="[10, 20, 50]"
             layout="total, sizes, prev, pager, next"
             class="pagination"
-            @size-change="loadExeLogs"
+            @size-change="onExeSizeChange"
             @current-change="loadExeLogs"
           />
         </div>
@@ -139,6 +139,13 @@ const exeTotal = ref(0)
 const exeFilters = reactive({ stepId: '', planId: '' })
 const exeTimeRange = ref<[string, string] | null>(null)
 
+// lazy 标志：tab 首次切换才加载，避免重复请求
+const exeLogsLoaded = ref(false)
+
+// page-size 改变时统一重置 page=1，否则可能停留在超出数据范围的页码
+const onOpSizeChange = () => { opPage.value = 1; loadOperationLogs() }
+const onExeSizeChange = () => { exePage.value = 1; loadExeLogs() }
+
 function formatTime(t: string | undefined) {
   if (!t) return '-'
   const d = new Date(t)
@@ -165,7 +172,7 @@ async function loadOperationLogs() {
   } catch (e) {
     operationList.value = []
     opTotal.value = 0
-    console.warn('操作日志加载失败（可能未建 operation_log 表）:', e)
+    console.warn('操作日志加载失败:', e)
   } finally {
     opLoading.value = false
   }
@@ -173,6 +180,7 @@ async function loadOperationLogs() {
 
 async function loadExeLogs() {
   exeLoading.value = true
+  exeLogsLoaded.value = true
   try {
     const [startTime, endTime] = exeTimeRange.value || [undefined, undefined]
     const res: any = await getExeLogList({
@@ -196,8 +204,8 @@ async function loadExeLogs() {
 }
 
 watch(activeTab, (name) => {
-  if (name === 'execution') loadExeLogs()
-  else loadOperationLogs()
+  // lazy 加载：execution tab 首次切换才请求；切回 op tab 不重复请求
+  if (name === 'execution' && !exeLogsLoaded.value) loadExeLogs()
 })
 
 onMounted(() => {

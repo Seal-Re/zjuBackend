@@ -6,6 +6,15 @@
 import axios, { type AxiosInstance } from 'axios'
 import { ElMessage } from 'element-plus'
 
+// 401 触发时统一清 token 并跳登录
+function handleUnauthorized() {
+  if (location.pathname === '/login') return
+  localStorage.removeItem('access_token')
+  localStorage.removeItem('refresh_token')
+  const redirect = encodeURIComponent(location.pathname + location.search)
+  location.replace(`/login?redirect=${redirect}`)
+}
+
 // 默认直连本地认证 mock，避免非 Vite 代理环境下出现 /auth-api 404
 const baseURL = import.meta.env.VITE_AUTH_API || 'http://localhost:5000'
 
@@ -26,6 +35,10 @@ authService.interceptors.request.use(config => {
 authService.interceptors.response.use(
   response => {
     const res = response.data
+    if (res.code === 401) {
+      handleUnauthorized()
+      return Promise.reject(new Error('未登录或登录已过期'))
+    }
     if (res.code !== 200 && res.code !== 201) {
       ElMessage.error(res.message || '请求失败')
       return Promise.reject(new Error(res.message || 'Error'))
@@ -33,6 +46,10 @@ authService.interceptors.response.use(
     return res.data
   },
   error => {
+    if (error.response?.status === 401) {
+      handleUnauthorized()
+      return Promise.reject(error)
+    }
     ElMessage.error(error.response?.data?.message || error.message)
     return Promise.reject(error)
   }

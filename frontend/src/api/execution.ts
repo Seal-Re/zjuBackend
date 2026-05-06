@@ -1,5 +1,23 @@
 import request from './request'
 
+/** 与后端 ExeStepCommand 对齐的指令载荷 */
+export interface ExeStepCommandPayload {
+  exeStepId: string
+  command?: string
+  url?: string
+  topic?: string
+  params?: Record<string, unknown>
+  [key: string]: unknown
+}
+
+/** 与后端 ExeLog 对齐的执行日志写入载荷 */
+export interface ExecutionLogPayload {
+  exeStepId?: string
+  planId?: string
+  content: string
+  [key: string]: unknown
+}
+
 export const getExeFunctionsByPlanId = (planId: string) => {
   return request({
     url: `/exeFunction/testFunctions/inexe/${planId}`,
@@ -28,7 +46,7 @@ export const pauseExeFunction = (exeFunctionId: string) => {
   })
 }
 
-export const operateStep = (data: { exeStepId: string; option: string }) => {
+export const operateStep = (data: { exeStepId: string; operation: string }) => {
   return request({
     url: '/exeStep/stepOperate',
     method: 'post',
@@ -36,7 +54,7 @@ export const operateStep = (data: { exeStepId: string; option: string }) => {
   })
 }
 
-export const executeStepCommand = (data: Record<string, unknown>) => {
+export const executeStepCommand = (data: ExeStepCommandPayload) => {
   return request({
     url: '/exeStep/do',
     method: 'post',
@@ -52,7 +70,7 @@ export const previewEmsMessage = (exeStepId: string) => {
   })
 }
 
-export const saveExecutionLog = (data: Record<string, unknown>) => {
+export const saveExecutionLog = (data: ExecutionLogPayload) => {
   return request({
     url: '/exeStep/log/save',
     method: 'post',

@@ -123,17 +123,17 @@ public class TestFunctionCaseServiceImpl implements TestFunctionCaseService {
     @Override
     public Response deletePhy(Integer caseId) {
         if (caseId == null) {
-            return ResponseFactory.failure("caseId is null");
+            return ResponseFactory.failure("子用例 ID 不能为空");
         }
         TestFunctionCase testFunctionCase = testFunctionCaseMapper.selectByPrimaryKey(caseId);
         if (testFunctionCase == null) {
-            return ResponseFactory.failure("cant find it" );
+            return ResponseFactory.failure("未找到对应的子用例");
         }
         int result = testFunctionCaseMapper.deleteByPrimaryKey(caseId);
         if (result > 0) {
-            return ResponseFactory.success("success");
+            return ResponseFactory.success("删除成功");
         }
-        return ResponseFactory.failure("fail");
+        return ResponseFactory.failure("删除失败");
     }
 
     @Override

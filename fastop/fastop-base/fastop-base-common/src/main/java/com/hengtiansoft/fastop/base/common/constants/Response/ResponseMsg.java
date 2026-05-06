@@ -18,5 +18,4 @@ public final class ResponseMsg {
     public static final String JSON_NOT_READABLE_ERROR = "Json解析异常";
     public static final String MAX_UPLOAD_SIZE_EXCEEDED_ERROR = "文件大小超过%sMB限制!";
     public static final String DEFAULT_ERROR = "服务器开小差了，请稍候再试";
-    public static final String RPC_ERROR = "发生远程调用异常";
 }

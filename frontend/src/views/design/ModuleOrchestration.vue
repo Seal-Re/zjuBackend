@@ -5,13 +5,10 @@
       <div class="left-actions">
         <el-button plain @click="handleBack">返回列表</el-button>
         <el-button type="success" @click="fetchData">刷新</el-button>
-        <el-button type="warning" @click="handleSave">保存修改</el-button>
         <el-button type="primary" @click="openCreateModule">创建用例</el-button>
       </div>
       <div class="right-actions">
-        <el-button plain @click="toggleCollapse">收起</el-button>
-        <el-button type="primary" @click="handleImport">导入</el-button>
-        <el-button type="primary" @click="handleExport">导出</el-button>
+        <el-button plain @click="toggleCollapse">{{ isExpanded ? '收起' : '展开' }}</el-button>
       </div>
     </div>
 
@@ -138,10 +135,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getModuleTree, addCase, updateCase, deleteCase, addStep, updateStep, deleteStep, deleteModule } from '@/api/designer/module-orchestration'
 import { getDeviceTopics } from '@/api/integration'
-// Assuming addModule exists or reusing similar for "Create Use Case" (Module) if needed.
-// Since I don't have addModule imported, I'll assume "Create Use Case" creates a Case on the first module for now,
-// or I should verify if I can import addModule from designer.
-import { addModule } from '@/api/designer' // Imported from generic designer api
+import { addModule } from '@/api/designer'
 
 const route = useRoute()
 const router = useRouter()
@@ -181,15 +175,9 @@ const fetchData = async () => {
 
 // --- Toolbar Actions ---
 const handleBack = () => router.push('/design/module')
-const handleSave = () => ElMessage.success('Saved successfully (Mock)')
-const handleImport = () => ElMessage.info('Import feature coming soon')
-const handleExport = () => ElMessage.info('Export feature coming soon')
 
 const toggleCollapse = () => {
     isExpanded.value = !isExpanded.value
-    // Element Plus Table toggleRowExpansion is needed if default-expand-all is dynamic
-    // But expanding all dynamically is tricky.
-    // Simple way: re-render table or iterate rows.
     if (tableRef.value) {
        toggleRowExpansionRecursive(tableData.value, isExpanded.value)
     }
@@ -301,7 +289,7 @@ watch(dialogVisible, async (v) => {
     rebuildParamUiFromExample()
   } catch (e) {
     console.error(e)
-    ElMessage.error('获取设备 topic 失败，请检查 device-controller-mock 与 application.yml')
+    ElMessage.error('设备服务暂不可用，请稍后重试或联系管理员')
   }
 })
 
@@ -312,10 +300,11 @@ const rules = {
   obj: [{ required: true, message: '请输入操作对象', trigger: 'blur' }]
 }
 
-// Determine allowed options
-const allowModuleCreation = computed(() => !isEdit.value && form.parentType === 'ROOT')
-const allowCaseCreation = computed(() => !isEdit.value && form.parentType === 'MODULE')
-const allowStepCreation = computed(() => !isEdit.value && form.parentType === 'CASE')
+// 父子关系：ROOT→MODULE、MODULE→CASE、CASE→STEP
+const ALLOWED_CHILD: Record<string, string> = { ROOT: 'MODULE', MODULE: 'CASE', CASE: 'STEP' }
+const allowModuleCreation = computed(() => !isEdit.value && ALLOWED_CHILD[form.parentType] === 'MODULE')
+const allowCaseCreation = computed(() => !isEdit.value && ALLOWED_CHILD[form.parentType] === 'CASE')
+const allowStepCreation = computed(() => !isEdit.value && ALLOWED_CHILD[form.parentType] === 'STEP')
 
 // Open Dialog for "Create Use Case" (Module) - Top Level
 const openCreateModule = () => {
@@ -398,8 +387,8 @@ const submitForm = async () => {
                     stepPurpose: form.purpose
                 })
             } else if (form.type === 'MODULE') {
-                // Assuming generic update exists or warn
-                ElMessage.warning('Module update not fully implemented in this view')
+                // 当前视图未实现 Module 直接编辑，请在模块库列表页修改
+                ElMessage.warning('请在模块库列表页修改用例基本信息')
             }
         } else {
             // Create
@@ -427,7 +416,7 @@ const submitForm = async () => {
                 })
             }
         }
-        ElMessage.success('Success')
+        ElMessage.success('保存成功')
         dialogVisible.value = false
         fetchData()
       } catch (e) {
@@ -439,23 +428,26 @@ const submitForm = async () => {
 
 const handleDelete = async (row: any) => {
     try {
-        await ElMessageBox.confirm('Are you sure you want to delete this node?', 'Warning', {
-            confirmButtonText: 'OK',
-            cancelButtonText: 'Cancel',
+        await ElMessageBox.confirm(`确认删除该节点【${row.name}】吗？`, '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
             type: 'warning',
         })
-
+    } catch {
+        return // 用户取消
+    }
+    try {
         if (row.type === 'CASE') {
             await deleteCase(row.id)
         } else if (row.type === 'STEP') {
             await deleteStep(row.id)
         } else if (row.type === 'MODULE') {
-             await deleteModule(row.id)
+            await deleteModule(row.id)
         }
-        ElMessage.success('Deleted')
+        ElMessage.success('删除成功')
         fetchData()
     } catch (e) {
-        // Cancelled or Error
+        console.error(e)
     }
 }
 

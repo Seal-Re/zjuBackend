@@ -35,6 +35,7 @@
     <result column="sync" jdbcType="BIT" property="sync" />
     <result column="management" jdbcType="VARCHAR" property="management" />
     <result column="for_record_data" jdbcType="INTEGER" property="forRecordData" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -95,11 +96,11 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    plan_id, entity_struct_id, entity_id, subject_id, fun_group_id, suite_id, military, 
-    plan_start_time, plan_end_time, actual_start_time, actual_end_time, status, plan_number, 
-    plan_round, plan_name, area_id, dispatcher_id, commander_id, executor_group_id, comm_assign, 
-    execut_assign, verify_assign, updatable, archived, deleted, base_type, created_at, 
-    updated_at, created_by, updated_by, sync, management, for_record_data
+    plan_id, entity_struct_id, entity_id, subject_id, fun_group_id, suite_id, military,
+    plan_start_time, plan_end_time, actual_start_time, actual_end_time, status, plan_number,
+    plan_round, plan_name, area_id, dispatcher_id, commander_id, executor_group_id, comm_assign,
+    execut_assign, verify_assign, updatable, archived, deleted, base_type, created_at,
+    updated_at, created_by, updated_by, sync, management, for_record_data, remark
   </sql>
   <select id="selectByExample" parameterType="com.hengtiansoft.fastop.model.planner.entity.TestPlanExample" resultMap="BaseResultMap">
     select
@@ -143,19 +144,20 @@
       verify_assign, updatable, archived, 
       deleted, base_type, created_at, 
       updated_at, created_by, updated_by, 
-      sync, management, for_record_data
+      sync, management, for_record_data, remark
       )
-    values (#{planId,jdbcType=CHAR}, #{entityStructId,jdbcType=INTEGER}, #{entityId,jdbcType=INTEGER}, 
-      #{subjectId,jdbcType=INTEGER}, #{funGroupId,jdbcType=INTEGER}, #{suiteId,jdbcType=INTEGER}, 
-      #{military,jdbcType=BIT}, #{planStartTime,jdbcType=TIMESTAMP}, #{planEndTime,jdbcType=TIMESTAMP}, 
-      #{actualStartTime,jdbcType=TIMESTAMP}, #{actualEndTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, 
-      #{planNumber,jdbcType=VARCHAR}, #{planRound,jdbcType=INTEGER}, #{planName,jdbcType=VARCHAR}, 
-      #{areaId,jdbcType=INTEGER}, #{dispatcherId,jdbcType=CHAR}, #{commanderId,jdbcType=CHAR}, 
-      #{executorGroupId,jdbcType=VARCHAR}, #{commAssign,jdbcType=VARCHAR}, #{executAssign,jdbcType=VARCHAR}, 
-      #{verifyAssign,jdbcType=VARCHAR}, #{updatable,jdbcType=BIT}, #{archived,jdbcType=BIT}, 
-      #{deleted,jdbcType=BIT}, #{baseType,jdbcType=INTEGER}, #{createdAt,jdbcType=TIMESTAMP}, 
-      #{updatedAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, 
-      #{sync,jdbcType=BIT}, #{management,jdbcType=VARCHAR}, #{forRecordData,jdbcType=INTEGER}
+    values (#{planId,jdbcType=CHAR}, #{entityStructId,jdbcType=INTEGER}, #{entityId,jdbcType=INTEGER},
+      #{subjectId,jdbcType=INTEGER}, #{funGroupId,jdbcType=INTEGER}, #{suiteId,jdbcType=INTEGER},
+      #{military,jdbcType=BIT}, #{planStartTime,jdbcType=TIMESTAMP}, #{planEndTime,jdbcType=TIMESTAMP},
+      #{actualStartTime,jdbcType=TIMESTAMP}, #{actualEndTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER},
+      #{planNumber,jdbcType=VARCHAR}, #{planRound,jdbcType=INTEGER}, #{planName,jdbcType=VARCHAR},
+      #{areaId,jdbcType=INTEGER}, #{dispatcherId,jdbcType=CHAR}, #{commanderId,jdbcType=CHAR},
+      #{executorGroupId,jdbcType=VARCHAR}, #{commAssign,jdbcType=VARCHAR}, #{executAssign,jdbcType=VARCHAR},
+      #{verifyAssign,jdbcType=VARCHAR}, #{updatable,jdbcType=BIT}, #{archived,jdbcType=BIT},
+      #{deleted,jdbcType=BIT}, #{baseType,jdbcType=INTEGER}, #{createdAt,jdbcType=TIMESTAMP},
+      #{updatedAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR},
+      #{sync,jdbcType=BIT}, #{management,jdbcType=VARCHAR}, #{forRecordData,jdbcType=INTEGER},
+      #{remark,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.hengtiansoft.fastop.model.planner.entity.TestPlan">
@@ -260,6 +262,9 @@
       <if test="forRecordData != null">
         for_record_data,
       </if>
+      <if test="remark != null">
+        remark,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="planId != null">
@@ -360,6 +365,9 @@
       </if>
       <if test="forRecordData != null">
         #{forRecordData,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -471,6 +479,9 @@
       <if test="record.forRecordData != null">
         for_record_data = #{record.forRecordData,jdbcType=INTEGER},
       </if>
+      <if test="record.remark != null">
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -510,7 +521,8 @@
       updated_by = #{record.updatedBy,jdbcType=VARCHAR},
       sync = #{record.sync,jdbcType=BIT},
       management = #{record.management,jdbcType=VARCHAR},
-      for_record_data = #{record.forRecordData,jdbcType=INTEGER}
+      for_record_data = #{record.forRecordData,jdbcType=INTEGER},
+      remark = #{record.remark,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -614,6 +626,9 @@
       <if test="forRecordData != null">
         for_record_data = #{forRecordData,jdbcType=INTEGER},
       </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
     </set>
     where plan_id = #{planId,jdbcType=CHAR}
   </update>
@@ -650,7 +665,8 @@
       updated_by = #{updatedBy,jdbcType=VARCHAR},
       sync = #{sync,jdbcType=BIT},
       management = #{management,jdbcType=VARCHAR},
-      for_record_data = #{forRecordData,jdbcType=INTEGER}
+      for_record_data = #{forRecordData,jdbcType=INTEGER},
+      remark = #{remark,jdbcType=VARCHAR}
     where plan_id = #{planId,jdbcType=CHAR}
   </update>
 </mapper>

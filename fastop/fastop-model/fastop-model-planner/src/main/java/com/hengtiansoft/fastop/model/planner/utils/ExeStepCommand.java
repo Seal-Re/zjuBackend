@@ -5,12 +5,12 @@ import lombok.Data;
 @Data
 public class ExeStepCommand {
 
-    String exeStepId;
+    private String exeStepId;
 
-    String deviceId;
+    private String deviceId;
 
-    String command;
+    private String command;
 
-    String url;
+    private String url;
 
 }

@@ -2,13 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useGlobalFilterStore = defineStore('globalFilter', () => {
-  // Cascader values: [Model, Profession, Subsystem, TestBase]
-  // We can store them as separate values or an array.
-  // Requirement says "4 Cascader Select". Usually "Model" might be level 1, etc. or independent.
-  // The requirement says "4 separate cascader select" or "4 items corresponding to...".
-  // "4 个级联下拉框 (Cascader Select)" usually implies 4 separate controls, but if they depend on each other, they might need logic.
-  // Let's assume they are separate but affect the global context.
-
+  // 4 个独立筛选器：型号 / 专业 / 子系统 / 试验基地，组合作用于全局上下文
   const model = ref('')
   const profession = ref('')
   const subsystem = ref('')

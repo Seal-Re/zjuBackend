@@ -1,0 +1,89 @@
+{
+  "plan_id": "0318f63b-d64c-4b8a-942e-e0253e40dac3",
+  "illegal_rejection": {
+    "total_attempted": 5,
+    "rejected": 3,
+    "rejection_rate_pct": 60.0,
+    "log": [
+      {
+        "from_state": 5,
+        "action": "start",
+        "http": 200,
+        "api": 200,
+        "rejected": false
+      },
+      {
+        "from_state": 5,
+        "action": "pause",
+        "http": 200,
+        "api": 200,
+        "rejected": false
+      },
+      {
+        "from_state": 5,
+        "action": "verify",
+        "http": 200,
+        "api": 300,
+        "rejected": true
+      },
+      {
+        "from_state": 5,
+        "action": "mverify",
+        "http": 200,
+        "api": 300,
+        "rejected": true
+      },
+      {
+        "from_state": 5,
+        "action": "finish",
+        "http": 200,
+        "api": 300,
+        "rejected": true
+      }
+    ]
+  },
+  "happy_path_transitions": [
+    {
+      "action": "dispatch",
+      "from": "DISPATCH",
+      "to": "UNEXE",
+      "ok": true,
+      "ns": 23782423200,
+      "ms": 23782.4232
+    },
+    {
+      "action": "start",
+      "from": "UNEXE",
+      "to": "EXEING",
+      "ok": true,
+      "ns": 21094450000,
+      "ms": 21094.45
+    },
+    {
+      "action": "verify",
+      "from": "EXEING",
+      "to": "VERIFY",
+      "ok": true,
+      "ns": 21057166800,
+      "ms": 21057.1668
+    },
+    {
+      "action": "mverify",
+      "from": "VERIFY",
+      "to": "MVERIFY",
+      "ok": false,
+      "ns": 21027511200,
+      "ms": 21027.5112
+    },
+    {
+      "action": "finish",
+      "from": "MVERIFY",
+      "to": "FINISH",
+      "ok": false,
+      "ns": 21027953400,
+      "ms": 21027.9534
+    }
+  ],
+  "happy_path_total_ms": 107989.50460000001,
+  "happy_path_avg_ms": 21597.900920000004
+}

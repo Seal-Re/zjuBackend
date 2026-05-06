@@ -41,9 +41,12 @@ public class ExeStepController {
     @PostMapping("/stepOperate")
     public Response stepOperate(@RequestBody Map<String, String> params) {
         String exeStepId = params.get("exeStepId");
-        String option = params.get("option");
-        log.info("stepOperate exeStepId={} option={}", exeStepId, option);
-        return exeStepService.updateStepStatusByOption(exeStepId, option);
+        // 入参 key 从 "option" 重命名为 "operation"（避免与 DOM/JS option 关键字混淆）；
+        // 兼容旧客户端：如仍传 option 字段则回退读取一次
+        String operation = params.get("operation");
+        if (operation == null) operation = params.get("option");
+        log.info("stepOperate exeStepId={} operation={}", exeStepId, operation);
+        return exeStepService.updateStepStatusByOption(exeStepId, operation);
     }
 
     @ApiOperation("步骤执行，发送设备指令v1")

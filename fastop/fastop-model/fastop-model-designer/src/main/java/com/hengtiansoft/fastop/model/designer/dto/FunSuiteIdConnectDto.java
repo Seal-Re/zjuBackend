@@ -8,8 +8,8 @@ import java.util.List;
 @Data
 public class FunSuiteIdConnectDto {
 
-    Integer suiteId;
+    private Integer suiteId;
 
-    List<TestFunction> testFunctions;
+    private List<TestFunction> testFunctions;
 
 }

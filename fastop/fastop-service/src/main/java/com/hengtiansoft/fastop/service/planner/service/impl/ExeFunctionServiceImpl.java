@@ -96,63 +96,50 @@ public class ExeFunctionServiceImpl implements ExeFunctionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean conveyTestFunction2ExeFunction(Integer suiteId, String planId) {
-
-        // Local Call: replaced functionSuiteFeignService.listFunctionSuiteBySuite(suiteId)
         List<FunctionSuiteDto> functionSuites = functionSuiteService.listDtoBySuiteWithExample(suiteId);
-
         if (CollectionUtil.isEmpty(functionSuites)) {
             return true;
         }
 
-        // Optimize: Batch fetch TestFunctions if needed, but FunctionSuiteDto might already contain some info.
-        // However, existing logic fetches TestFunctions again or uses what's in DTO.
-        // Let's use the DTOs directly or fetch if detail is missing.
-        // The Reference code used: Response<TestFunction> functionResponse = testFunctionFeignService.getFunctionById(functionSuiteDto.getFunId());
-
+        // 批量拉 TestFunction，避免在循环里逐个查询
         List<Integer> funIds = functionSuites.stream()
                 .map(FunctionSuiteDto::getFunId)
                 .collect(Collectors.toList());
-
-        // Local Call: Replaced testFunctionFeignService.getFunctionById calls loop with batch fetch if possible, or single fetch.
-        // Using existing local service method to get map of functions for efficiency.
         Map<Integer, TestFunction> testFunctionMap = testFunctionService.getFunctionsByIds(funIds);
-
         if (CollectionUtil.isEmpty(testFunctionMap)) {
-             // throw new RuntimeException("未找到对应的测试功能实体数据");
-             // Or just continue if optional
-             return true;
+            return true;
         }
 
         for (FunctionSuiteDto functionSuiteDto : functionSuites) {
-
             TestFunction testFunction = testFunctionMap.get(functionSuiteDto.getFunId());
+            if (testFunction == null) continue;
 
-            if (testFunction != null) {
+            FunctionSuite functionSuite = new FunctionSuite();
+            BeanUtils.copyProperties(functionSuiteDto, functionSuite);
+            functionSuite.setTestFunId(functionSuiteDto.getFunId());
 
-                FunctionSuite functionSuite = new FunctionSuite();
-
-                BeanUtils.copyProperties(functionSuiteDto, functionSuite);
-                functionSuite.setTestFunId(functionSuiteDto.getFunId());
-
-                // Reuse logic to save ExeFunction
-                String exeFunId = saveExeFunction(functionSuite, planId, testFunction);
-
-                // Replaced conveyTestStep2ExeStep
-                // exeStepService.conveyTestStep2ExeStep(testFunction.getFunId(), exeFunId);
-                // Note: Reference uses conveyTestStep2ExeStep(TestFunction function, String exeFunId)
-                // We should implement similar logic here or delegate to ExeStepService properly.
-                // Target's ExeStepService has: conveyTestStep2ExeStep(Integer funId, String exeFunctionId)
-                exeStepService.conveyTestStep2ExeStep(testFunction.getFunId(), exeFunId);
-            }
+            String exeFunId = saveExeFunction(functionSuite, planId, testFunction);
+            // TODO 性能优化（已记 KNOWN_ISSUES）：conveyTestStep2ExeStep 内部为
+            // module→case→step 三层 N+1，单次派发可能产生数十至上百次 SQL，
+            // 待批量 IN 查询 + bulk insert 改造。
+            exeStepService.conveyTestStep2ExeStep(testFunction.getFunId(), exeFunId);
         }
-
         return true;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public String saveExeFunction(FunctionSuite functionSuite, String planId, TestFunction function) {
-        if (function == null || planId == null || planId.trim().isEmpty()) {
-            return null;
+        // 显式抛错而非返回 null：上游用返回值作为 exeStep 的外键 exeFunctionId，
+        // 一旦 null 会导致 ExeStep 表外键写入空值，做静默数据损坏；
+        // 在事务边界内抛异常配合 @Transactional(rollbackFor = Exception.class) 整体回滚。
+        if (function == null) {
+            throw new IllegalArgumentException("saveExeFunction: TestFunction 不能为 null");
+        }
+        if (planId == null || planId.trim().isEmpty()) {
+            throw new IllegalArgumentException("saveExeFunction: planId 不能为空");
+        }
+        if (functionSuite == null) {
+            throw new IllegalArgumentException("saveExeFunction: FunctionSuite 不能为 null");
         }
 
         ExeFunction eFunction = new ExeFunction();
@@ -233,8 +220,6 @@ public class ExeFunctionServiceImpl implements ExeFunctionService {
      * 通过testPlanId获取用例数量
      */
     public int countExeFunctionByPlanId(String planId) {
-        // Reference uses custom mapper method: countExeFunctionByPlanId
-        // Target Mapper is generated. Use Example.
         ExeFunctionExample example = new ExeFunctionExample();
         example.createCriteria().andPlanIdEqualTo(planId);
         long count = exeFunctionMapper.countByExample(example);
@@ -313,8 +298,6 @@ public class ExeFunctionServiceImpl implements ExeFunctionService {
     @Transactional(rollbackFor = Exception.class)
     public boolean updateCaseExeToPause(String planId) {
         boolean result = true;
-        // Reference uses custom mapper: getExeCaseIdInExeByPlanId
-        // Use Example to find executing functions
         ExeFunctionExample example = new ExeFunctionExample();
         example.createCriteria().andPlanIdEqualTo(planId).andExeStatusEqualTo(TestPlanStatusContants.PLAN_STATUS_EXEING);
         List<ExeFunction> exeFunctions = exeFunctionMapper.selectByExample(example);

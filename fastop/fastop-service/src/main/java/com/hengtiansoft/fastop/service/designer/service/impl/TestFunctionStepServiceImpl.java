@@ -119,17 +119,17 @@ public class TestFunctionStepServiceImpl implements TestFunctionStepService {
     @Override
     public Response deletePhy(Integer stepId) {
         if (stepId == null) {
-            return ResponseFactory.failure("stepId is null");
+            return ResponseFactory.failure("步骤 ID 不能为空");
         }
         TestFunctionStep testFunctionstep = testFunctionStepMapper.selectByPrimaryKey(stepId);
         if (testFunctionstep == null) {
-            return ResponseFactory.failure("cant find it" );
+            return ResponseFactory.failure("未找到对应的步骤");
         }
         int result = testFunctionStepMapper.deleteByPrimaryKey(stepId);
         if (result > 0) {
-            return ResponseFactory.success("success");
+            return ResponseFactory.success("删除成功");
         }
-        return ResponseFactory.failure("fail");
+        return ResponseFactory.failure("删除失败");
     }
 
     @Override

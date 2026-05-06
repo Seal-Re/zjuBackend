@@ -12,14 +12,12 @@
         @clear="loadData"
       />
       <el-select v-model="query.type" placeholder="设备类型" clearable style="width: 160px">
-        <el-option label="工控机" value="industrial_pc" />
-        <el-option label="传感器" value="sensor" />
-        <el-option label="执行机构" value="actuator" />
+        <el-option v-for="t in DEVICE_TYPE_OPTIONS" :key="t.value" :label="t.label" :value="t.value" />
       </el-select>
       <el-select v-model="query.status" placeholder="状态" clearable style="width: 140px">
-        <el-option label="可用" :value="1" />
-        <el-option label="禁用" :value="0" />
-        <el-option label="维护中" :value="2" />
+        <el-option label="可用" :value="DEVICE_STATUS.ENABLED" />
+        <el-option label="禁用" :value="DEVICE_STATUS.DISABLED" />
+        <el-option label="维护中" :value="DEVICE_STATUS.MAINTAIN" />
       </el-select>
       <el-button type="primary" @click="loadData">查询</el-button>
       <el-button @click="resetFilter">重置</el-button>
@@ -65,16 +63,14 @@
         </el-form-item>
         <el-form-item label="类型" prop="type">
           <el-select v-model="form.type" placeholder="请选择设备类型" style="width: 100%">
-            <el-option label="工控机" value="industrial_pc" />
-            <el-option label="传感器" value="sensor" />
-            <el-option label="执行机构" value="actuator" />
+            <el-option v-for="t in DEVICE_TYPE_OPTIONS" :key="t.value" :label="t.label" :value="t.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="form.status">
-            <el-radio :label="1">可用</el-radio>
-            <el-radio :label="2">维护中</el-radio>
-            <el-radio :label="0">禁用</el-radio>
+            <el-radio :label="DEVICE_STATUS.ENABLED">可用</el-radio>
+            <el-radio :label="DEVICE_STATUS.MAINTAIN">维护中</el-radio>
+            <el-radio :label="DEVICE_STATUS.DISABLED">禁用</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="说明">
@@ -100,6 +96,29 @@ import { useAuthStore } from '@/store/auth'
 const authStore = useAuthStore()
 const canManage = computed(() => authStore.hasRole('ADMIN'))
 
+// 设备状态枚举 / 文本 / Tag 类型映射（与后端 device.status 对齐）
+const DEVICE_STATUS = { DISABLED: 0, ENABLED: 1, MAINTAIN: 2 } as const
+const DEVICE_STATUS_TEXT: Record<number, string> = {
+    [DEVICE_STATUS.DISABLED]: '禁用',
+    [DEVICE_STATUS.ENABLED]: '可用',
+    [DEVICE_STATUS.MAINTAIN]: '维护中'
+}
+const DEVICE_STATUS_TAG: Record<number, string> = {
+    [DEVICE_STATUS.DISABLED]: 'info',
+    [DEVICE_STATUS.ENABLED]: 'success',
+    [DEVICE_STATUS.MAINTAIN]: 'warning'
+}
+
+// 设备类型枚举（联调时改字典表驱动；先抽常量去重）
+const DEVICE_TYPE_OPTIONS = [
+    { value: 'industrial_pc', label: '工控机' },
+    { value: 'sensor', label: '传感器' },
+    { value: 'actuator', label: '执行机构' }
+] as const
+const DEVICE_TYPE_TEXT: Record<string, string> = Object.fromEntries(
+    DEVICE_TYPE_OPTIONS.map(o => [o.value, o.label])
+)
+
 const loading = ref(false)
 const tableData = ref<DeviceDto[]>([])
 
@@ -119,7 +138,7 @@ const form = reactive<DeviceDto>({
   code: '',
   name: '',
   type: '',
-  status: 1,
+  status: DEVICE_STATUS.ENABLED,
   description: ''
 })
 
@@ -161,7 +180,7 @@ const openCreateDialog = () => {
   form.code = ''
   form.name = ''
   form.type = ''
-  form.status = 1
+  form.status = DEVICE_STATUS.ENABLED
   form.description = ''
   dialogVisible.value = true
 }
@@ -172,7 +191,7 @@ const openEditDialog = (row: DeviceDto) => {
   form.code = row.code
   form.name = row.name
   form.type = row.type || ''
-  form.status = row.status ?? 1
+  form.status = row.status ?? DEVICE_STATUS.ENABLED
   form.description = row.description || ''
   dialogVisible.value = true
 }
@@ -214,24 +233,14 @@ const handleDelete = (row: DeviceDto) => {
   }).catch(() => {})
 }
 
-const statusText = (status?: number) => {
-  const map: any = { 0: '禁用', 1: '可用', 2: '维护中' }
-  return map[status ?? 1] || '可用'
-}
+const statusText = (status?: number) =>
+  DEVICE_STATUS_TEXT[status ?? DEVICE_STATUS.ENABLED] || '未知'
 
-const statusType = (status?: number) => {
-  const map: any = { 0: 'info', 1: 'success', 2: 'warning' }
-  return map[status ?? 1] || 'success'
-}
+const statusType = (status?: number) =>
+  DEVICE_STATUS_TAG[status ?? DEVICE_STATUS.ENABLED] || 'info'
 
-const renderType = (type?: string) => {
-  const map: any = {
-    industrial_pc: '工控机',
-    sensor: '传感器',
-    actuator: '执行机构'
-  }
-  return map[type || ''] || type || '-'
-}
+const renderType = (type?: string) =>
+  DEVICE_TYPE_TEXT[type || ''] || type || '-'
 
 onMounted(() => {
   loadData()

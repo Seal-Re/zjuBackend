@@ -192,6 +192,7 @@ public class TestPlanServiceImpl implements TestPlanService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Response remarkTestPlan(String planId, String remark) {
         if (StringUtils.isBlank(planId)) {
             return ResponseFactory.failure("planId 不能为空");
@@ -200,7 +201,14 @@ public class TestPlanServiceImpl implements TestPlanService {
         if (testPlan == null) {
             return ResponseFactory.failure("未找到对应计划");
         }
-        // TestPlan 实体暂无 remark 列，此处预留更新点；当前仅记录操作日志
+        // 仅更新 remark 列；用 selective update 避免覆盖其他业务字段
+        TestPlan patch = new TestPlan();
+        patch.setPlanId(planId);
+        patch.setRemark(remark);
+        int rows = testPlanMapper.updateByPrimaryKeySelective(patch);
+        if (rows <= 0) {
+            return ResponseFactory.failure("备注更新失败");
+        }
         recordOperationLog("测试计划", "备注", "计划", planId,
                 remark != null ? remark : "");
         return ResponseFactory.success("备注已记录");
@@ -211,7 +219,8 @@ public class TestPlanServiceImpl implements TestPlanService {
     public Response deleteSingleTestPlan(String planId) {
 
         if (StringUtils.isBlank(planId)) {
-            return ResponseFactory.success("planId为空");
+            // 失败必须返回 failure 而非 success，否则前端把 success 当作"删除成功"误导用户
+            return ResponseFactory.failure("计划 ID 不能为空");
         }
 
         TestPlan testPlanDel = testPlanMapper.selectByPrimaryKey(planId);
@@ -242,7 +251,8 @@ public class TestPlanServiceImpl implements TestPlanService {
     public Response deleteBatchTestPlan(TestPlanDelBatchDto testPlanDelBatchDto) {
         List<String> planIds = testPlanDelBatchDto.getPlanIdLists();
         if (planIds.isEmpty()){
-            return ResponseFactory.success("planId为空");
+            // 失败必须返回 failure，避免前端 ElMessage.success 误导
+            return ResponseFactory.failure("批量删除：计划 ID 列表为空");
         }
         List<TestPlan> testPlanDelBatch = getTestPlanListByPlanId(planIds);
         List<String> planIdsDel = testPlanDelBatch.stream().map(TestPlan::getPlanId).collect(Collectors.toList());
@@ -305,22 +315,20 @@ public class TestPlanServiceImpl implements TestPlanService {
     @Override
     public Response dispatchPlan(String planId) {
         if (StringUtils.isBlank(planId)) {
-            return ResponseFactory.failure("planId is null");
+            return ResponseFactory.failure("计划 ID 不能为空");
         }
         TestPlan testPlan = testPlanMapper.selectByPrimaryKey(planId);
         if (testPlan == null) {
-            return ResponseFactory.failure("Plan not found");
+            return ResponseFactory.failure("未找到对应的测试计划");
         }
 
-        // Validate Plan status (must be UNEXE or DISPATCH)
-        // Assuming UNEXE=0, DISPATCH=0? The enum says DISPATCH.getKey() for create.
-        // Let's assume UNEXE is also OK or maybe just DISPATCH.
-        // Task description: "Validate Plan status (must be UNEXE or DISPATCH)."
-        if (!testPlan.getStatus().equals(TestPlanEnum.DISPATCH.getKey()) && !testPlan.getStatus().equals(TestPlanStatusContants.PLAN_STATUS_UNEXE)) {
-            return ResponseFactory.failure("Status invalid for dispatch");
+        // 仅允许 DISPATCH(待派工) 或 UNEXE(已下发未执行) 触发派发；其余状态拒绝
+        Integer cur = testPlan.getStatus();
+        if (!Objects.equals(cur, TestPlanStatusContants.PLAN_STATUS_DISPATCH)
+                && !Objects.equals(cur, TestPlanStatusContants.PLAN_STATUS_UNEXE)) {
+            return ResponseFactory.failure(illegalTransitionMsg(cur, "派发"));
         }
 
-        // Aggregate data
         Map<String, Object> dispatchData = new HashMap<>();
         dispatchData.put("plan", testPlan);
 
@@ -329,16 +337,18 @@ public class TestPlanServiceImpl implements TestPlanService {
         List<ExeFunction> exeFunctions = exeFunctionMapper.selectByExample(exeFunctionExample);
         dispatchData.put("functions", exeFunctions);
 
-        List<ExeStep> allSteps = new ArrayList<>();
+        // 一次性 IN 查询所有 ExeFunction 下的 step，避免逐个 function 一次 SQL 的 N+1
+        List<ExeStep> allSteps;
         if (CollectionUtil.isNotEmpty(exeFunctions)) {
-            for (ExeFunction func : exeFunctions) {
-                ExeStepExample exeStepExample = new ExeStepExample();
-                exeStepExample.createCriteria().andExeFunctionIdEqualTo(func.getExeFunctionId());
-                List<ExeStep> steps = exeStepMapper.selectByExample(exeStepExample);
-                if (CollectionUtil.isNotEmpty(steps)) {
-                    allSteps.addAll(steps);
-                }
-            }
+            List<String> exeFunctionIds = exeFunctions.stream()
+                    .map(ExeFunction::getExeFunctionId)
+                    .collect(Collectors.toList());
+            ExeStepExample exeStepExample = new ExeStepExample();
+            exeStepExample.createCriteria().andExeFunctionIdIn(exeFunctionIds);
+            allSteps = exeStepMapper.selectByExample(exeStepExample);
+            if (allSteps == null) allSteps = new ArrayList<>();
+        } else {
+            allSteps = new ArrayList<>();
         }
         dispatchData.put("steps", allSteps);
 
@@ -346,7 +356,7 @@ public class TestPlanServiceImpl implements TestPlanService {
 
         int updateCount = testPlanMapper.updateByPrimaryKeySelective(testPlan);
         if (updateCount <= 0) {
-            return ResponseFactory.failure("Failed to update plan status");
+            return ResponseFactory.failure("更新计划状态失败");
         }
         recordOperationLog("测试计划", "派发", "计划", planId, testPlan.getPlanName());
         return ResponseFactory.success(dispatchData);
@@ -356,55 +366,173 @@ public class TestPlanServiceImpl implements TestPlanService {
     @Transactional(rollbackFor = Exception.class)
     public Response startPlan(String planId) {
         if (StringUtils.isBlank(planId)) {
-            return ResponseFactory.failure("planId is null");
+            return ResponseFactory.failure("计划 ID 不能为空");
         }
         TestPlan testPlan = testPlanMapper.selectByPrimaryKey(planId);
         if (testPlan == null) {
-            return ResponseFactory.failure("Plan not found");
+            return ResponseFactory.failure("未找到对应的测试计划");
         }
 
-        testPlan.setStatus(TestPlanStatusContants.PLAN_STATUS_EXEING); // 2
-        testPlan.setActualStartTime(new Date());
+        // 仅允许 UNEXE(待执行) 或 PAUSE(暂停后恢复) 进入 EXEING；阻止 DISPATCH/VERIFY/MVERIFY/FINISH 误转
+        Integer cur = testPlan.getStatus();
+        if (!Objects.equals(cur, TestPlanStatusContants.PLAN_STATUS_UNEXE)
+                && !Objects.equals(cur, TestPlanStatusContants.PLAN_STATUS_PAUSE)) {
+            return ResponseFactory.failure(illegalTransitionMsg(cur, "开始/恢复"));
+        }
+
+        testPlan.setStatus(TestPlanStatusContants.PLAN_STATUS_EXEING);
+        // 仅首次开始时记录实际开始时间；恢复（PAUSE→EXEING）保留原值
+        if (Objects.equals(cur, TestPlanStatusContants.PLAN_STATUS_UNEXE)
+                && testPlan.getActualStartTime() == null) {
+            testPlan.setActualStartTime(new Date());
+        }
         testPlanMapper.updateByPrimaryKeySelective(testPlan);
 
-        // Cascade Update: All ExeFunction records under this plan must also update their status to EXEING.
+        // 级联：将该计划下所有 ExeFunction 状态批量改为 EXEING（一条 SQL 替代 N+1）
+        ExeFunction template = new ExeFunction();
+        template.setExeStatus(TestPlanStatusContants.PLAN_STATUS_EXEING);
         ExeFunctionExample example = new ExeFunctionExample();
         example.createCriteria().andPlanIdEqualTo(planId);
-        List<ExeFunction> exeFunctions = exeFunctionMapper.selectByExample(example);
+        exeFunctionMapper.updateByExampleSelective(template, example);
 
-        for (ExeFunction exeFunc : exeFunctions) {
-            exeFunc.setExeStatus(TestPlanStatusContants.PLAN_STATUS_EXEING); // Assuming ExeStatus follows same constants
-            exeFunctionMapper.updateByPrimaryKeySelective(exeFunc);
-        }
         recordOperationLog("测试计划", "开始", "计划", planId, testPlan.getPlanName());
-        return ResponseFactory.success("Plan started");
+        return ResponseFactory.success("计划已启动");
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Response pausePlan(String planId) {
         if (StringUtils.isBlank(planId)) {
-            return ResponseFactory.failure("planId is null");
+            return ResponseFactory.failure("计划 ID 不能为空");
         }
         TestPlan testPlan = testPlanMapper.selectByPrimaryKey(planId);
         if (testPlan == null) {
-            return ResponseFactory.failure("Plan not found");
+            return ResponseFactory.failure("未找到对应的测试计划");
         }
 
-        testPlan.setStatus(TestPlanStatusContants.PLAN_STATUS_PAUSE); // 3
+        // 仅 EXEING 可暂停；FINISH/PAUSE/VERIFY 等不允许
+        Integer cur = testPlan.getStatus();
+        if (!Objects.equals(cur, TestPlanStatusContants.PLAN_STATUS_EXEING)) {
+            return ResponseFactory.failure(illegalTransitionMsg(cur, "暂停"));
+        }
+
+        testPlan.setStatus(TestPlanStatusContants.PLAN_STATUS_PAUSE);
         testPlanMapper.updateByPrimaryKeySelective(testPlan);
 
-        // Cascade Update: All ExeFunction records under this plan must also update their status to PAUSE.
+        // 级联：将该计划下所有 ExeFunction 状态批量改为 PAUSE
+        ExeFunction template = new ExeFunction();
+        template.setExeStatus(TestPlanStatusContants.PLAN_STATUS_PAUSE);
         ExeFunctionExample example = new ExeFunctionExample();
         example.createCriteria().andPlanIdEqualTo(planId);
-        List<ExeFunction> exeFunctions = exeFunctionMapper.selectByExample(example);
+        exeFunctionMapper.updateByExampleSelective(template, example);
 
-        for (ExeFunction exeFunc : exeFunctions) {
-            exeFunc.setExeStatus(TestPlanStatusContants.PLAN_STATUS_PAUSE);
-            exeFunctionMapper.updateByPrimaryKeySelective(exeFunc);
-        }
         recordOperationLog("测试计划", "暂停", "计划", planId, testPlan.getPlanName());
-        return ResponseFactory.success("Plan paused");
+        return ResponseFactory.success("计划已暂停");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Response verifyPlan(String planId) {
+        return moveToStatus(planId, "提交检验",
+                TestPlanStatusContants.PLAN_STATUS_VERIFY,
+                Collections.singletonList(TestPlanStatusContants.PLAN_STATUS_EXEING));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Response mverifyPlan(String planId) {
+        return moveToStatus(planId, "转军检",
+                TestPlanStatusContants.PLAN_STATUS_MVERIFY,
+                Collections.singletonList(TestPlanStatusContants.PLAN_STATUS_VERIFY));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Response finishPlan(String planId) {
+        if (StringUtils.isBlank(planId)) {
+            return ResponseFactory.failure("计划 ID 不能为空");
+        }
+        TestPlan testPlan = testPlanMapper.selectByPrimaryKey(planId);
+        if (testPlan == null) {
+            return ResponseFactory.failure("未找到对应的测试计划");
+        }
+        Integer cur = testPlan.getStatus();
+        if (!Objects.equals(cur, TestPlanStatusContants.PLAN_STATUS_MVERIFY)) {
+            return ResponseFactory.failure(illegalTransitionMsg(cur, "完工"));
+        }
+        testPlan.setStatus(TestPlanStatusContants.PLAN_STATUS_FINISH);
+        if (testPlan.getActualEndTime() == null) {
+            testPlan.setActualEndTime(new Date());
+        }
+        int rows = testPlanMapper.updateByPrimaryKeySelective(testPlan);
+        if (rows <= 0) {
+            return ResponseFactory.failure("更新计划状态失败");
+        }
+        recordOperationLog("测试计划", "完工", "计划", planId, testPlan.getPlanName());
+        return ResponseFactory.success("计划已完工");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Response resetPlan(String planId) {
+        if (StringUtils.isBlank(planId)) {
+            return ResponseFactory.failure("计划 ID 不能为空");
+        }
+        TestPlan testPlan = testPlanMapper.selectByPrimaryKey(planId);
+        if (testPlan == null) {
+            return ResponseFactory.failure("未找到对应的测试计划");
+        }
+        Integer cur = testPlan.getStatus();
+        // FINISH 不允许重置；其余状态都可回到 DISPATCH 重新派工
+        if (Objects.equals(cur, TestPlanStatusContants.PLAN_STATUS_FINISH)) {
+            return ResponseFactory.failure(illegalTransitionMsg(cur, "重置"));
+        }
+        testPlan.setStatus(TestPlanStatusContants.PLAN_STATUS_DISPATCH);
+        testPlan.setActualStartTime(null);
+        testPlan.setActualEndTime(null);
+        int rows = testPlanMapper.updateByPrimaryKeySelective(testPlan);
+        if (rows <= 0) {
+            return ResponseFactory.failure("更新计划状态失败");
+        }
+        // 级联：把该计划下所有 ExeFunction 状态重置为 UNEXE，避免遗留中间态
+        ExeFunction template = new ExeFunction();
+        template.setExeStatus(TestPlanStatusContants.PLAN_STATUS_UNEXE);
+        ExeFunctionExample example = new ExeFunctionExample();
+        example.createCriteria().andPlanIdEqualTo(planId);
+        exeFunctionMapper.updateByExampleSelective(template, example);
+
+        recordOperationLog("测试计划", "重置", "计划", planId, testPlan.getPlanName());
+        return ResponseFactory.success("计划已重置");
+    }
+
+    /**
+     * 状态推进通用模板。校验当前态在 allowedFrom 内 → 写入 to。失败返回 failure，不抛异常。
+     */
+    private Response moveToStatus(String planId, String actionLabel, Integer to, List<Integer> allowedFrom) {
+        if (StringUtils.isBlank(planId)) {
+            return ResponseFactory.failure("计划 ID 不能为空");
+        }
+        TestPlan testPlan = testPlanMapper.selectByPrimaryKey(planId);
+        if (testPlan == null) {
+            return ResponseFactory.failure("未找到对应的测试计划");
+        }
+        Integer cur = testPlan.getStatus();
+        if (cur == null || !allowedFrom.contains(cur)) {
+            return ResponseFactory.failure(illegalTransitionMsg(cur, actionLabel));
+        }
+        testPlan.setStatus(to);
+        int rows = testPlanMapper.updateByPrimaryKeySelective(testPlan);
+        if (rows <= 0) {
+            return ResponseFactory.failure("更新计划状态失败");
+        }
+        recordOperationLog("测试计划", actionLabel, "计划", planId, testPlan.getPlanName());
+        return ResponseFactory.success(actionLabel + "成功");
+    }
+
+    /** 状态流转拒绝时统一文案；带可读状态名便于排查。*/
+    private static String illegalTransitionMsg(Integer cur, String action) {
+        String name = cur == null ? "未知" : TestPlanEnum.getValue(cur);
+        return "当前计划状态[" + (name == null ? cur : name) + "]不允许执行[" + action + "]";
     }
 
     private void recordOperationLog(String module, String action, String targetType, String targetId, String detail) {

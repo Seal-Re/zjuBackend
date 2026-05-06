@@ -1,7 +1,7 @@
 <template>
   <div class="login-page">
     <div class="login-card">
-      <h2 class="login-title">军检测试平台登录</h2>
+      <h2 class="login-title">{{ APP_TITLE }} · 登录</h2>
       <p class="login-subtitle">请使用分配的账号登录系统</p>
 
       <el-form :model="form" :rules="rules" ref="formRef" label-position="top">
@@ -33,7 +33,7 @@
         </el-form-item>
       </el-form>
 
-      <div class="login-hint">
+      <div v-if="isDev" class="login-hint">
         测试环境可使用：
         <span class="code">admin / 123456</span>
       </div>
@@ -46,6 +46,7 @@ import { reactive, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, type FormInstance } from 'element-plus'
 import { useAuthStore } from '@/store/auth'
+import { APP_TITLE } from '@/constants/app'
 
 const router = useRouter()
 const route = useRoute()
@@ -53,10 +54,11 @@ const authStore = useAuthStore()
 
 const formRef = ref<FormInstance>()
 const submitting = ref(false)
+const isDev = import.meta.env.DEV
 
 const form = reactive({
-  username: 'admin',
-  password: '123456'
+  username: '',
+  password: ''
 })
 
 const rules = {

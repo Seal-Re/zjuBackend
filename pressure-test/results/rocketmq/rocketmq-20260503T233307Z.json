@@ -1,0 +1,21 @@
+{
+  "ems_url_configured": false,
+  "note": "EMS service not running; producer¡úconsumer e2e latency cannot be measured. This sample times only backend round-trip on /exeStep/log/list as a proxy.",
+  "samples_count": 10,
+  "p50_ms": 10014.6621,
+  "p95_ms": 10028.4027,
+  "max_ms": 10028.4027,
+  "min_ms": 10004.6496,
+  "raw_ns": [
+    10004649600,
+    10006907900,
+    10008685900,
+    10008708000,
+    10011611200,
+    10014662100,
+    10016106600,
+    10018919200,
+    10019960400,
+    10028402700
+  ]
+}

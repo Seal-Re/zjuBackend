@@ -34,16 +34,16 @@ public class TestFunctionModuleController {
 
     @ApiOperation("删除用例")
     @PostMapping("/delete")
-    public Response deleteTestFunctionModule(@RequestParam Integer ModuleId) {
-        log.info("deleteTestFunctionModule ModuleId={}", ModuleId);
-        return testFunctionModuleService.delete(ModuleId);
+    public Response deleteTestFunctionModule(@RequestParam Integer moduleId) {
+        log.info("deleteTestFunctionModule moduleId={}", moduleId);
+        return testFunctionModuleService.delete(moduleId);
     }
 
-    @ApiOperation("根据ModuleId查询用例")
-    @GetMapping("/get/{ModuleId}")
-    public Response getByModuleId(@PathVariable Integer ModuleId) {
-        log.info("getByModuleId ModuleId={}", ModuleId);
-        return testFunctionModuleService.getByModuleId(ModuleId);
+    @ApiOperation("根据moduleId查询用例")
+    @GetMapping("/get/{moduleId}")
+    public Response getByModuleId(@PathVariable Integer moduleId) {
+        log.info("getByModuleId moduleId={}", moduleId);
+        return testFunctionModuleService.getByModuleId(moduleId);
     }
 
     @ApiOperation("根据funId查询用例列表")

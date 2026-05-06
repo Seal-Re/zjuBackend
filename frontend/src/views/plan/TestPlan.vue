@@ -252,9 +252,8 @@ import {
   getTestPlans, createTestPlan, updateTestPlan, deleteSingleTestPlan, 
   deleteTestPlanWithBatch, dispatchPlan, startPlan, pausePlan
 } from '@/api/planner'
-// 【新增】引入获取构型和清单的 API
-import { listAllBaseStructAndId } from '@/api/base' 
-import { getTestSuites } from '@/api/designer' 
+// 引入获取构型和清单的 API
+import { listAllBaseStructAndId, getTestSuites } from '@/api/designer'
 
 // --- 类型定义 ---
 interface TestPlan {

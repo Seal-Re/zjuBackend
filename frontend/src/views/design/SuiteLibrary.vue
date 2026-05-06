@@ -219,7 +219,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useGlobalFilterStore } from '@/store/globalFilter'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { InfoFilled } from '@element-plus/icons-vue'
@@ -230,9 +230,9 @@ import {
     updateTestSuite,
     getTestFunctions,
     submitTestSuite,
-    getRely
+    getRely,
+    listAllBaseStructAndId
 } from '@/api/designer'
-import { listAllBaseStructAndId } from '@/api/base' 
 
 const filterStore = useGlobalFilterStore()
 
@@ -313,12 +313,18 @@ const handleSubsystemChange = async () => {
 }
 // ============================================
 
-const STATUS_TEXT_MAP: Record<number, string> = { 0:'待提交', 1:'待校对', 2:'待批准', 3:'审签成功' }
-const getStatusText = (status: number) => STATUS_TEXT_MAP[status] || '未知状态'
-const getStatusType = (status: number) => {
-    if (status === 3) return 'success'; if (status === 0) return 'info';
-    if (status === 4) return 'warning'; return 'primary'
+const STATUS_TEXT_MAP: Record<number, string> = {
+    0: '待提交', 1: '待校对', 2: '待批准', 3: '审签成功', 4: '审签驳回'
 }
+const STATUS_TAG_MAP: Record<number, string> = {
+    0: 'info', 1: 'primary', 2: 'primary', 3: 'success', 4: 'warning'
+}
+const getStatusText = (status: number) => STATUS_TEXT_MAP[status] || '未知状态'
+const getStatusType = (status: number) => STATUS_TAG_MAP[status] || 'info'
+
+// 默认架次范围（创建/重置/编辑回退共用）
+const DEFAULT_PLANE_EFFECT_MIN = 1
+const DEFAULT_PLANE_EFFECT_MAX = 100
 
 // --- 表单对象 ---
 const form = reactive({
@@ -327,8 +333,8 @@ const form = reactive({
     suiteDesc: '',
     military: false,
     approveAssign: '',
-    planeEffectMin: 1,
-    planeEffectMax: 100 
+    planeEffectMin: DEFAULT_PLANE_EFFECT_MIN,
+    planeEffectMax: DEFAULT_PLANE_EFFECT_MAX
 })
 
 const rules = {
@@ -359,14 +365,19 @@ const compatibleFunctions = computed(() => {
         const fMin = Number(func.planeEffectMin) || 0
         const fMax = Number(func.planeEffectMax) || 9999
         return fMin === sMin && fMax === sMax
-    }).map(func => ({ 
-        ...func, 
+    }).map(func => ({
+        ...func,
         displayName: func.funName,
         funId: Number(func.funId) // 确保 ID 类型统一
     }))
 
-    excludedCount.value = allFunctions.value.length - validFuncs.length
     return validFuncs
+})
+
+// 计算属性内 mutate 另一 ref 会触发 Vue "side effect in computed" 警告，
+// 改用 watch 派生 excludedCount。
+watch(compatibleFunctions, (validFuncs) => {
+    excludedCount.value = allFunctions.value.length - validFuncs.length
 })
 
 const fetchData = async () => {
@@ -385,7 +396,8 @@ const fetchData = async () => {
 const resetForm = () => {
     form.suiteId = undefined
     form.suiteName = ''; form.suiteDesc = ''; form.military = false; form.approveAssign = ''
-    form.planeEffectMin = 1; form.planeEffectMax = 100
+    form.planeEffectMin = DEFAULT_PLANE_EFFECT_MIN
+    form.planeEffectMax = DEFAULT_PLANE_EFFECT_MAX
     selectedFunctionIds.value = []; excludedCount.value = 0; activeStep.value = 0
 }
 
@@ -416,31 +428,28 @@ const handleNextStep = async () => {
     })
 }
 
-// 修改 handleEdit 方法
 const handleEdit = async (row: any) => {
     isEditMode.value = true
-    
-    // 1. 基础信息回显
+
+    // 基础信息回显
     form.suiteId = row.suiteId
     form.suiteName = row.suiteName
     form.suiteDesc = row.suiteDesc
     form.military = !!row.military
     form.approveAssign = row.submitter || row.approveAssign || ''
-    form.planeEffectMin = row.planeEffectMin || 1
-    form.planeEffectMax = row.planeEffectMax || 100
-    
-    // 2. 先加载全量可选库 (左侧数据源)
-    // 必须先有数据源，穿梭框才能通过 ID 匹配显示出名称
+    form.planeEffectMin = row.planeEffectMin || DEFAULT_PLANE_EFFECT_MIN
+    form.planeEffectMax = row.planeEffectMax || DEFAULT_PLANE_EFFECT_MAX
+
+    // 先加载全量可选库（穿梭框需 funId 数据源才能通过 ID 显示名称）
     await loadFunctions()
 
-    // 3. 【核心修改】调用 getRely 获取已关联模块
+    // 拉取该清单已关联模块用于回显
         try {
             loadingFunctions.value = true
             const data: any = await getRely(row.suiteId)
             const functions = (data && Array.isArray(data.testFunctions)) ? data.testFunctions : []
 
             selectedFunctionIds.value = functions.map((f: any) => Number(f.funId))
-
     } catch (e) {
         console.error("获取关联模块失败", e)
         selectedFunctionIds.value = []
@@ -452,16 +461,27 @@ const handleEdit = async (row: any) => {
     dialogVisible.value = true
 }
 
-const handleDetail = (_row: any) => { /* TODO: implement detail view */ }
+const handleDetail = (row: any) => {
+  // 详情查看暂以编辑视图打开（只读模式由后端 status 控制）
+  handleEdit(row)
+}
 
 const handleSubmitToReview = async (row: any) => {
     try {
         await ElMessageBox.confirm('确定要提交该清单进行审签吗？', '提示', {
             confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'
         })
-        await submitTestSuite(row.suiteId);
-        ElMessage.success('提交成功'); fetchData()
-    } catch (e) { }
+    } catch {
+        return // 用户取消
+    }
+    try {
+        await submitTestSuite(row.suiteId)
+        ElMessage.success('提交成功')
+        fetchData()
+    } catch (e) {
+        console.error(e)
+        ElMessage.error('提交审签失败')
+    }
 }
 
 // --- 提交 ---
@@ -496,13 +516,17 @@ const submitSuite = async () => {
         fetchData() 
     } catch (e: any) {
         console.error(e)
-        ElMessage.error('操作失败: ' + (e.msg || e.message))
+        ElMessage.error('操作失败: ' + (e?.message || '未知错误'))
     } finally {
         submitting.value = false
     }
 }
 
-const handleCancel = () => { dialogVisible.value = false }
+const handleCancel = () => {
+  dialogVisible.value = false
+  // 清掉表单校验红字，避免下次打开仍残留
+  if (infoFormRef.value?.resetFields) infoFormRef.value.resetFields()
+}
 
 onMounted(() => { initBaseStructs() })
 </script>

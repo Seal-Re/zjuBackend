@@ -193,39 +193,30 @@ const emsSendLoading = ref(false)
 const fetchPlans = async () => {
     try {
         const res: any = await getTestPlans({})
-        
         const list = Array.isArray(res) ? res : []
-        // 仅展示已派发/执行中的计划，避免选择未派发计划导致“无执行结构”报错
+        // 仅展示已派发/执行中的计划，避免选择未派发计划导致"无执行结构"报错
         const runnable = list.filter((p: any) => [0, 1, 2, 3, 4, 6].includes(Number(p.status)))
-        planOptions.value = runnable.map((p: any) => ({ 
-            label: p.planName, 
-            value: p.planId, 
-            suiteId: p.suiteId 
+        planOptions.value = runnable.map((p: any) => ({
+            label: p.planName,
+            value: p.planId,
+            suiteId: p.suiteId
         }))
     } catch (e) {
-        console.error("获取计划失败:", e)
+        console.error('获取计划失败:', e)
     }
 }
 
-// 2. 加载左侧树 (核心修改区域)
+// 2. 加载左侧树
 const loadExecutionTree = async () => {
-    
-    if (!selectedPlanId.value) {
-        console.warn("未选择 PlanID，停止加载")
-        return
-    }
-    
+    if (!selectedPlanId.value) return
+
     treeLoading.value = true
     treeData.value = []
     currentTask.value = null
 
     try {
         const planInfo = planOptions.value.find(p => p.value === selectedPlanId.value)
-        
-        if (!planInfo) {
-             console.error("无法在选项中找到当前计划信息")
-             return
-        }
+        if (!planInfo) return
 
         // 根节点 (Plan)
         const root: TaskNode = {
@@ -241,28 +232,6 @@ const loadExecutionTree = async () => {
         const exeFunctions = Array.isArray(exeFunctionsRes)
             ? exeFunctionsRes
             : (exeFunctionsRes ? [exeFunctionsRes] : [])
-
-        // #region agent log exeFunctions (H1)
-        fetch('http://127.0.0.1:7636/ingest/f6c8c880-ffd9-4ffd-824d-2ebe6355dc47', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Debug-Session-Id': 'ea6e3f'
-            },
-            body: JSON.stringify({
-                sessionId: 'ea6e3f',
-                runId: 'pre-fix',
-                hypothesisId: 'H1',
-                location: 'frontend/src/views/command/CommandDashboard.vue:loadExecutionTree',
-                message: 'exeFunctions loaded',
-                data: {
-                    planId: selectedPlanId.value,
-                    count: exeFunctions.length
-                },
-                timestamp: Date.now()
-            })
-        }).catch(() => {})
-        // #endregion
 
         if (exeFunctions.length === 0) {
             ElMessage.warning("该计划暂无执行结构，请先派发计划")
@@ -286,34 +255,11 @@ const loadExecutionTree = async () => {
 
             const steps = Array.isArray(stepsRes) ? stepsRes : []
 
-            // #region agent log exeSteps (H2)
-            fetch('http://127.0.0.1:7636/ingest/f6c8c880-ffd9-4ffd-824d-2ebe6355dc47', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Debug-Session-Id': 'ea6e3f'
-                },
-                body: JSON.stringify({
-                    sessionId: 'ea6e3f',
-                    runId: 'pre-fix',
-                    hypothesisId: 'H2',
-                    location: 'frontend/src/views/command/CommandDashboard.vue:loadExecutionTree',
-                    message: 'exeSteps loaded',
-                    data: {
-                        planId: selectedPlanId.value,
-                        exeFunctionId,
-                        count: steps.length
-                    },
-                    timestamp: Date.now()
-                })
-            }).catch(() => {})
-            // #endregion
-
             // 计算进度
             let finishedCount = 0
             
             funcNode.children = steps.map((step: any) => {
-                const sStatus = step.exeStatus || 0
+                const sStatus = step.exeStatus ?? 0
                 if (sStatus === 2) finishedCount++
 
                 return {
@@ -339,9 +285,9 @@ const loadExecutionTree = async () => {
         }
 
         treeData.value = [root]
-        
+
     } catch (e: any) {
-        console.error("加载执行结构发生异常:", e)
+        console.error('加载执行结构发生异常:', e)
         const msg = String(e?.message || '')
         if (msg.includes('查询不到对应planId的ExeFunction')) {
             ElMessage.warning('当前计划暂无执行结构，请先在测试计划页执行“派发”')
@@ -413,24 +359,30 @@ const confirmSendEms = async () => {
     }
 }
 
-// 暂停 (对应 /exeStep/pause)
+// 暂停 (对应 /exeStep/pause) — 当前后端粒度只到功能组，
+// 即使选中单步骤也会暂停其所属整组。提示文案需让用户清楚跨级别影响。
 const handlePause = async () => {
     if (!currentTask.value) return
-    
-    // 如果选中的是步骤，则暂停其所属的功能组
+
     const targetFuncId = currentTask.value.exeFunctionId
     if (!targetFuncId) return
 
+    const isStep = currentTask.value.type === 'step'
+    const tip = isStep
+        ? '当前选中为单个步骤，但暂停指令将作用于其所属的整个功能组（暂停组内全部步骤）。是否继续？'
+        : '确定要暂停该功能组下的所有步骤吗？'
+
     try {
-        await ElMessageBox.confirm('确定要发送暂停指令吗？这将暂停该功能组下的所有步骤。', '警告', {
-            type: 'warning'
-        })
+        await ElMessageBox.confirm(tip, '警告', { type: 'warning' })
+    } catch {
+        return // 用户取消
+    }
+    try {
         await pauseExeFunction(targetFuncId)
-        
-        currentTask.value.status = 3 // 标记为暂停/异常
+        currentTask.value.status = 3
         ElMessage.success('暂停指令已发送')
     } catch (e) {
-        // cancel
+        console.error(e)
     }
 }
 
@@ -443,7 +395,11 @@ const getStatusClass = (status: number) => {
 }
 
 const getStatusText = (status: number) => {
-    const map: any = { 0: '未开始', 1: '进行中', 2: '已完工', 3: '已暂停' }
+    // 与后端五状态机/执行扩展态对齐：0 未开始 / 1 进行中 / 2 已完工 / 3 已暂停 / 4 异常 / 5 已审签 / 6 已派发
+    const map: Record<number, string> = {
+        0: '未开始', 1: '进行中', 2: '已完工', 3: '已暂停',
+        4: '异常', 5: '已审签', 6: '已派发'
+    }
     return map[status] || '未知'
 }
 

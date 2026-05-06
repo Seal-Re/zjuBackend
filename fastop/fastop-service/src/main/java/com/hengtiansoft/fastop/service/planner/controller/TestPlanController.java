@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @Slf4j
 @Api(tags = "测试计划管理")
 @RequestMapping("/planner/plan")
@@ -21,15 +23,15 @@ public class TestPlanController {
 
     @ApiOperation("创建新的计划")
     @PostMapping("/createTestPlan")
-    public Response createTestPlan(@RequestBody TestPlanRequestDto testPlanRequestDto) {
-        log.info("正在创建新的测试计划:", testPlanRequestDto);
+    public Response createTestPlan(@Valid @RequestBody TestPlanRequestDto testPlanRequestDto) {
+        log.info("正在创建新的测试计划: {}", testPlanRequestDto);
         return testPlanService.createTestPlan(testPlanRequestDto);
     }
 
     @ApiOperation("更新计划")
     @PostMapping("/updateTestPlan")
-    public Response updateTestPlan(@RequestBody TestPlanRequestDto testPlanRequestDto) {
-        log.info("正在更新计划:", testPlanRequestDto);
+    public Response updateTestPlan(@Valid @RequestBody TestPlanRequestDto testPlanRequestDto) {
+        log.info("正在更新计划: {}", testPlanRequestDto);
         return testPlanService.updateTestPlan(testPlanRequestDto);
     }
 
@@ -62,7 +64,7 @@ public class TestPlanController {
     }
 
     @ApiOperation("派发/同步计划")
-    @GetMapping("/dispatch/{planId}")
+    @PostMapping("/dispatch/{planId}")
     public Response dispatchPlan(@PathVariable("planId") String planId){
         log.info("Dispatch plan: {}", planId);
         return testPlanService.dispatchPlan(planId);
@@ -82,4 +84,31 @@ public class TestPlanController {
         return testPlanService.pausePlan(planId);
     }
 
+    @ApiOperation("提交检验：执行结束→待普检 (EXEING→VERIFY)")
+    @PostMapping("/verify/{planId}")
+    public Response verifyPlan(@PathVariable("planId") String planId) {
+        log.info("Verify plan: {}", planId);
+        return testPlanService.verifyPlan(planId);
+    }
+
+    @ApiOperation("转军检：普检通过→待军检 (VERIFY→MVERIFY)")
+    @PostMapping("/mverify/{planId}")
+    public Response mverifyPlan(@PathVariable("planId") String planId) {
+        log.info("Move to mverify: {}", planId);
+        return testPlanService.mverifyPlan(planId);
+    }
+
+    @ApiOperation("完工：军检通过→已完工 (MVERIFY→FINISH)")
+    @PostMapping("/finish/{planId}")
+    public Response finishPlan(@PathVariable("planId") String planId) {
+        log.info("Finish plan: {}", planId);
+        return testPlanService.finishPlan(planId);
+    }
+
+    @ApiOperation("重置计划：任意非完工态→DISPATCH，并重置 ExeFunction 状态")
+    @PostMapping("/reset/{planId}")
+    public Response resetPlan(@PathVariable("planId") String planId) {
+        log.info("Reset plan: {}", planId);
+        return testPlanService.resetPlan(planId);
+    }
 }

@@ -1,3 +1,8 @@
+/**
+ * 用户管理 API（RBAC 后台用）。
+ * 当前前端无 UI 入口直接调用，函数已实现等待后续后台页面接入；
+ * 切勿删除——保留接口契约方便后端联调对齐 mock 服务路径。
+ */
 import authRequest from './authRequest'
 
 export interface UserDto {

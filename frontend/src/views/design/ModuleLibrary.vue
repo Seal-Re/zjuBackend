@@ -179,10 +179,10 @@ import { useGlobalFilterStore } from '@/store/globalFilter'
 import { 
   createTestFunction, 
   getTestFunctions, 
-  updateTestFunction, 
-  submitTestFunction 
+  updateTestFunction,
+  submitTestFunction,
+  listAllBaseStructAndId
 } from '@/api/designer'
-import { listAllBaseStructAndId } from '@/api/base' 
 
 import { Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -195,14 +195,17 @@ const filterStore = useGlobalFilterStore()
 const currentTestBaseId = ref<number>(0)
 const tableData = ref<any[]>([])
 
-// --- 状态与颜色映射 ---
+// --- 状态与颜色映射（与后端 approveStatus 0~7 对齐）---
 const APPROVE_STATUS_MAP = [ "待提交", "待校对", "待质审", "待审查", "待批准", "待审核", "审签成功", "审签失败" ]
-const getStatusType = (status: number) => {
-  if (status === 6) return 'success'
-  if (status === 7) return 'danger' 
-  if (status === 0) return 'info'    
-  return 'warning'                   
+const STATUS_TAG_MAP: Record<number, string> = {
+    0: 'info', 1: 'primary', 2: 'primary', 3: 'primary',
+    4: 'primary', 5: 'primary', 6: 'success', 7: 'danger'
 }
+const getStatusType = (status: number) => STATUS_TAG_MAP[status] || 'warning'
+
+// 默认架次范围（创建/编辑/重置共用）
+const DEFAULT_PLANE_EFFECT_MIN = 1
+const DEFAULT_PLANE_EFFECT_MAX = 100
 
 // ================= 级联筛选核心逻辑 =================
 
@@ -214,7 +217,7 @@ const modelOptions = ref<any[]>([])
 const professionOptions = ref<any[]>([])
 const subsystemOptions = ref<any[]>([])
 
-// 1. 初始化：获取所有构型数据
+// 初始化：获取所有构型数据
 const initBaseStructs = async () => {
     try {
         const data: any = await listAllBaseStructAndId()
@@ -231,7 +234,7 @@ const initBaseStructs = async () => {
     }
 }
 
-// 2. 机型改变 -> 过滤专业
+// 机型改变 -> 过滤专业
 const handleModelChange = (val: any, clearNext = true) => {
     if (clearNext) {
         filterStore.profession = ''
@@ -256,7 +259,7 @@ const handleModelChange = (val: any, clearNext = true) => {
     }
 }
 
-// 3. 专业改变 -> 过滤子系统
+// 专业改变 -> 过滤子系统
 const handleProfessionChange = (val: any, clearNext = true) => {
     if (clearNext) {
         filterStore.subsystem = ''
@@ -282,7 +285,7 @@ const handleProfessionChange = (val: any, clearNext = true) => {
     }
 }
 
-// 4. 子系统改变 (或点击刷新) -> 查找 ID 并获取列表
+// 子系统改变（或点击刷新）-> 查找 ID 并获取列表
 const handleSubsystemChange = async () => {
     const { model, profession, subsystem } = filterStore
     
@@ -327,7 +330,10 @@ const goToDetails = (row: any) => { router.push({ name: 'ModuleOrchestration', p
 const parseComplexField = (val: any) => {
     if (!val) return []
     if (Array.isArray(val)) return val
-    try { return JSON.parse(val) } catch (e) { return [] }
+    try { return JSON.parse(val) } catch (e) {
+        console.warn('parseComplexField JSON 解析失败，返回空数组:', val)
+        return []
+    }
 }
 
 // --- 弹窗与表单逻辑 ---
@@ -340,8 +346,8 @@ const form = reactive({
     funName: '',
     military: false,
     versionDescription: '',
-    planeEffectMin: 1,
-    planeEffectMax: 100,
+    planeEffectMin: DEFAULT_PLANE_EFFECT_MIN,
+    planeEffectMax: DEFAULT_PLANE_EFFECT_MAX,
     techFiles: [] as {value: string}[],
     devices: [] as {value: string}[],
     securityChecks: []
@@ -352,8 +358,8 @@ const resetForm = () => {
     form.funName = ''
     form.military = false
     form.versionDescription = ''
-    form.planeEffectMin = 1
-    form.planeEffectMax = 100
+    form.planeEffectMin = DEFAULT_PLANE_EFFECT_MIN
+    form.planeEffectMax = DEFAULT_PLANE_EFFECT_MAX
     form.techFiles = []
     form.devices = []
     form.securityChecks = []
@@ -373,8 +379,8 @@ const openEditDialog = (row: any) => {
     form.funName = row.funName
     form.military = !!row.military
     form.versionDescription = row.versionDescription
-    form.planeEffectMin = row.planeEffectMin || 1
-    form.planeEffectMax = row.planeEffectMax || 100
+    form.planeEffectMin = row.planeEffectMin || DEFAULT_PLANE_EFFECT_MIN
+    form.planeEffectMax = row.planeEffectMax || DEFAULT_PLANE_EFFECT_MAX
     
     const techFilesRaw = parseComplexField(row.otherTechFiles)
     form.techFiles = techFilesRaw.map((item: any[]) => ({ value: item[0] || '' }))
@@ -398,7 +404,9 @@ const submitForm = async () => {
             return
         }
 
-        const commonData = {
+        // 编辑时不要回写 approveStatus，否则会把已审签模块状态打回 0（待提交），
+        // 直接覆盖业务流；只在创建时初始化为 0。
+        const commonData: Record<string, unknown> = {
             num: Number(form.num),
             funName: form.funName,
             military: form.military,
@@ -406,7 +414,6 @@ const submitForm = async () => {
             planeEffectMin: form.planeEffectMin,
             planeEffectMax: form.planeEffectMax,
             testBaseId: currentTestBaseId.value,
-            approveStatus: 0, 
             otherTechFiles: form.techFiles.map(item => [item.value]),
             devicePool: form.devices.map(item => [item.value])
         }
@@ -416,7 +423,7 @@ const submitForm = async () => {
             await updateTestFunction({ funId: currentEditId.value, ...commonData })
             ElMessage.success('修改成功')
         } else {
-            await createTestFunction(commonData)
+            await createTestFunction({ ...commonData, approveStatus: 0 })
             ElMessage.success('创建成功')
         }
         dialogVisible.value = false
@@ -432,13 +439,17 @@ const handleSubmitToReview = async (row: any) => {
         await ElMessageBox.confirm('确定要提交该模块进行审签吗？', '提示', {
             confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'
         })
-        await submitTestFunction(row.funId);
+    } catch {
+        return // 用户取消
+    }
+    try {
+        await submitTestFunction(row.funId)
         ElMessage.success('提交成功')
-        // 刷新当前列表
-        if (currentTestBaseId.value) {
-            fetchFunctions(currentTestBaseId.value)
-        }
-    } catch (e) { }
+        if (currentTestBaseId.value) fetchFunctions(currentTestBaseId.value)
+    } catch (e) {
+        console.error(e)
+        ElMessage.error('提交审签失败')
+    }
 }
 
 onMounted(() => {

@@ -69,6 +69,8 @@ public class TestPlan {
 
     private Integer forRecordData;
 
+    private String remark;
+
     public String getPlanId() {
         return planId;
     }
@@ -331,5 +333,13 @@ public class TestPlan {
 
     public void setForRecordData(Integer forRecordData) {
         this.forRecordData = forRecordData;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark == null ? null : remark.trim();
     }
 }

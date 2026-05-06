@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @Slf4j
 @Api(tags = "工艺模块管理")
 @RequestMapping("/designer/testFunction")
@@ -21,14 +23,14 @@ public class TestFunctionController {
 
     @ApiOperation("新增模块")
     @PostMapping("/add")
-    public Response addTestFunction(@RequestBody TestFunctionInfoRequestDto tFunctionInfo) {
+    public Response addTestFunction(@Valid @RequestBody TestFunctionInfoRequestDto tFunctionInfo) {
         log.info("addTestFunction: {}", tFunctionInfo);
         return testFunctionService.add(tFunctionInfo);
     }
 
     @ApiOperation("修改模块信息")
     @PostMapping("/update")
-    public Response updateTestFunction(@RequestBody TestFunctionInfoRequestDto tFunctionInfo) {
+    public Response updateTestFunction(@Valid @RequestBody TestFunctionInfoRequestDto tFunctionInfo) {
         log.info("updateTestFunction: {}", tFunctionInfo);
         return testFunctionService.update(tFunctionInfo);
     }
@@ -50,37 +52,37 @@ public class TestFunctionController {
     @ApiOperation("根据ID查询单个模块详情")
     @GetMapping("/get/{funId}")
     public Response getTestFunctionById(@ApiParam("功能ID") @PathVariable Integer funId) {
-        log.debug("getTestFunctionById funId={}", funId);
+        log.info("getTestFunctionById funId={}", funId);
         return testFunctionService.getById(funId);
     }
 
     @ApiOperation("根据基础试验ID查询模块列表")
     @GetMapping("/listByBaseId")
     public Response listTestFunctionByBaseId(@ApiParam("基础试验ID") @RequestParam Integer testBaseId) {
-        log.debug("listTestFunctionByBaseId testBaseId={}", testBaseId);
+        log.info("listTestFunctionByBaseId testBaseId={}", testBaseId);
         return testFunctionService.listByTestBaseId(testBaseId);
     }
 
     @ApiOperation("查询全部模块列表")
     @GetMapping("/listAll")
     public Response listAllTestFunction() {
-        log.debug("listAllTestFunction");
+        log.info("listAllTestFunction");
         return testFunctionService.listAll();
     }
 
     @ApiOperation("模块列表（支持可选 testBaseId 筛选）")
     @GetMapping("/list")
     public Response listTestFunction(@RequestParam(required = false) Integer testBaseId) {
-        if (testBaseId != null) {
-            return testFunctionService.listByTestBaseId(testBaseId);
-        }
-        return testFunctionService.listAll();
+        log.info("listTestFunction testBaseId={}", testBaseId);
+        return testBaseId != null
+                ? testFunctionService.listByTestBaseId(testBaseId)
+                : testFunctionService.listAll();
     }
 
     @ApiOperation("通用/条件查询模块")
     @PostMapping("/query")
     public Response queryTestFunction(@RequestBody TestFunctionInfoRequestDto tFunctionInfo) {
-        log.debug("queryTestFunction: {}", tFunctionInfo);
+        log.info("queryTestFunction: {}", tFunctionInfo);
         return testFunctionService.query(tFunctionInfo);
     }
 

@@ -314,11 +314,16 @@ public class TestSuiteServiceImpl implements TestSuiteService {
         if (level != suite.getListApprStatus()) {
             return ResponseFactory.failure("审签步骤不匹配，实际步骤为 " + StatusContants.SUITE_APP_LEVEL[suite.getListApprStatus()]);
         }
-        /*
-        if (expectedWorker == null || !expectedWorker.equals(checkWorker)) {
-            return ResponseFactory.failure("工作人员 [" + checkWorker + "] 无权在级别 " + level + " 进行 ["+StatusContants.SUITE_APP_LEVEL[level]+"]操作 期望工作人员: [" + expectedWorker + "]");
+
+        // 提交阶段（level=0）任意操作人发起；后续各级必须匹配该清单上指定的责任人，
+        // 否则任何已登录用户都能审签任何清单（与 TestFunction 审签流对齐）。
+        if (level != StatusContants.suite_app_submit) {
+            if (expectedWorker == null || !expectedWorker.equals(checkWorker)) {
+                return ResponseFactory.failure("工作人员 [" + checkWorker + "] 无权在级别 " + level
+                        + " 进行 [" + StatusContants.SUITE_APP_LEVEL[level] + "] 操作，期望工作人员: [" + expectedWorker + "]");
+            }
         }
-        TODO*/
+
         suite.setListApprStatus(targetListApprStatus);
         Integer updateCount = testSuiteMapper.updateByPrimaryKeySelective(suite);
 
