@@ -2,8 +2,8 @@
   <div class="layout-container">
     <aside class="sidebar">
       <div class="logo">
-        <span class="logo-text">{{ APP_BRAND }}</span>
-        <span class="logo-sub">{{ APP_BRAND_SUB }}</span>
+        <span class="logo-text">大飞机军检平台</span>
+        <span class="logo-sub">数字化测试</span>
       </div>
       <el-menu
         :default-active="activeMenu"
@@ -56,7 +56,7 @@
           <el-breadcrumb separator="/">
             <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
             <el-breadcrumb-item v-for="(matched, index) in route.matched" :key="index">
-              {{ (matched.meta as any)?.title || matched.name || '当前' }}
+              {{ matched.name || '当前' }}
             </el-breadcrumb-item>
           </el-breadcrumb>
         </div>
@@ -102,7 +102,6 @@ import {
   Monitor
 } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/store/auth'
-import { APP_BRAND, APP_BRAND_SUB } from '@/constants/app'
 
 const route = useRoute()
 const router = useRouter()
@@ -113,10 +112,10 @@ let timer: any = null
 
 const authStore = useAuthStore()
 
-const displayName = computed(() => authStore.user?.name || authStore.user?.username || '加载中…')
-const userInitial = computed(() => (displayName.value || '?').slice(0, 1))
+const displayName = computed(() => authStore.user?.name || authStore.user?.username || '管理员')
+const userInitial = computed(() => (displayName.value || '管').slice(0, 1))
 const isAuthenticated = computed(() => authStore.isAuthenticated)
-const canManageDevice = computed(() => authStore.hasRole('ADMIN'))
+const canManageDevice = computed(() => authStore.hasRole('系统管理'))
 
 const updateTime = () => {
   const now = new Date()

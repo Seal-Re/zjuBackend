@@ -1,64 +1,6 @@
 import request from './request'
 
-/**
- * 业务请求载荷接口集合（沿用历史宽松字段，保留 [key:string]: unknown 透传，
- * 渐进式收紧类型而不破坏现有调用方）。
- */
-export interface BaseQueryParams {
-  testBaseId?: number
-  page?: number
-  size?: number
-  [key: string]: unknown
-}
-
-export interface TestFunctionRequest {
-  funId?: number | string
-  num?: number
-  funName?: string
-  military?: boolean
-  versionDescription?: string
-  planeEffectMin?: number
-  planeEffectMax?: number
-  testBaseId?: number
-  approveStatus?: number
-  otherTechFiles?: unknown[]
-  devicePool?: unknown[]
-  [key: string]: unknown
-}
-
-export interface TestSuiteRequest {
-  suiteId?: number
-  testBaseId?: number
-  suiteName?: string
-  suiteDesc?: string
-  military?: boolean
-  submitter?: string
-  planeEffectMin?: number
-  planeEffectMax?: number
-  funIds?: number[]
-  [key: string]: unknown
-}
-
-export interface ModuleAddRequest {
-  moduleName: string
-  funId: number
-  [key: string]: unknown
-}
-
-export interface FunctionSuiteBindRequest {
-  suiteId: number
-  testFunctions: Array<{ funId: number; num?: number; version?: number }>
-  [key: string]: unknown
-}
-
-export const listAllBaseStructAndId = () => {
-  return request({
-    url: '/base/listAllBaseStructAndId',
-    method: 'get'
-  })
-}
-
-export const getTestBaseWithLimit = (params: BaseQueryParams) => {
+export const getTestBaseWithLimit = (params: Record<string, unknown>) => {
   return request({
     url: '/testBase/getTestBaseWithLimit',
     method: 'get',
@@ -66,7 +8,7 @@ export const getTestBaseWithLimit = (params: BaseQueryParams) => {
   })
 }
 
-export const getTestFunctions = (params: BaseQueryParams) => {
+export const getTestFunctions = (params: Record<string, unknown>) => {
   return request({
     url: '/designer/testFunction/listByBaseId',
     method: 'get',
@@ -74,7 +16,7 @@ export const getTestFunctions = (params: BaseQueryParams) => {
   })
 }
 
-export const getTestSuites = (params: BaseQueryParams) => {
+export const getTestSuites = (params: Record<string, unknown>) => {
   return request({
     url: '/designer/testSuite/listByBaseId',
     method: 'get',
@@ -82,7 +24,7 @@ export const getTestSuites = (params: BaseQueryParams) => {
   })
 }
 
-export const getCheckTestFunction = (params: BaseQueryParams) => {
+export const getCheckTestFunction = (params: Record<string, unknown>) => {
   return request({
     url: '/designer/testFunction/getCheckTestFunction',
     method: 'get',
@@ -90,7 +32,7 @@ export const getCheckTestFunction = (params: BaseQueryParams) => {
   })
 }
 
-export const getCheckTestSuite = (params: BaseQueryParams) => {
+export const getCheckTestSuite = (params: Record<string, unknown>) => {
   return request({
     url: '/designer/testSuite/getCheckTestSuite',
     method: 'get',
@@ -98,7 +40,7 @@ export const getCheckTestSuite = (params: BaseQueryParams) => {
   })
 }
 
-export const createTestFunction = (data: TestFunctionRequest) => {
+export const createTestFunction = (data: Record<string, unknown>) => {
   return request({
     url: '/designer/testFunction/add',
     method: 'post',
@@ -106,7 +48,7 @@ export const createTestFunction = (data: TestFunctionRequest) => {
   })
 }
 
-export const addModule = (data: ModuleAddRequest) => {
+export const addModule = (data: Record<string, unknown>) => {
   return request({
     url: '/designer/module/add',
     method: 'post',
@@ -128,7 +70,7 @@ export const checkTestFunction = (data: {
   })
 }
 
-export const createTestSuite = (data: TestSuiteRequest) => {
+export const createTestSuite = (data: Record<string, unknown>) => {
   return request({
     url: '/designer/testSuite/add',
     method: 'post',
@@ -136,7 +78,7 @@ export const createTestSuite = (data: TestSuiteRequest) => {
   })
 }
 
-export const bindFunctionToSuite = (data: FunctionSuiteBindRequest) => {
+export const bindFunctionToSuite = (data: Record<string, unknown>) => {
   return request({
     url: '/functionSuite/createFunctionSuite',
     method: 'post',
@@ -180,7 +122,7 @@ export const getTestSuiteDetail = (suiteId: string | number) => {
   })
 }
 
-export const updateTestFunction = (data: TestFunctionRequest) => {
+export const updateTestFunction = (data: Record<string, unknown>) => {
   return request({
     url: '/designer/testFunction/update',
     method: 'post',
@@ -188,7 +130,7 @@ export const updateTestFunction = (data: TestFunctionRequest) => {
   })
 }
 
-export const updateTestSuite = (data: TestSuiteRequest) => {
+export const updateTestSuite = (data: Record<string, unknown>) => {
   return request({
     url: '/designer/testSuite/update',
     method: 'post',

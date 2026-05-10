@@ -48,7 +48,7 @@ public class TestFunctionCaseController {
 
     @ApiOperation("根据moduleId查询子用例列表")
     @GetMapping("/listByModuleId")
-    public Response listByModuleId(@RequestParam Integer moduleId) {
+    public Response listByFunId(@RequestParam Integer moduleId) {
         log.info("listByModuleId moduleId={}", moduleId);
         return testFunctionCaseService.getByModuleId(moduleId);
     }

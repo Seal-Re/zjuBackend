@@ -490,7 +490,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"exeStepId\": \"c7afa0d3-91bf-41ed-9189-5785df04bcfc\",\r\n    \"operation\": \"runStep\"\r\n}",
+          "raw": "{\r\n    \"exeStepId\": \"c7afa0d3-91bf-41ed-9189-5785df04bcfc\",\r\n    \"option\": \"runStep\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -520,7 +520,7 @@
               "disabled": true
             },
             {
-              "key": "operation",
+              "key": "option",
               "value": "runStep",
               "type": "text",
               "uuid": "b10cbb3a-6649-4914-8ab5-46102bdde257",

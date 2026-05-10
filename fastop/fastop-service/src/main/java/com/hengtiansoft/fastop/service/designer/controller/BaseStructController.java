@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BaseStructController {
 
     @Autowired
-    private BaseStructService baseStructService;
+    public BaseStructService baseStructService;
 
     @GetMapping("/listAllBaseStruct")
     @ApiOperation("获取基础构型")

@@ -1,28 +1,5 @@
 import request from '@/api/request'
 
-/** 子用例（Case）请求载荷，对齐后端 TestFunctionCase 实体可写字段 */
-export interface CaseRequest {
-  caseId?: number
-  caseName?: string
-  caseDescription?: string
-  moduleId?: number
-  [key: string]: unknown
-}
-
-/** 步骤（Step）请求载荷，对齐后端 TestFunctionStep 实体可写字段 + 自助 EMS 报文 */
-export interface StepRequest {
-  stepId?: number
-  caseId?: number
-  stepName?: string
-  stepDescription?: string
-  stepOperation?: string
-  stepObj?: string
-  stepPurpose?: string
-  stepCommandExample?: string
-  stepCommandParams?: string
-  [key: string]: unknown
-}
-
 export function getModuleTree(funId: number) {
   return request({
     url: '/designer/module/treeByFunId',
@@ -31,7 +8,7 @@ export function getModuleTree(funId: number) {
   })
 }
 
-export function addCase(data: CaseRequest) {
+export function addCase(data: Record<string, unknown>) {
   return request({
     url: '/designer/case/add',
     method: 'post',
@@ -39,7 +16,7 @@ export function addCase(data: CaseRequest) {
   })
 }
 
-export function updateCase(data: CaseRequest) {
+export function updateCase(data: Record<string, unknown>) {
   return request({
     url: '/designer/case/update',
     method: 'post',
@@ -55,7 +32,7 @@ export function deleteCase(caseId: number) {
   })
 }
 
-export function addStep(data: StepRequest) {
+export function addStep(data: Record<string, unknown>) {
   return request({
     url: '/designer/step/add',
     method: 'post',
@@ -63,7 +40,7 @@ export function addStep(data: StepRequest) {
   })
 }
 
-export function updateStep(data: StepRequest) {
+export function updateStep(data: Record<string, unknown>) {
   return request({
     url: '/designer/step/update',
     method: 'post',
@@ -75,7 +52,7 @@ export function deleteStep(stepId: number) {
   return request({
     url: '/designer/step/delete',
     method: 'post',
-    params: { stepId }
+    params: { StepId: stepId }
   })
 }
 
@@ -83,6 +60,6 @@ export function deleteModule(moduleId: number) {
   return request({
     url: '/designer/module/delete',
     method: 'post',
-    params: { moduleId }
+    params: { ModuleId: moduleId }
   })
 }

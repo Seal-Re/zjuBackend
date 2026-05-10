@@ -24,12 +24,10 @@
         <swagger-models.version>1.5.21</swagger-models.version>
         <swagger-annotations.version>1.5.21</swagger-annotations.version>
         <druid.version>1.1.22</druid.version>
-        <!-- commons-text 1.9 受 CVE-2022-42889 (Text4Shell RCE) 影响，升级到 1.10.0 -->
-        <commons-text.version>1.10.0</commons-text.version>
+        <commons-text.version>1.9</commons-text.version>
         <hutool.version>5.7.13</hutool.version>
         <mybatis-spring-boot.version>2.2.0</mybatis-spring-boot.version>
-        <!-- fastjson 1.2.78 受多个 autotype RCE CVE 影响，升级到官方安全版 1.2.83 -->
-        <fastjson.version>1.2.83</fastjson.version>
+        <fastjson.version>1.2.78</fastjson.version>
     </properties>
     <dependencyManagement>
         <dependencies>

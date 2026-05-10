@@ -38,7 +38,7 @@ public class TestExampleServiceImpl implements TestExampleService {
     }
 
     @Override
-    public Response updateAll() {
+    public Response UpdateAll() {
         StringBuilder sb = new StringBuilder();
 
         ProcessResult moduleResult = updateModule();

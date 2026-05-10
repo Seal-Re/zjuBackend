@@ -56,27 +56,26 @@ public class ResponseFactory {
     }
 
     public static <T> ResponseBuilder<T> builder() {
-        return new ResponseBuilder<>();
-    }
+            return new ResponseBuilder<>();
+        }
 
-    public static <T> Response<T> build(int code, String msg) {
-        return (Response<T>) builder().withCode(code).withMsg(msg).build();
-    }
+        public static <T> Response<T> build(int code, String msg) {
+            return (Response<T>) builder().withCode(code).withMsg(msg).build();
+        }
 
-    public static <T> Response<T> success(T data) {
-        return (Response<T>) builder().withData(data).build();
-    }
+        public static <T> Response<T> success(T data) {
+            return (Response<T>) builder().withData(data).build();
+        }
 
-    /**
-     * 仅返回提示文案的 success（不写入 data 字段），适用于"删除/操作成功"等无业务数据返回的场景。
-     * 旧代码大量使用 success("xxx 成功") 把字符串塞进 data 字段，前端 res.data 拿到字符串不便处理；
-     * 新代码请使用 successMsg("...")，data 保持 null，message 字段承载提示文案。
-     */
-    public static <T> Response<T> successMsg(String msg) {
-        return (Response<T>) builder().withMsg(msg).build();
-    }
+        public static <T> Response<T> failure(String msg) {
+            return (Response<T>) builder().withCode(ResponseCode.FAILURE_CODE).withMsg(msg).build();
+        }
 
-    public static <T> Response<T> failure(String msg) {
-        return (Response<T>) builder().withCode(ResponseCode.FAILURE_CODE).withMsg(msg).build();
-    }
+
+        public static <T> T getFeignData(Response<T> respData) {
+            if (respData == null || respData.getCode() != ResponseCode.SUCC_CODE || respData.getData() == null) {
+                return null;
+            }
+            return respData.getData();
+        }
 }

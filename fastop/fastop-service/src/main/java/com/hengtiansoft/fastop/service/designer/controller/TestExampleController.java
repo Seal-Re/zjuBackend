@@ -23,6 +23,6 @@ public class TestExampleController {
     @PostMapping("/updateAll")
     public Response updateAll() {
         log.info("updateAll test examples");
-        return testExampleService.updateAll();
+        return testExampleService.UpdateAll();
     }
 }
