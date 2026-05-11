@@ -1,7 +1,0 @@
-//scripts/plan_list_run.lua: cannot open //scripts/plan_list_run.lua: No such file or directory
-//scripts/plan_list_run.lua: cannot open //scripts/plan_list_run.lua: No such file or directory
-//scripts/plan_list_run.lua: cannot open //scripts/plan_list_run.lua: No such file or directory
-//scripts/plan_list_run.lua: cannot open //scripts/plan_list_run.lua: No such file or directory
-//scripts/plan_list_run.lua: cannot open //scripts/plan_list_run.lua: No such file or directory
-Running 1m test @ http://host.docker.internal:20004
-Assertion failed: bucket_index < h->bucket_count (src/hdr_histogram.c: counts_index: 54)

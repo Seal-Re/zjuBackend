@@ -1,74 +1,49 @@
 spring:
   application:
-    # 应用名（原值 service-designer 是早期微服务残骸，已统一为 fastop 主项目名）
-    name: fastop
+    name: service-designer
   profiles:
     active: ${FASTOP_PROFILES_ACTIVE:dev}
   datasource:
     druid:
-      url: ${FASTOP_DATASOURCE_URL:jdbc:mysql://localhost:3304/autosys_1014?useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
+      url: ${FASTOP_DATASOURCE_URL:jdbc:mysql://localhost:3304/autosys_1014}
       username: ${FASTOP_DATASOURCE_USERNAME:root}
-      # 仅供本地开发的弱默认密码，生产必须通过 FASTOP_DATASOURCE_PASSWORD 注入
       password: ${FASTOP_DATASOURCE_PASSWORD:Fastop@123}
-      # Druid 连接池基础参数
-      initial-size: 5
-      min-idle: 5
-      max-active: 20
-      max-wait: 60000
-      validation-query: SELECT 1
-      test-while-idle: true
-      time-between-eviction-runs-millis: 60000
-  servlet:
-    multipart:
-      # 上传报文 / 技术文件等可能较大，提升默认限制
-      max-file-size: 50MB
-      max-request-size: 100MB
-  mvc:
-    pathmatch:
-      # SpringFox 2.9.2 在 Spring Boot 2.6+ 启动会因 PathPattern 默认策略触发 NPE，
-      # 切回 ANT_PATH_MATCHER 解决；待迁移 SpringDoc OpenAPI 后可去除。
-      matching-strategy: ANT_PATH_MATCHER
-  jackson:
-    # 统一日期格式与时区，避免 Date 字段返前端时格式漂移（默认 epoch ms 不可读）
-    date-format: yyyy-MM-dd HH:mm:ss
-    time-zone: Asia/Shanghai
-    default-property-inclusion: non_null
+  security:
+    oauth2:
+      client:
+        registration:
+          idp:
+            client-id: ${IDP_CLIENT_ID:client}
+            client-secret: ${IDP_CLIENT_SECRET:secret}
+            authorization-grant-type: authorization_code
+            # 默认：dev 模式让回调走 Vite 代理（cookie 会种在前端 origin 上）。
+            # 生产同源部署时改成 "{baseUrl}/login/oauth2/code/{registrationId}"
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - openid
+              - profile
+        provider:
+          idp:
+            issuer-uri: http://192.168.1.97:19000
 
 server:
   port: ${FASTOP_SERVER_PORT:10001}
   servlet:
     context-path: /fastop
-  # 启用优雅停机，避免重启时打断正在处理的请求
-  shutdown: graceful
+    session:
+      cookie:
+        name: FASTOP_SESSIONID
+        path: /
 
 mybatis:
   mapper-locations: classpath:/mapper/*.xml
-  configuration:
-    # 数据库下划线 → Java 驼峰自动映射（避免每个 ResultMap 重复声明）
-    map-underscore-to-camel-case: true
-
-logging:
-  level:
-    root: info
-    com.hengtiansoft.fastop: info
-  pattern:
-    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
-
-management:
-  endpoints:
-    web:
-      exposure:
-        # 仅暴露 health/info，避免 env/heapdump 等敏感端点对外
-        include: health,info
-      base-path: /actuator
-  endpoint:
-    health:
-      show-details: when-authorized
 
 fastop:
   integration:
     device-controller-url: ${FASTOP_DEVICE_CONTROLLER_URL:http://localhost:5001}
-    # EMS 地址默认空，由部署环境通过 FASTOP_EMS_URL 注入；避免将内网真实 IP 写进配置默认
-    ems-url: ${FASTOP_EMS_URL:}
+    ems-url: ${FASTOP_EMS_URL:http://192.168.1.97:11452/subscribe/product}
     ems-send-path: ${FASTOP_EMS_SEND_PATH:/addDefault}
     ems-ability-default: ${FASTOP_EMS_ABILITY_DEFAULT:fastop.send}
+  web:
+    frontend-origin: ${FASTOP_FRONTEND_ORIGIN:http://localhost:5173}
+    post-login-redirect: ${FASTOP_POST_LOGIN_REDIRECT:http://localhost:5173/}

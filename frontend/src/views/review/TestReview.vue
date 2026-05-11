@@ -6,6 +6,7 @@
     </el-tabs>
 
     <div class="actions" style="margin-bottom: 20px">
+        <el-button type="success" :disabled="!tableData.length">批量审签</el-button>
         <el-button type="primary" link @click="loadData">刷新列表</el-button>
     </div>
 
@@ -86,17 +87,16 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import {
-    checkTestFunction,
+import { 
+    checkTestFunction, 
     getCheckTestFunction,
     checkTestSuite,
-    getCheckTestSuite
+    getCheckTestSuite 
 } from '@/api/designer'
-import { useAuthStore } from '@/store/auth'
 
-const authStore = useAuthStore()
+// --- 1. 常量定义 ---
 
-// 模块：0-6 (6是成功，7是失败)
+// 模块：0-6 (6是成功)
 const FUNS_APP_LEVEL = [
   "待提交",   // 0
   "待校对",   // 1
@@ -117,7 +117,8 @@ const SUITE_APP_LEVEL = [
   "审签失败"  // 4
 ];
 
-const activeTab = ref('function')
+// --- 2. 状态管理 ---
+const activeTab = ref('function') 
 const tableData = ref<any[]>([])
 const loading = ref(false) 
 const dialogVisible = ref(false)
@@ -129,8 +130,11 @@ const form = reactive({
     comment: ''
 })
 
-// 成功状态码界定（失败状态码 success+1，前端不再模拟，后端返回真值）
+// --- 3. 计算属性与工具函数 ---
+
+// 成功/失败状态码界定
 const SUCCESS_CODE = computed(() => activeTab.value === 'function' ? 6 : 3)
+const FAIL_CODE = computed(() => activeTab.value === 'function' ? 7 : 4)
 
 // 获取当前 Tab 的下拉选项 (不包含成功状态，只包含待处理状态)
 const currentApprovalOptions = computed(() => {
@@ -177,6 +181,8 @@ const getNextStepTip = () => {
     return `通过后将流转至：${nextText} (${next})`;
 }
 
+// --- 4. 核心逻辑 ---
+
 const handleTabChange = () => {
     tableData.value = [];
     loadData();
@@ -193,15 +199,14 @@ const loadData = async () => {
         }
         const rawList = Array.isArray(res) ? res : [];
         
-        // 后端字段：TestFunction.approveStatus / TestSuite.listApprStatus
         tableData.value = rawList.map((item: any) => ({
             ...item,
             approveStatus: Number(
               activeTab.value === 'function'
-                ? (item.approveStatus ?? 0)
-                : (item.listApprStatus ?? 0)
+                ? (item.approveStatus ?? item.Approvestatus ?? 0)
+                : (item.listApprStatus ?? item.approveStatus ?? 0)
             ),
-            _rowKey: item.funId || item.suiteId || item.id
+            _rowKey: item.funId || item.suiteId || item.id 
         }))
     } catch (error) {
         console.error(error)
@@ -221,42 +226,47 @@ const openCheckDialog = (row: any) => {
 
 const submitCheck = async () => {
     if (!currentId.value) return;
-    const currentLevel = Number(form.level);
-
-    // 审批人取自当前登录用户而非硬编码 'worker'，否则审计日志失去溯源意义
-    const currentUser = authStore.user?.username || authStore.user?.name
-    if (!currentUser) {
-        ElMessage.error('登录态异常，请重新登录后再审签')
-        return
-    }
+    const currentLevel = Number(form.level); 
 
     try {
         if (activeTab.value === 'function') {
             await checkTestFunction({
                 funId: currentId.value,
-                checkWorker: currentUser,
+                checkWorker: 'worker', 
                 level: currentLevel,
-                result: form.result,
+                result: form.result, 
                 comment: form.comment
             })
         } else {
             await checkTestSuite({
                 suiteId: currentId.value,
-                checkWorker: currentUser,
+                checkWorker: 'worker',
                 level: currentLevel,
                 result: form.result,
                 comment: form.comment
             })
         }
-
+        
         ElMessage.success('审签操作成功')
         dialogVisible.value = false
-        // 不再前端模拟状态机，从后端拉真实状态避免漂移
-        loadData()
+        
+        // --- 视图更新逻辑 ---
+        const targetIndex = tableData.value.findIndex(item => item._rowKey === currentId.value);
+        if (targetIndex !== -1) {
+            let newStatus = FAIL_CODE.value;
+            
+            if (form.result === 'pass') {
+                const maxSuccess = SUCCESS_CODE.value;
+                // 线性 +1
+                newStatus = currentLevel >= maxSuccess ? maxSuccess : currentLevel + 1;
+            } 
+            
+            tableData.value[targetIndex].approveStatus = newStatus;
+        }
 
     } catch (e: any) {
         console.error(e)
-        ElMessage.error('审签失败，请稍后重试')
+        ElMessage.error(e.message || '审签失败')
     }
 }
 

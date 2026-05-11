@@ -3,7 +3,6 @@ package com.hengtiansoft.fastop.model.planner.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import java.util.Date;
 import java.util.List;
 
@@ -30,12 +29,10 @@ public class TestPlanRequestDto {
 
     private Integer status;
 
-    @NotBlank(message = "计划编号不能为空")
     private String planNumber;
 
     private Integer planRound;
 
-    @NotBlank(message = "计划名称不能为空")
     private String planName;
 
     private Integer areaId;

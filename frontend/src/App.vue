@@ -6,7 +6,7 @@
 </script>
 
 <style>
-/* 数字化军检测试平台 - 全局变量与基础样式 */
+/* 国产大飞机军检系统 - 全局变量与基础样式 */
 :root {
   --app-sidebar-bg: #0d1b2a;
   --app-sidebar-active: #1b4962;

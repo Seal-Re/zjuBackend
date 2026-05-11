@@ -1,0 +1,31 @@
+server:
+  port: 10001
+  servlet:
+    context-path: /fastop
+
+spring:
+  application:
+    name: service-designer
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.1.97:8848
+        namespace: xdfastop
+        ip: 192.168.1.156
+        enabled: true
+      config:
+        server-addr: 192.168.1.97:8848
+        file-extension: yml
+        group: DEFAULT_GROUP
+        namespace: xdfastop
+        enabled: true
+        prefix: service-designer
+        refreshable-dataids: app-service.yml
+
+nacos:
+  discovery:
+    enabled: true
+  config:
+    enabled: true

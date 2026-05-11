@@ -126,17 +126,17 @@ public class TestFunctionModuleServiceImpl implements TestFunctionModuleService 
     @Override
     public Response deletePhy(Integer moduleId) {
         if (moduleId == null) {
-            return ResponseFactory.failure("用例 ID 不能为空");
+            return ResponseFactory.failure("moduleId is null");
         }
         TestFunctionModule testFunctionmodule = testFunctionModuleMapper.selectByPrimaryKey(moduleId);
         if (testFunctionmodule == null) {
-            return ResponseFactory.failure("未找到对应的用例");
+            return ResponseFactory.failure("cant find it" );
         }
         int result = testFunctionModuleMapper.deleteByPrimaryKey(moduleId);
         if (result > 0) {
-            return ResponseFactory.success("删除成功");
+            return ResponseFactory.success("success");
         }
-        return ResponseFactory.failure("删除失败");
+        return ResponseFactory.failure("fail");
     }
 
     @Override

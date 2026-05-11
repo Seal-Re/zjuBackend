@@ -2,7 +2,6 @@
 .env
 .env.local
 *.env
-*.local
 !.env.example
 application-local.yml
 *local*.yml
@@ -24,14 +23,10 @@ __pycache__/
 .venv/
 venv/
 .pytest_cache/
-auth-mock-service/__pycache__/
-auth-mock-service/venv/
-auth-mock-service/.venv/
 
 # ── Node / frontend ──
 frontend/node_modules/
 frontend/dist/
-frontend/.vite/
 frontend/.env.local
 frontend/tsconfig.tsbuildinfo
 frontend/tsconfig.node.tsbuildinfo
@@ -51,16 +46,3 @@ Thumbs.db
 /logs/
 /temp/
 *.log
-
-# ── AI / editor debug residue (avoid sessionId leak) ──
-.cursor/
-.claude/
-
-# ── Large data dumps (GitHub 100MB hard limit / 50MB warning) ──
-# Raw V2 schema dump and migration build artifacts; regenerate via data-migration/scripts/.
-data/0723.sql
-data-migration/output/fastop_v25_full.sql
-data-migration/output/combined_v25_data.sql
-data-migration/extracted/0723/exe_step.sql
-data-migration/extracted/0723/exe_step_command.sql
-data-migration/extracted/0723/test_steps.sql

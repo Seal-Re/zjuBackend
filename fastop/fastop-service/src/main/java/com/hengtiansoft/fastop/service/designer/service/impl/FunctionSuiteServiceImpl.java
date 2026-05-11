@@ -54,11 +54,11 @@ public class FunctionSuiteServiceImpl implements FunctionSuiteService {
     public Response createFunctionSuite(FunSuiteIdConnectDto funSuiteIdConnectDto) {
         Integer suiteId = funSuiteIdConnectDto.getSuiteId();
         if (null == suiteId) {
-            return ResponseFactory.failure("清单 ID 不能为空");
+            return ResponseFactory.failure("suiteId is null");
         }
         List<TestFunction> testFunctions = funSuiteIdConnectDto.getTestFunctions();
         if (null == testFunctions) {
-            return ResponseFactory.failure("待关联的模块列表不能为空");
+            return ResponseFactory.failure("testFunctions is null");
         }
 
         TestSuite tSuite = testSuiteService.getTestSuiteInfoById(suiteId);
@@ -104,11 +104,11 @@ public class FunctionSuiteServiceImpl implements FunctionSuiteService {
     public Response deleteFunctionSuite(FunctionSuiteDeleteDto functionSuiteDeleteDto) {
         Integer suiteId = functionSuiteDeleteDto.getSuiteId();
         if (null == suiteId) {
-            return ResponseFactory.failure("清单 ID 不能为空");
+            return ResponseFactory.failure("suiteId is null");
         }
         List<FunctionSuiteDto> functionSuiteDtos = functionSuiteDeleteDto.getFunctionSuiteDtos();
         if (null == functionSuiteDtos) {
-            return ResponseFactory.failure("待删除的模块列表不能为空");
+            return ResponseFactory.failure("functionSuiteDtos is null");
         }
 
         TestSuite tSuite = testSuiteService.getTestSuiteInfoById(suiteId);
@@ -205,7 +205,7 @@ public class FunctionSuiteServiceImpl implements FunctionSuiteService {
         // 审查特殊清单
         testSuiteService.reviewSuiteSpecial(suiteId);
 
-        return ResponseFactory.success("操作成功");
+        return ResponseFactory.success("success");
     }
 
     @Override

@@ -1,49 +1,6 @@
 import request from './request'
 
-/**
- * 与后端 TestPlanRequestDto 对齐的请求体。
- * 业务逻辑保持向后兼容（额外字段允许通过 `[k: string]: unknown` 透传），
- * 但常用字段先以显式可选属性给 IDE/编译器留下类型保护。
- */
-export interface TestPlanRequest {
-  planId?: string
-  planName?: string
-  planNumber?: string
-  planRound?: number
-  planStartTime?: string
-  planEndTime?: string
-  status?: number
-  suiteId?: number
-  entityStructId?: number
-  entityId?: number
-  subjectId?: number
-  funGroupId?: number
-  funGroupIds?: number[]
-  areaId?: number
-  military?: boolean
-  dispatcherId?: string
-  commanderId?: string
-  management?: string
-  forRecordData?: number
-  remark?: string
-  [key: string]: unknown
-}
-
-export interface TestPlanBatchDeleteRequest {
-  planIdLists: string[]
-  [key: string]: unknown
-}
-
-export interface TestPlanQueryParams {
-  testBaseId?: number
-  status?: number
-  planName?: string
-  page?: number
-  size?: number
-  [key: string]: unknown
-}
-
-export const createTestPlan = (data: TestPlanRequest) => {
+export const createTestPlan = (data: Record<string, unknown>) => {
   return request({
     url: '/planner/plan/createTestPlan',
     method: 'post',
@@ -51,7 +8,7 @@ export const createTestPlan = (data: TestPlanRequest) => {
   })
 }
 
-export const updateTestPlan = (data: TestPlanRequest) => {
+export const updateTestPlan = (data: Record<string, unknown>) => {
   return request({
     url: '/planner/plan/updateTestPlan',
     method: 'post',
@@ -59,7 +16,7 @@ export const updateTestPlan = (data: TestPlanRequest) => {
   })
 }
 
-export const remarkTestPlan = (data: { planId: string; remark: string }) => {
+export const remarkTestPlan = (data: Record<string, unknown>) => {
   return request({
     url: '/planner/plan/remarkTestPlan',
     method: 'post',
@@ -74,7 +31,7 @@ export const deleteSingleTestPlan = (planId: string) => {
   })
 }
 
-export const deleteTestPlanWithBatch = (data: TestPlanBatchDeleteRequest) => {
+export const deleteTestPlanWithBatch = (data: Record<string, unknown>) => {
   return request({
     url: '/planner/plan/deleteTestPlanWithBatch',
     method: 'delete',
@@ -82,7 +39,7 @@ export const deleteTestPlanWithBatch = (data: TestPlanBatchDeleteRequest) => {
   })
 }
 
-export const getTestPlans = (params?: TestPlanQueryParams) => {
+export const getTestPlans = (params?: Record<string, unknown>) => {
   return request({
     url: '/planner/plan/listAll',
     method: 'get',
@@ -93,7 +50,7 @@ export const getTestPlans = (params?: TestPlanQueryParams) => {
 export const dispatchPlan = (planId: string) => {
   return request({
     url: `/planner/plan/dispatch/${planId}`,
-    method: 'post'
+    method: 'get'
   })
 }
 

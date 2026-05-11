@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hengtiansoft.fastop.model.designer.dto.TestFunctionStepMapper">
+  <resultMap id="BaseResultMap" type="com.hengtiansoft.fastop.model.designer.entity.TestFunctionStep">
+    <id column="step_id" jdbcType="INTEGER" property="stepId" />
+    <result column="step_name" jdbcType="VARCHAR" property="stepName" />
+    <result column="change_user" jdbcType="VARCHAR" property="changeUser" />
+    <result column="step_description" jdbcType="VARCHAR" property="stepDescription" />
+    <result column="step_note" jdbcType="VARCHAR" property="stepNote" />
+    <result column="step_date" jdbcType="VARCHAR" property="stepDate" />
+    <result column="step_operation" jdbcType="VARCHAR" property="stepOperation" />
+    <result column="step_obj" jdbcType="VARCHAR" property="stepObj" />
+    <result column="step_purpose" jdbcType="VARCHAR" property="stepPurpose" />
+    <result column="total_send" jdbcType="BIT" property="totalSend" />
+    <result column="condition_status" jdbcType="VARCHAR" property="conditionStatus" />
+    <result column="case_id" jdbcType="INTEGER" property="caseId" />
+    <result column="step_status" jdbcType="INTEGER" property="stepStatus" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    step_id, step_name, change_user, step_description, step_note, step_date, step_operation, 
+    step_obj, step_purpose, total_send, condition_status, case_id, step_status
+  </sql>
+  <select id="selectByExample" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionStepExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from test_function_step
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from test_function_step
+    where step_id = #{stepId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from test_function_step
+    where step_id = #{stepId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionStepExample">
+    delete from test_function_step
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionStep">
+    insert into test_function_step (step_id, step_name, change_user, 
+      step_description, step_note, step_date, 
+      step_operation, step_obj, step_purpose, 
+      total_send, condition_status, case_id, 
+      step_status)
+    values (#{stepId,jdbcType=INTEGER}, #{stepName,jdbcType=VARCHAR}, #{changeUser,jdbcType=VARCHAR}, 
+      #{stepDescription,jdbcType=VARCHAR}, #{stepNote,jdbcType=VARCHAR}, #{stepDate,jdbcType=VARCHAR}, 
+      #{stepOperation,jdbcType=VARCHAR}, #{stepObj,jdbcType=VARCHAR}, #{stepPurpose,jdbcType=VARCHAR}, 
+      #{totalSend,jdbcType=BIT}, #{conditionStatus,jdbcType=VARCHAR}, #{caseId,jdbcType=INTEGER}, 
+      #{stepStatus,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionStep">
+    insert into test_function_step
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="stepId != null">
+        step_id,
+      </if>
+      <if test="stepName != null">
+        step_name,
+      </if>
+      <if test="changeUser != null">
+        change_user,
+      </if>
+      <if test="stepDescription != null">
+        step_description,
+      </if>
+      <if test="stepNote != null">
+        step_note,
+      </if>
+      <if test="stepDate != null">
+        step_date,
+      </if>
+      <if test="stepOperation != null">
+        step_operation,
+      </if>
+      <if test="stepObj != null">
+        step_obj,
+      </if>
+      <if test="stepPurpose != null">
+        step_purpose,
+      </if>
+      <if test="totalSend != null">
+        total_send,
+      </if>
+      <if test="conditionStatus != null">
+        condition_status,
+      </if>
+      <if test="caseId != null">
+        case_id,
+      </if>
+      <if test="stepStatus != null">
+        step_status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="stepId != null">
+        #{stepId,jdbcType=INTEGER},
+      </if>
+      <if test="stepName != null">
+        #{stepName,jdbcType=VARCHAR},
+      </if>
+      <if test="changeUser != null">
+        #{changeUser,jdbcType=VARCHAR},
+      </if>
+      <if test="stepDescription != null">
+        #{stepDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="stepNote != null">
+        #{stepNote,jdbcType=VARCHAR},
+      </if>
+      <if test="stepDate != null">
+        #{stepDate,jdbcType=VARCHAR},
+      </if>
+      <if test="stepOperation != null">
+        #{stepOperation,jdbcType=VARCHAR},
+      </if>
+      <if test="stepObj != null">
+        #{stepObj,jdbcType=VARCHAR},
+      </if>
+      <if test="stepPurpose != null">
+        #{stepPurpose,jdbcType=VARCHAR},
+      </if>
+      <if test="totalSend != null">
+        #{totalSend,jdbcType=BIT},
+      </if>
+      <if test="conditionStatus != null">
+        #{conditionStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="caseId != null">
+        #{caseId,jdbcType=INTEGER},
+      </if>
+      <if test="stepStatus != null">
+        #{stepStatus,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionStepExample" resultType="java.lang.Long">
+    select count(*) from test_function_step
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update test_function_step
+    <set>
+      <if test="record.stepId != null">
+        step_id = #{record.stepId,jdbcType=INTEGER},
+      </if>
+      <if test="record.stepName != null">
+        step_name = #{record.stepName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.changeUser != null">
+        change_user = #{record.changeUser,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stepDescription != null">
+        step_description = #{record.stepDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stepNote != null">
+        step_note = #{record.stepNote,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stepDate != null">
+        step_date = #{record.stepDate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stepOperation != null">
+        step_operation = #{record.stepOperation,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stepObj != null">
+        step_obj = #{record.stepObj,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stepPurpose != null">
+        step_purpose = #{record.stepPurpose,jdbcType=VARCHAR},
+      </if>
+      <if test="record.totalSend != null">
+        total_send = #{record.totalSend,jdbcType=BIT},
+      </if>
+      <if test="record.conditionStatus != null">
+        condition_status = #{record.conditionStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="record.caseId != null">
+        case_id = #{record.caseId,jdbcType=INTEGER},
+      </if>
+      <if test="record.stepStatus != null">
+        step_status = #{record.stepStatus,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update test_function_step
+    set step_id = #{record.stepId,jdbcType=INTEGER},
+      step_name = #{record.stepName,jdbcType=VARCHAR},
+      change_user = #{record.changeUser,jdbcType=VARCHAR},
+      step_description = #{record.stepDescription,jdbcType=VARCHAR},
+      step_note = #{record.stepNote,jdbcType=VARCHAR},
+      step_date = #{record.stepDate,jdbcType=VARCHAR},
+      step_operation = #{record.stepOperation,jdbcType=VARCHAR},
+      step_obj = #{record.stepObj,jdbcType=VARCHAR},
+      step_purpose = #{record.stepPurpose,jdbcType=VARCHAR},
+      total_send = #{record.totalSend,jdbcType=BIT},
+      condition_status = #{record.conditionStatus,jdbcType=VARCHAR},
+      case_id = #{record.caseId,jdbcType=INTEGER},
+      step_status = #{record.stepStatus,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionStep">
+    update test_function_step
+    <set>
+      <if test="stepName != null">
+        step_name = #{stepName,jdbcType=VARCHAR},
+      </if>
+      <if test="changeUser != null">
+        change_user = #{changeUser,jdbcType=VARCHAR},
+      </if>
+      <if test="stepDescription != null">
+        step_description = #{stepDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="stepNote != null">
+        step_note = #{stepNote,jdbcType=VARCHAR},
+      </if>
+      <if test="stepDate != null">
+        step_date = #{stepDate,jdbcType=VARCHAR},
+      </if>
+      <if test="stepOperation != null">
+        step_operation = #{stepOperation,jdbcType=VARCHAR},
+      </if>
+      <if test="stepObj != null">
+        step_obj = #{stepObj,jdbcType=VARCHAR},
+      </if>
+      <if test="stepPurpose != null">
+        step_purpose = #{stepPurpose,jdbcType=VARCHAR},
+      </if>
+      <if test="totalSend != null">
+        total_send = #{totalSend,jdbcType=BIT},
+      </if>
+      <if test="conditionStatus != null">
+        condition_status = #{conditionStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="caseId != null">
+        case_id = #{caseId,jdbcType=INTEGER},
+      </if>
+      <if test="stepStatus != null">
+        step_status = #{stepStatus,jdbcType=INTEGER},
+      </if>
+    </set>
+    where step_id = #{stepId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hengtiansoft.fastop.model.designer.entity.TestFunctionStep">
+    update test_function_step
+    set step_name = #{stepName,jdbcType=VARCHAR},
+      change_user = #{changeUser,jdbcType=VARCHAR},
+      step_description = #{stepDescription,jdbcType=VARCHAR},
+      step_note = #{stepNote,jdbcType=VARCHAR},
+      step_date = #{stepDate,jdbcType=VARCHAR},
+      step_operation = #{stepOperation,jdbcType=VARCHAR},
+      step_obj = #{stepObj,jdbcType=VARCHAR},
+      step_purpose = #{stepPurpose,jdbcType=VARCHAR},
+      total_send = #{totalSend,jdbcType=BIT},
+      condition_status = #{conditionStatus,jdbcType=VARCHAR},
+      case_id = #{caseId,jdbcType=INTEGER},
+      step_status = #{stepStatus,jdbcType=INTEGER}
+    where step_id = #{stepId,jdbcType=INTEGER}
+  </update>
+</mapper>

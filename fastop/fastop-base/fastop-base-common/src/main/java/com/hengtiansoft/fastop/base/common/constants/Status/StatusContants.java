@@ -20,7 +20,13 @@ public interface StatusContants {
 	// 测试集模块集审签状态
 	public static final int suite_funs_app_unapp = 0;	// 未审签
 	public static final int suite_funs_app_passed = 1;	// 审签通过
-
+//	public static final int suite_funs_app_proof = 2;	// 待校对
+//	public static final int suite_funs_app_verify = 3;	// 待审核
+//	public static final int suite_funs_app_qualityapp = 4;	// 待质审
+//	public static final int suite_funs_app_checkapp = 5;	// 待审查
+//	public static final int suite_funs_app_militaryapp = 6;	// 待军审
+//	public static final int suite_funs_app_approve = 7;	// 待批准
+	
 	// 测试集清单审签状态
 	public static final int suite_list_app_approve_fail = -3;	// 批准失败
 	public static final int suite_list_app_proof_fail = -2;	// 校对失败
@@ -29,8 +35,15 @@ public interface StatusContants {
 	public static final int suite_list_app_proof = 2;	// 待校对
 	public static final int suite_list_app_approve = 3;	// 待批准
 
+	//测试集审签状态
+//	public static final int  suite_app_unpass = 0; //未审签
+//	public static final int  suite_app_passed = 1; //审签通过
+//	public static final int  suite_app_verifing = 2; //待审签
+//	public static final int  suite_app_client_verifing = 3;	//待客户审签
+	
 	//测试功能的审签状态
 	public static final int  tfun_app_approve_fail = -7;	// 待批准失败
+//	public static final int  tfun_app_militaryapp_fial = -6;	// 待军审失败
 	public static final int  tfun_app_checkapp_fial = -5;	// 待审查失败
 	public static final int  tfun_app_qualityapp_fial = -4;	// 待质审失败
 	public static final int  tfun_app_verify_fial = -3; // 待审核失败
@@ -41,6 +54,7 @@ public interface StatusContants {
 	public static final int  tfun_app_verify = 3; // 待审核
 	public static final int  tfun_app_qualityapp = 4;	// 待质审
 	public static final int  tfun_app_checkapp = 5;	// 待审查
+//	public static final int  tfun_app_militaryapp = 6;	// 待军审
 	public static final int  tfun_app_approve = 7;	// 待批准
 	
 	//测试功能修改标志 changeflag
