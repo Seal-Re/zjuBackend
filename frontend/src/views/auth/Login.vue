@@ -1,49 +1,27 @@
 <template>
   <div class="login-page">
     <div class="login-card">
-      <h2 class="login-title">军检测试平台登录</h2>
-      <p class="login-subtitle">通过统一身份认证 (Idp) 登录</p>
-
-      <el-button
-        type="primary"
-        class="login-button"
-        :loading="submitting"
-        @click="handleLogin"
-      >
-        前往 Idp 登录
-      </el-button>
-
-      <div class="login-hint">
-        登录将跳转到统一身份认证服务，认证完成后自动返回本系统。
-      </div>
+      <p class="login-subtitle">正在跳转到统一身份认证...</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 
 const route = useRoute()
 const authStore = useAuthStore()
 
-const submitting = ref(false)
-
-const handleLogin = () => {
-  submitting.value = true
-  const redirect = (route.query.redirect as string) || '/'
-  // 整页跳转，不需要 finally，下一次回到本页时组件会重建
-  authStore.login(redirect)
-}
-
-// 进入 /login 时尝试静默拉一次 /me：如果 cookie 还有效就直接跳回业务页
 onMounted(async () => {
+  const redirect = (route.query.redirect as string) || '/'
   const ok = await authStore.fetchUser()
   if (ok) {
-    const redirect = (route.query.redirect as string) || '/'
     window.location.replace(redirect)
+    return
   }
+  authStore.login(redirect)
 })
 </script>
 

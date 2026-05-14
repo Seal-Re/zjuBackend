@@ -1,0 +1,7 @@
+**/target/
+!fastop-service/target/fastop-service-0.0.1-SNAPSHOT.jar
+.git/
+.github/
+.idea/
+**/*.md
+dataset/

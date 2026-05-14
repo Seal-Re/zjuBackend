@@ -5,9 +5,9 @@ spring:
     active: ${FASTOP_PROFILES_ACTIVE:dev}
   datasource:
     druid:
-      url: ${FASTOP_DATASOURCE_URL:jdbc:mysql://localhost:3304/autosys_1014}
+      url: ${FASTOP_DATASOURCE_URL:jdbc:mysql://192.168.1.97:3304/autosys_1014_0511}
       username: ${FASTOP_DATASOURCE_USERNAME:root}
-      password: ${FASTOP_DATASOURCE_PASSWORD:Fastop@123}
+      password: ${FASTOP_DATASOURCE_PASSWORD:fastop}
   security:
     oauth2:
       client:
@@ -24,7 +24,14 @@ spring:
               - profile
         provider:
           idp:
-            issuer-uri: http://192.168.1.97:19000
+            # IDP_ISSUER_URI: 浏览器可访问的 IdP 地址（用于 authorization-uri，浏览器会直接跳转）
+            # IDP_INTERNAL_URI: 容器内部调用 IdP 的地址（token/userinfo/jwks 由后端服务端对服务端调用）
+            # 两者在 Docker 部署时通常不同：浏览器走宿主机 LAN IP，容器走 host.docker.internal
+            authorization-uri: ${IDP_ISSUER_URI:http://192.168.1.97:19000}/oauth2/authorize
+            token-uri: ${IDP_INTERNAL_URI:http://192.168.1.97:19000}/oauth2/token
+            user-info-uri: ${IDP_INTERNAL_URI:http://192.168.1.97:19000}/userinfo
+            jwk-set-uri: ${IDP_INTERNAL_URI:http://192.168.1.97:19000}/oauth2/jwks
+            user-name-attribute: sub
 
 server:
   port: ${FASTOP_SERVER_PORT:10001}
@@ -40,7 +47,7 @@ mybatis:
 
 fastop:
   integration:
-    device-controller-url: ${FASTOP_DEVICE_CONTROLLER_URL:http://localhost:5001}
+    device-controller-url: ${FASTOP_DEVICE_CONTROLLER_URL:http://192.168.1.97:19999}
     ems-url: ${FASTOP_EMS_URL:http://192.168.1.97:11452/subscribe/product}
     ems-send-path: ${FASTOP_EMS_SEND_PATH:/addDefault}
     ems-ability-default: ${FASTOP_EMS_ABILITY_DEFAULT:fastop.send}

@@ -12,8 +12,7 @@ export default defineConfig({
   },
   server: {
     fs: {
-      // Allow serving files from the real path when Vite is started via a junction (C:\fp)
-      allow: ['C:/fp', 'D:/IntelliJIDEAprogram/SpringBootProgram/idp/fastop-docker-master/fastop-docker-master-b0ce8e9177bb719eedeef92a9ea785a8159f9300/frontend']
+      allow: ['D:/IntelliJIDEAprogram/SpringBootProgram/idp/fastop-docker-master/frontend']
     },
     proxy: {
       // 业务 API + OAuth2 回调（/api/login/oauth2/code/idp 也走这条规则）

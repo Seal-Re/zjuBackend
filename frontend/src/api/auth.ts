@@ -9,7 +9,6 @@ import request from './request'
  * dev 环境通过 Vite 代理把 /api/* 转到 http://localhost:10001/fastop。
  */
 
-const API_BASE = (import.meta.env.VITE_API_BASE as string) || '/api'
 // OAuth2 流程必须在同一 origin 完成（避免跨 5173↔10001 的 session cookie 丢失），
 // 所以登录跳转直接到 fastop 后端，不走 Vite 代理。
 const OAUTH2_ORIGIN = (import.meta.env.VITE_OAUTH2_ORIGIN as string) || 'http://localhost:10001/fastop'

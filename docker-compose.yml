@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+
+  fastop-backend:
+    image: fastop-backend:latest
+    ports:
+      - "10001:10001"
+    environment:
+      FASTOP_DATASOURCE_URL: jdbc:mysql://192.168.1.97:3306/autosys_1014_0511
+      FASTOP_DATASOURCE_USERNAME: root
+      FASTOP_DATASOURCE_PASSWORD: fastop
+      FASTOP_FRONTEND_ORIGIN: http://192.168.1.97:5173
+      FASTOP_POST_LOGIN_REDIRECT: http://192.168.1.97:5173/
+      IDP_ISSUER_URI: http://192.168.1.97:19000
+      # 容器间直接走 Docker 内网，用 IdP 容器名，不经过宿主机端口映射
+      IDP_INTERNAL_URI: http://idp_idp:19000
+    restart: unless-stopped
+
+  fastop-frontend:
+    image: fastop-frontend:latest
+    ports:
+      - "5173:5173"
+    depends_on:
+      - fastop-backend
+    restart: unless-stopped
+
+networks:
+  default:
+    name: fastop-network
